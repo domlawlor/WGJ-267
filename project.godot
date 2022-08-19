@@ -11,7 +11,13 @@ config_version=4
 [application]
 
 config/name="Wgj- 267"
+run/main_scene="res://Main.tscn"
 config/icon="res://icon.png"
+
+[autoload]
+
+Global="*res://Global.gd"
+Events="*res://Events.gd"
 
 [gui]
 

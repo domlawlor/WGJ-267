@@ -1,0 +1,25 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Main.gd" type="Script" id=1]
+
+[node name="Main" type="Control"]
+script = ExtResource( 1 )
+
+[node name="Menu" type="Control" parent="."]
+margin_right = 40.0
+margin_bottom = 40.0
+
+[node name="LoadLevel1" type="Button" parent="Menu"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = 399.0
+margin_top = 219.0
+margin_right = 491.0
+margin_bottom = 239.0
+text = "Load Level 1"
+
+[node name="Main2D" type="Node2D" parent="."]
+
+[connection signal="pressed" from="Menu/LoadLevel1" to="." method="_on_LoadLevel1_pressed"]
