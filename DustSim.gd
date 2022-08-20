@@ -18,20 +18,36 @@ var pixelSizeScale = 4
 # TODO: Pull these values from elsewhere
 # TODO: also this fixes us to one screens worth of pixels. 
 #		Change in future to bigger world, only updating whats close to the player
-var pixelWorldSizeX = 160
-var pixelWorldSizeY = 120
+var pixelWorldSizeX = worldSizeX / pixelSizeScale
+var pixelWorldSizeY = worldSizeY / pixelSizeScale
 var pixelTypes = []
+
+var REGION_SIZE = 8
+var regionWorldSizeX = pixelWorldSizeX / REGION_SIZE
+var regionWorldSizeY = pixelWorldSizeY / REGION_SIZE
+var checkRegions = []
 
 func GetPixel(pos):
 	return pixelTypes[(pos.y * pixelWorldSizeX) + pos.x]
 
 func SetPixel(pos, type):
 	pixelTypes[(pos.y * pixelWorldSizeX) + pos.x] = type
+	ActivateRegion(pos)
+
+func ActivateRegion(pos):
+	var regX = floor(pos.x / REGION_SIZE)
+	var regY = floor(pos.y / REGION_SIZE)
+	var regIndex = regY * regionWorldSizeX + regX
+	checkRegions[regIndex] = true
 
 func ClearWorld():
 	var pixelCount = pixelWorldSizeX * pixelWorldSizeY
 	pixelTypes.resize(pixelCount)
 	pixelTypes.fill(PixelType.EMPTY)
+	
+	var regionCount = regionWorldSizeX * regionWorldSizeY
+	checkRegions.resize(regionCount)
+	checkRegions.fill(true)
 	
 	var image = get_texture().get_data()
 	image.lock()
@@ -95,12 +111,12 @@ func MovePixel(srcPos, destPos, image):
 	image.set_pixelv(srcPos, Color.transparent)
 	#print("Moved pixel: ", srcPos, " to ", destPos)
 
-func UpdateDustPixelSim(pos, velocity, image):
+func UpdateDustPixelSim(pos, image):
 	var randNum = randi() % 2
 	
-	var downPos = Vector2(pos.x, pos.y + velocity)
-	var downRightPos = Vector2(pos.x + velocity, pos.y + velocity)
-	var downLeftPos = Vector2(pos.x - velocity, pos.y + velocity)
+	var downPos = Vector2(pos.x, pos.y + 1)
+	var downRightPos = Vector2(pos.x + 1, pos.y + 1)
+	var downLeftPos = Vector2(pos.x - 1, pos.y + 1)
 	
 	var downPosInBounds = IsInBounds(downPos)
 	var downRightPosInBounds = IsInBounds(downRightPos)
@@ -108,10 +124,14 @@ func UpdateDustPixelSim(pos, velocity, image):
 	
 	if downPosInBounds and GetPixel(downPos) == PixelType.EMPTY:
 		MovePixel(pos, downPos, image)
+		return true
 	elif downRightPosInBounds and GetPixel(downRightPos) == PixelType.EMPTY:
 		MovePixel(pos, downRightPos, image)
+		return true
 	elif downLeftPosInBounds and GetPixel(downLeftPos) == PixelType.EMPTY:
 		MovePixel(pos, downLeftPos, image)
+		return true
+	return false
 
 # One idea is we could get rid of delta by running in fixed time steps
 #	So in sim, accumulate the delta and once bigger than a fixedTimeStep, run the sim.
@@ -119,20 +139,20 @@ func UpdateSim(delta):
 	
 	var image = get_texture().get_data()
 	image.lock()
-	
-	# starts at the bottom of the screen so falling pixels only update once
-	var yPos = pixelWorldSizeY - 1 # top screen is 0, bottom is worldSize.y - 1
-	while yPos >= 0: 
-		for xPos in range(pixelWorldSizeX): # and just increment for x, simpler
-			var pos = Vector2(xPos, yPos)
-			var pixelType = GetPixel(pos)
-			
-			if pixelType == PixelType.DUST:
-				var velocity = 2
-				while velocity > 0:
-					UpdateDustPixelSim(pos, velocity, image)
-					velocity -= 1
-		yPos -= 1
+	var regionFinalIndex = (regionWorldSizeX * regionWorldSizeY) - 1
+	for i in range(regionFinalIndex, -1, -1):
+		var checkRegionNextFrame = false
+		if checkRegions[i]:
+			var posStart = ConvertRegionIndexToPosStart(i)
+			for yMod in range(7, -1, -1):
+				for xMod in 8:
+					var xPos = posStart.x + xMod
+					var yPos = posStart.y + yMod
+					var pos = Vector2(xPos, yPos)
+					var pixelType = GetPixel(pos)
+					if pixelType == PixelType.DUST:
+						checkRegionNextFrame = UpdateDustPixelSim(pos, image)
+		checkRegions[i] = checkRegionNextFrame
 	
 	
 	image.unlock()
@@ -155,7 +175,7 @@ func _input(event):
 		
 		
 
-func _process(delta):
+func _physics_process(delta):
 	UpdateSim(delta)
 	
 	#var dustImage := Image.new()
@@ -169,3 +189,32 @@ func _process(delta):
 	
 	#dustTexture.create_from_image(dustImage)
 	#set_texture(dustTexture)
+	
+func ConvertRegionIndexToPosStart(rIndex):
+	var x = (rIndex % regionWorldSizeX) * REGION_SIZE
+	var y = floor(rIndex / regionWorldSizeX) * REGION_SIZE
+	return Vector2(x, y)
+
+#func _draw():
+#	var regionSize = Vector2(8, 8)
+#
+#	var regionFinalIndex = (pixelWorldSizeX / REGION_SIZE) * (pixelWorldSizeY / REGION_SIZE) - 1
+#	for i in range(regionFinalIndex, -1, -1):
+#		var posStart = ConvertRegionIndexToPosStart(i)
+#		var rect = Rect2(posStart, regionSize)
+#		if checkRegions[i]:	
+#			draw_rect(rect, Color.green, true)
+#		else:
+#			draw_rect(rect, Color.red, true)
+#
+#	var rectSize = Vector2(1, 1)
+#
+#	var yPos = pixelWorldSizeY - 1 # top screen is 0, bottom is worldSize.y - 1
+#	while yPos >= 0: 
+#		for xPos in range(pixelWorldSizeX): # and just increment for x, simpler
+#			var pos = Vector2(xPos, yPos)
+#			var pixelType = GetPixel(pos)
+#			if pixelType == PixelType.DUST:
+#				var rect = Rect2(pos, rectSize)
+#				draw_rect(rect, Color.black, true)
+#		yPos -= 1

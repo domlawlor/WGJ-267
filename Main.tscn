@@ -44,9 +44,9 @@ text = "Load Level 1"
 [node name="Main2D" type="Node2D" parent="."]
 
 [node name="DustSim" type="Sprite" parent="."]
-position = Vector2( 320, 240 )
 scale = Vector2( 4, 4 )
 texture = SubResource( 2 )
+offset = Vector2( 80, 60 )
 script = ExtResource( 2 )
 dustColourA = Color( 0.262745, 0.262745, 0.262745, 1 )
 dustColourB = Color( 0.317647, 0.317647, 0.317647, 1 )
