@@ -1,6 +1,7 @@
 extends Control
 
 onready var menu : Control = $Menu
+onready var levelList : VBoxContainer = $Menu/LevelList
 onready var main_2d : Node2D = $Main2D
 
 var level_instance : Node2D
@@ -17,6 +18,7 @@ func load_level(level_name : String):
 	if (level_resource):
 		level_instance = level_resource.instance()
 		main_2d.add_child(level_instance)
+		levelList.visible = false
 
 func _on_LoadLevel1_pressed():
 	load_level("Level1")

@@ -8,7 +8,10 @@ export(Color) var dustColourD
 enum PixelType {
 	EMPTY
 	DUST
+	COLLISION
 }
+
+onready var colTest : KinematicBody2D = $CollisionTestArea
 
 var worldSizeX = 640
 var worldSizeY = 480
@@ -38,7 +41,17 @@ func ActivateRegion(pos):
 	var regX = floor(pos.x / REGION_SIZE)
 	var regY = floor(pos.y / REGION_SIZE)
 	var regIndex = regY * regionWorldSizeX + regX
-	checkRegions[regIndex] = true
+	checkRegions[regIndex] = true #actual pos index
+	
+	var regionCount = regionWorldSizeX * regionWorldSizeY
+	if regIndex > 0:
+		checkRegions[regIndex - 1] = true # to the left
+	if regIndex < regionCount - 1:
+		checkRegions[regIndex + 1] = true # to the right
+	if regIndex >= regionWorldSizeX:
+		checkRegions[regIndex - regionWorldSizeX] = true # to the up
+	if regIndex < regionCount - regionWorldSizeX:
+		checkRegions[regIndex + regionWorldSizeX] = true # to the down
 
 func ClearWorld():
 	var pixelCount = pixelWorldSizeX * pixelWorldSizeY
@@ -58,15 +71,23 @@ func ClearWorld():
 func _ready():
 	print("TextureSize-",get_texture().get_size())
 	print("Image-",get_texture().get_data().get_size())
-
 	ClearWorld()
+	SetLevelCollisions()
+
+func SetLevelCollisions():
+	for i in range(0, pixelTypes.size()):
+		colTest.position.x = i % pixelWorldSizeX
+		colTest.position.y = floor(i / pixelWorldSizeX)
+		var col = colTest.move_and_collide(Vector2.ZERO, true, true, true)
+		if col != null:
+			pixelTypes[i] = PixelType.COLLISION
 
 func CreateDust(positions):
 	var image = get_texture().get_data()
 	image.lock()
 	
 	for pos in positions:
-		if !IsInBounds(pos):
+		if !IsInBounds(pos) or !IsPixelFree(pos):
 			continue
 		
 		print("CreateDust xPos:", pos.x, ", yPos:", pos.y)
@@ -108,6 +129,9 @@ func IsInBounds(pos):
 	var inYBounds = pos.y < pixelWorldSizeY and pos.y >= 0
 	return inXBounds and inYBounds
 
+func IsPixelFree(pos):
+	return pixelTypes[(pos.y * pixelWorldSizeX) + pos.x] == PixelType.EMPTY
+	
 func MovePixel(srcPos, destPos, image):
 	SetPixel(destPos, GetPixel(srcPos))
 	SetPixel(srcPos, PixelType.EMPTY)
@@ -158,8 +182,10 @@ func UpdateSim(delta):
 					var pixelType = GetPixel(pos)
 					if pixelType == PixelType.DUST:
 						checkRegionNextFrame = UpdateDustPixelSim(pos, image)
-		checkRegions[i] = checkRegionNextFrame
-	
+			if checkRegionNextFrame:
+				ActivateRegion(posStart)
+			else:
+				checkRegions[i] = false
 	
 	image.unlock()
 	get_texture().set_data(image)
@@ -182,29 +208,16 @@ func _input(event):
 		else:
 			CreateDust([simPos])
 		
-		
-		
-
-func _physics_process(delta):
-	UpdateSim(delta)
-	
-	#var dustImage := Image.new()
-	#var dustTexture := ImageTexture.new()
-	
-	var useMipmaps = false
-	#dustImage.lock()
-	#dustImage.create_from_data(worldSize.x, worldSize.y, useMipmaps, FORMAT_RGBA8, pixelColors)
-	#dustImage.unlock()
-	
-	
-	#dustTexture.create_from_image(dustImage)
-	#set_texture(dustTexture)
-	
 func ConvertRegionIndexToPosStart(rIndex):
 	var x = (rIndex % regionWorldSizeX) * REGION_SIZE
 	var y = floor(rIndex / regionWorldSizeX) * REGION_SIZE
 	return Vector2(x, y)
 
+func _physics_process(delta):
+	UpdateSim(delta)
+	#update()
+
+# DEBUG: DRAW REGION - uncomment _draw() and update()
 #func _draw():
 #	var regionSize = Vector2(8, 8)
 #
@@ -212,19 +225,8 @@ func ConvertRegionIndexToPosStart(rIndex):
 #	for i in range(regionFinalIndex, -1, -1):
 #		var posStart = ConvertRegionIndexToPosStart(i)
 #		var rect = Rect2(posStart, regionSize)
-#		if checkRegions[i]:	
-#			draw_rect(rect, Color.green, true)
-#		else:
-#			draw_rect(rect, Color.red, true)
-#
-#	var rectSize = Vector2(1, 1)
-#
-#	var yPos = pixelWorldSizeY - 1 # top screen is 0, bottom is worldSize.y - 1
-#	while yPos >= 0: 
-#		for xPos in range(pixelWorldSizeX): # and just increment for x, simpler
-#			var pos = Vector2(xPos, yPos)
-#			var pixelType = GetPixel(pos)
-#			if pixelType == PixelType.DUST:
-#				var rect = Rect2(pos, rectSize)
-#				draw_rect(rect, Color.black, true)
-#		yPos -= 1
+#		var c = Color(0, 1, 0, 0.2)
+#		if !checkRegions[i]:
+#			c.g = 0
+#			c.r = 1
+#		draw_rect(rect, c, true)
