@@ -48,5 +48,9 @@ position = Vector2( 320, 240 )
 scale = Vector2( 4, 4 )
 texture = SubResource( 2 )
 script = ExtResource( 2 )
+dustColourA = Color( 0.262745, 0.262745, 0.262745, 1 )
+dustColourB = Color( 0.317647, 0.317647, 0.317647, 1 )
+dustColourC = Color( 0.384314, 0.384314, 0.384314, 1 )
+dustColourD = Color( 0.435294, 0.435294, 0.435294, 1 )
 
 [connection signal="pressed" from="Menu/VBoxContainer/LoadLevel1" to="." method="_on_LoadLevel1_pressed"]
