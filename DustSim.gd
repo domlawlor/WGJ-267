@@ -95,6 +95,12 @@ func CreateBulkDust(pos):
 	positions.push_back(Vector2(pos.x + (randi() % 2), pos.y - (randi() % 14)))
 	positions.push_back(Vector2(pos.x + (randi() % 6), pos.y - (randi() % 14)))
 	positions.push_back(Vector2(pos.x - (randi() % 6), pos.y - (randi() % 14)))
+	positions.push_back(Vector2(pos.x - (randi() % 8), pos.y - (randi() % 14)))
+	positions.push_back(Vector2(pos.x + (randi() % 8), pos.y - (randi() % 14)))
+	positions.push_back(Vector2(pos.x - (randi() % 10), pos.y - (randi() % 14)))
+	positions.push_back(Vector2(pos.x + (randi() % 10), pos.y - (randi() % 14)))
+	positions.push_back(Vector2(pos.x + (randi() % 12), pos.y - (randi() % 14)))
+	positions.push_back(Vector2(pos.x - (randi() % 12), pos.y - (randi() % 14)))
 	CreateDust(positions)
 
 func IsInBounds(pos):
@@ -169,6 +175,10 @@ func _input(event):
 		
 		if event.is_action_pressed("spawn_bulk_pixels"):
 			CreateBulkDust(Vector2(simPosX, simPosY))
+			CreateBulkDust(Vector2(simPosX+5, simPosY))
+			CreateBulkDust(Vector2(simPosX-5, simPosY))
+			CreateBulkDust(Vector2(simPosX+10, simPosY))
+			CreateBulkDust(Vector2(simPosX-10, simPosY))
 		else:
 			CreateDust([simPos])
 		
