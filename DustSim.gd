@@ -188,14 +188,10 @@ func UpdateDustPixelSim(pos, image):
 	
 	if downPosInBounds and GetPixel(downPos) == PixelType.EMPTY:
 		MovePixel(pos, downPos, image)
-		return true
 	elif downRightPosInBounds and GetPixel(downRightPos) == PixelType.EMPTY:
 		MovePixel(pos, downRightPos, image)
-		return true
 	elif downLeftPosInBounds and GetPixel(downLeftPos) == PixelType.EMPTY:
 		MovePixel(pos, downLeftPos, image)
-		return true
-	return false
 
 # One idea is we could get rid of delta by running in fixed time steps
 #	So in sim, accumulate the delta and once bigger than a fixedTimeStep, run the sim.
@@ -204,8 +200,7 @@ func UpdateSim(delta):
 	var image = sprite.get_texture().get_data()
 	image.lock()
 	if forceCount > 0:
-		if ApplyForce(forcePos, image):
-			ActivateRegion(forcePos)
+		ApplyForce(forcePos, image)
 		if forceRight:
 			forcePos.x = min(forcePos.x + 1, pixelWorldSizeX - 1)
 		else:
@@ -214,7 +209,6 @@ func UpdateSim(delta):
 	
 	var regionFinalIndex = (regionWorldSizeX * regionWorldSizeY) - 1
 	for i in range(regionFinalIndex, -1, -1):
-		var checkRegionNextFrame = false
 		if checkRegions[i]:
 			var posStart = ConvertRegionIndexToPosStart(i)
 			for yMod in range(REGION_SIZE, 0, -1):
@@ -225,11 +219,7 @@ func UpdateSim(delta):
 					var pos = Vector2(xPos, yPos)
 					var pixelType = GetPixel(pos)
 					if pixelType == PixelType.DUST:
-						checkRegionNextFrame = UpdateDustPixelSim(pos, image)
-			if checkRegionNextFrame:
-				ActivateRegion(posStart)
-			else:
-				checkRegions[i] = false
+						UpdateDustPixelSim(pos, image)
 	
 	image.unlock()
 	sprite.get_texture().set_data(image)
@@ -264,7 +254,6 @@ func ApplyForce(pos, image):
 	if forceRight:
 		mod = -1 # right
 	var sweepHeight = 5
-	var somethingMoved = false
 	var checkNum = 1
 	var xStart = pos.x - ((sweepHeight - 1) * mod)
 	var yStart = pos.y - (sweepHeight - 1)
@@ -285,16 +274,12 @@ func ApplyForce(pos, image):
 					
 					if dirPosInBounds and GetPixel(dirPos) == PixelType.EMPTY:
 						MovePixel(currentPos, dirPos, image)
-						somethingMoved = true
 					elif dirUpPosInBounds and GetPixel(dirUpPos) == PixelType.EMPTY:
 						MovePixel(currentPos, dirUpPos, image)
-						somethingMoved = true
 					elif dirUpUpPosInBounds and GetPixel(dirUpUpPos) == PixelType.EMPTY:
 						MovePixel(currentPos, dirUpUpPos, image)
-						somethingMoved = true
 			c += 1
 		checkNum += 1
-	return somethingMoved
 	
 func ConvertRegionIndexToPosStart(rIndex):
 	var x = (rIndex % regionWorldSizeX) * REGION_SIZE
