@@ -238,8 +238,10 @@ func _input(event):
 	if event.is_action_pressed("debug_button_1"):
 		pass
 	if event.is_action_pressed("spawn_pixel") or event.is_action_pressed("spawn_bulk_pixels"):
-		var simPosX = floor(event.position.x / pixelSizeScale)
-		var simPosY = floor(event.position.y / pixelSizeScale)
+		var unscaledX = event.position.x / 2
+		var unscaledY = event.position.y / 2
+		var simPosX = floor(unscaledX / pixelSizeScale)
+		var simPosY = floor(unscaledY / pixelSizeScale)
 		var simPos = Vector2(simPosX, simPosY)
 		print(simPos)
 
