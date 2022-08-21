@@ -60,6 +60,7 @@ var forceRight = true
 
 func _ready():
 	Events.connect("sweep", self, "_on_sweep")
+	Events.connect("spawn_dust", self, "_on_spawn_dust")
 	
 	sprite.visible = true
 	pixelSizeScale = sprite.scale.x
@@ -242,6 +243,17 @@ func SetLevelCollisions():
 		if col != null:
 			pixelTypes[i] = PixelType.COLLISION
 
+func _on_spawn_dust(pos, amount):
+	var simPos = GetSimPos(pos)
+	var positions = []
+	var xStart = simPos.x - floor(amount / 2)
+	var yStart = simPos.y - amount
+	for x in range(0, amount):
+		for y in range(0, amount):
+			positions.push_back(Vector2(xStart + x, yStart + y))
+	CreateDust(positions)
+	
+	
 func CreateDust(positions):
 	var image = sprite.get_texture().get_data()
 	image.lock()
@@ -373,10 +385,10 @@ func _input(event):
 	if event.is_action_pressed("spawn_pixel") or event.is_action_pressed("spawn_bulk_pixels"):
 		var unscaledX = event.position.x / 2
 		var unscaledY = event.position.y / 2
-		var simPosX = floor(unscaledX / pixelSizeScale)
-		var simPosY = floor(unscaledY / pixelSizeScale)
-		var simPos = Vector2(simPosX, simPosY)
-		#print(simPos)
+		var pos = Vector2(unscaledX, unscaledY)
+		var simPos = GetSimPos(pos)
+		var simPosX = simPos.x
+		var simPosY = simPos.y
 		
 		if event.is_action_pressed("spawn_bulk_pixels"):
 			CreateBulkDust(Vector2(simPosX, simPosY))
@@ -436,13 +448,14 @@ func ConvertRegionIndexToPosStart(rIndex):
 	return Vector2(x, y)
 
 func _on_sweep(pos, facingRight):
-	var simPosX = floor(pos.x / pixelSizeScale)
-	var simPosY = floor(pos.y / pixelSizeScale)
-	var simPos = Vector2(simPosX, simPosY)
-	print("sweep pos:" + str(simPos))
-	forcePos = simPos
+	forcePos = GetSimPos(pos)
 	forceCount = FORCE_COUNT
 	forceRight = facingRight
+
+func GetSimPos(pos):
+	var simPosX = floor(pos.x / pixelSizeScale)
+	var simPosY = floor(pos.y / pixelSizeScale)
+	return Vector2(simPosX, simPosY)
 
 func UpdateSimThreaded(delta):
 	
