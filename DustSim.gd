@@ -30,7 +30,7 @@ var regionWorldSizeX : int
 var regionWorldSizeY : int
 var checkRegions = []
 
-var FORCE_COUNT = 15
+var FORCE_COUNT = 20
 var forceCount = 0
 var forcePos : Vector2 = Vector2.ZERO
 var forceRight = true
@@ -215,10 +215,11 @@ func UpdateSim(delta):
 	image.lock()
 	if forceCount > 0:
 		ApplyForce(forcePos, image)
-		if forceRight:
-			forcePos.x = min(forcePos.x + 1, pixelWorldSizeX - 1)
-		else:
-			forcePos.x = max(forcePos.x - 1, 0)
+		if forceCount % 2 == 0:
+			if forceRight:
+				forcePos.x = min(forcePos.x + 1, pixelWorldSizeX - 1)
+			else:
+				forcePos.x = max(forcePos.x - 1, 0)
 		forceCount -= 1
 	
 	var regionFinalIndex = (regionWorldSizeX * regionWorldSizeY) - 1
