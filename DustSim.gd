@@ -210,6 +210,7 @@ func UpdateSim(delta):
 	var regionFinalIndex = (regionWorldSizeX * regionWorldSizeY) - 1
 	for i in range(regionFinalIndex, -1, -1):
 		if checkRegions[i]:
+			checkRegions[i] = false
 			var posStart = ConvertRegionIndexToPosStart(i)
 			for yMod in range(REGION_SIZE, 0, -1):
 				yMod -= 1
