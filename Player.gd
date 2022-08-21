@@ -1,7 +1,7 @@
 extends KinematicBody2D
 
 onready var animatedSprite = $AnimatedSprite
-onready var animationPlayer = $AnimationPlayer
+#onready var animationPlayer = $AnimationPlayer
 onready var sweepTimer = $SweepTimer
 
 enum PlayerState {
