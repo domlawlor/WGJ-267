@@ -1,0 +1,13 @@
+[remap]
+
+importer="image"
+type="Image"
+path="res://.import/dustSim_2x.png-17b3562587feec9644a33b42c62105f6.image"
+
+[deps]
+
+source_file="res://Art/dustSim_2x.png"
+dest_files=[ "res://.import/dustSim_2x.png-17b3562587feec9644a33b42c62105f6.image" ]
+
+[params]
+

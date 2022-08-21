@@ -1,4 +1,4 @@
-extends Sprite
+extends Node2D
 
 export(Color) var dustColourA
 export(Color) var dustColourB
@@ -11,24 +11,44 @@ enum PixelType {
 	COLLISION
 }
 
+# pick pixel scale size here
+#onready var sprite : Sprite = $Sprite_4x
+onready var sprite : Sprite = $Sprite_2x
+
 onready var colTest : KinematicBody2D = $CollisionTestArea
 
-var worldSizeX = 640
-var worldSizeY = 480
+var worldSizeX : int = 640
+var worldSizeY : int = 480
 
-var pixelSizeScale = 4
+var pixelSizeScale : int
+var pixelWorldSizeX : int
+var pixelWorldSizeY : int
+var pixelTypes = []
+
+var REGION_SIZE = 8
+var regionWorldSizeX : int
+var regionWorldSizeY : int
+var checkRegions = []
+
+func _ready():
+	sprite.visible = true
+	pixelSizeScale = sprite.scale.x
+	
+	pixelWorldSizeX = worldSizeX / pixelSizeScale
+	pixelWorldSizeY = worldSizeY / pixelSizeScale
+	
+	regionWorldSizeX = pixelWorldSizeX / REGION_SIZE
+	regionWorldSizeY = pixelWorldSizeY / REGION_SIZE
+	
+	print("TextureSize-", sprite.get_texture().get_size())
+	print("Image-", sprite.get_texture().get_data().get_size())
+	ClearWorld()
+	SetLevelCollisions()
 
 # TODO: Pull these values from elsewhere
 # TODO: also this fixes us to one screens worth of pixels. 
 #		Change in future to bigger world, only updating whats close to the player
-var pixelWorldSizeX = worldSizeX / pixelSizeScale
-var pixelWorldSizeY = worldSizeY / pixelSizeScale
-var pixelTypes = []
 
-var REGION_SIZE = 8
-var regionWorldSizeX = pixelWorldSizeX / REGION_SIZE
-var regionWorldSizeY = pixelWorldSizeY / REGION_SIZE
-var checkRegions = []
 
 func GetPixel(pos):
 	return pixelTypes[(pos.y * pixelWorldSizeX) + pos.x]
@@ -48,8 +68,8 @@ func ActivateRegion(pos):
 		checkRegions[regIndex - 1] = true # to the left
 	if regIndex < regionCount - 1:
 		checkRegions[regIndex + 1] = true # to the right
-	if regIndex >= regionWorldSizeX:
-		checkRegions[regIndex - regionWorldSizeX] = true # to the up
+	#if regIndex >= regionWorldSizeX:
+		#checkRegions[regIndex - regionWorldSizeX] = true # to the up
 	if regIndex < regionCount - regionWorldSizeX:
 		checkRegions[regIndex + regionWorldSizeX] = true # to the down
 
@@ -62,28 +82,22 @@ func ClearWorld():
 	checkRegions.resize(regionCount)
 	checkRegions.fill(true)
 	
-	var image = get_texture().get_data()
+	var image = sprite.get_texture().get_data()
 	image.lock()
 	image.fill(Color.transparent)
 	image.unlock()
-	get_texture().set_data(image)
-
-func _ready():
-	print("TextureSize-",get_texture().get_size())
-	print("Image-",get_texture().get_data().get_size())
-	ClearWorld()
-	SetLevelCollisions()
+	sprite.get_texture().set_data(image)
 
 func SetLevelCollisions():
 	for i in range(0, pixelTypes.size()):
-		colTest.position.x = i % pixelWorldSizeX
-		colTest.position.y = floor(i / pixelWorldSizeX)
+		colTest.position.x = (i % pixelWorldSizeX) * pixelSizeScale
+		colTest.position.y = floor(i / pixelWorldSizeX) * pixelSizeScale
 		var col = colTest.move_and_collide(Vector2.ZERO, true, true, true)
 		if col != null:
 			pixelTypes[i] = PixelType.COLLISION
 
 func CreateDust(positions):
-	var image = get_texture().get_data()
+	var image = sprite.get_texture().get_data()
 	image.lock()
 	
 	for pos in positions:
@@ -106,7 +120,7 @@ func CreateDust(positions):
 		image.set_pixel(pos.x, pos.y, color)
 	
 	image.unlock()
-	get_texture().set_data(image)
+	sprite.get_texture().set_data(image)
 
 func CreateBulkDust(pos):
 	var positions = [pos]
@@ -167,15 +181,16 @@ func UpdateDustPixelSim(pos, image):
 #	So in sim, accumulate the delta and once bigger than a fixedTimeStep, run the sim.
 func UpdateSim(delta):
 	
-	var image = get_texture().get_data()
+	var image = sprite.get_texture().get_data()
 	image.lock()
 	var regionFinalIndex = (regionWorldSizeX * regionWorldSizeY) - 1
 	for i in range(regionFinalIndex, -1, -1):
 		var checkRegionNextFrame = false
 		if checkRegions[i]:
 			var posStart = ConvertRegionIndexToPosStart(i)
-			for yMod in range(7, -1, -1):
-				for xMod in 8:
+			for yMod in range(REGION_SIZE, 0, -1):
+				yMod -= 1
+				for xMod in REGION_SIZE:
 					var xPos = posStart.x + xMod
 					var yPos = posStart.y + yMod
 					var pos = Vector2(xPos, yPos)
@@ -188,7 +203,7 @@ func UpdateSim(delta):
 				checkRegions[i] = false
 	
 	image.unlock()
-	get_texture().set_data(image)
+	sprite.get_texture().set_data(image)
 
 func _input(event):
 	if event.is_action_pressed("debug_button_1"):
@@ -219,14 +234,30 @@ func _physics_process(delta):
 
 # DEBUG: DRAW REGION - uncomment _draw() and update()
 #func _draw():
-#	var regionSize = Vector2(8, 8)
+#	var scaledRegionSize = REGION_SIZE * pixelSizeScale
+#	var regionRectSize = Vector2(scaledRegionSize, scaledRegionSize)
 #
 #	var regionFinalIndex = (pixelWorldSizeX / REGION_SIZE) * (pixelWorldSizeY / REGION_SIZE) - 1
 #	for i in range(regionFinalIndex, -1, -1):
 #		var posStart = ConvertRegionIndexToPosStart(i)
-#		var rect = Rect2(posStart, regionSize)
+#		var scaledPos = posStart * pixelSizeScale
+#		var rect = Rect2(scaledPos, regionRectSize)
 #		var c = Color(0, 1, 0, 0.2)
 #		if !checkRegions[i]:
 #			c.g = 0
 #			c.r = 1
 #		draw_rect(rect, c, true)
+
+# DEBUG: DRAW COLLISION - uncomment _draw() and update()
+#func _draw():
+#	var rectSize = Vector2(pixelSizeScale, pixelSizeScale)
+#
+#	var pixelFinalIndex = (pixelWorldSizeX * pixelWorldSizeY) - 1
+#	for i in range(pixelFinalIndex, -1, -1):
+#		if pixelTypes[i] == PixelType.COLLISION:
+#			var x = (i % pixelWorldSizeX) * pixelSizeScale
+#			var y = floor(i / pixelWorldSizeX) * pixelSizeScale
+#			var pos = Vector2(x, y)
+#			var rect = Rect2(pos, rectSize)
+#			var c = Color(0, 1, 1, 0.9)
+#			draw_rect(rect, c, true)
