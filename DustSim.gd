@@ -30,7 +30,7 @@ var regionWorldSizeX : int
 var regionWorldSizeY : int
 var checkRegions = []
 
-var FORCE_COUNT = 8
+var FORCE_COUNT = 15
 var forceCount = 0
 var forcePos : Vector2 = Vector2.ZERO
 var forceRight = true
