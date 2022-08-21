@@ -176,17 +176,31 @@ func MovePixel(srcPos, destPos, image):
 	#print("Moved pixel: ", srcPos, " to ", destPos)
 
 func UpdateDustPixelSim(pos, image):
-	var randNum = randi() % 2
-	
 	var downPos = Vector2(pos.x, pos.y + 1)
+	var downPosInBounds = IsInBounds(downPos)
+	var downClear = downPosInBounds and GetPixel(downPos) == PixelType.EMPTY
+	
+	if downClear:
+		var randNum = randi() % 15
+		if randNum == 1:
+			var leftPos = Vector2(pos.x - 1, pos.y)
+			var rightPos = Vector2(pos.x + 1, pos.y)
+			var leftPosInBounds = IsInBounds(leftPos)
+			var rightPosInBounds = IsInBounds(rightPos)
+			if leftPosInBounds and GetPixel(leftPos) == PixelType.EMPTY:
+				MovePixel(pos, leftPos, image)
+				return
+			elif rightPosInBounds and GetPixel(rightPos) == PixelType.EMPTY:
+				MovePixel(pos, rightPos, image)
+				return
+	
 	var downRightPos = Vector2(pos.x + 1, pos.y + 1)
 	var downLeftPos = Vector2(pos.x - 1, pos.y + 1)
 	
-	var downPosInBounds = IsInBounds(downPos)
 	var downRightPosInBounds = IsInBounds(downRightPos)
 	var downLeftPosInBounds = IsInBounds(downLeftPos)
 	
-	if downPosInBounds and GetPixel(downPos) == PixelType.EMPTY:
+	if downClear:
 		MovePixel(pos, downPos, image)
 	elif downRightPosInBounds and GetPixel(downRightPos) == PixelType.EMPTY:
 		MovePixel(pos, downRightPos, image)
