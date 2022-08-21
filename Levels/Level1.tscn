@@ -268,6 +268,7 @@ points = PoolVector2Array( 64, 64, 0, 64, 0, 0, 64, 0 )
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
 offset = Vector2( 320, 240 )
 transform = Transform2D( 1, 0, 0, 1, 320, 240 )
+follow_viewport_enable = true
 
 [node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
 

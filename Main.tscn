@@ -27,4 +27,9 @@ text = "Load Level 1"
 
 [node name="Main2D" type="Node2D" parent="."]
 
+[node name="Camera2D" type="Camera2D" parent="."]
+anchor_mode = 0
+current = true
+zoom = Vector2( 0.5, 0.5 )
+
 [connection signal="pressed" from="Menu/LevelList/LoadLevel1" to="." method="_on_LoadLevel1_pressed"]
