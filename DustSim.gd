@@ -12,8 +12,8 @@ enum PixelType {
 }
 
 # pick pixel scale size here
-#onready var sprite : Sprite = $Sprite_4x
-onready var sprite : Sprite = $Sprite_2x
+onready var sprite : Sprite = $Sprite_4x
+#onready var sprite : Sprite = $Sprite_2x
 
 onready var colTest : KinematicBody2D = $CollisionTestArea
 
@@ -29,6 +29,11 @@ var REGION_SIZE = 8
 var regionWorldSizeX : int
 var regionWorldSizeY : int
 var checkRegions = []
+
+var FORCE_COUNT = 5
+var forceCount = 0
+var forcePos : Vector2 = Vector2.ZERO
+var forceRight = true
 
 func _ready():
 	sprite.visible = true
@@ -60,18 +65,31 @@ func SetPixel(pos, type):
 func ActivateRegion(pos):
 	var regX = floor(pos.x / REGION_SIZE)
 	var regY = floor(pos.y / REGION_SIZE)
-	var regIndex = regY * regionWorldSizeX + regX
+	var regIndex : int = regY * regionWorldSizeX + regX
 	checkRegions[regIndex] = true #actual pos index
 	
 	var regionCount = regionWorldSizeX * regionWorldSizeY
-	if regIndex > 0:
-		checkRegions[regIndex - 1] = true # to the left
-	if regIndex < regionCount - 1:
-		checkRegions[regIndex + 1] = true # to the right
-	#if regIndex >= regionWorldSizeX:
-		#checkRegions[regIndex - regionWorldSizeX] = true # to the up
-	if regIndex < regionCount - regionWorldSizeX:
-		checkRegions[regIndex + regionWorldSizeX] = true # to the down
+	var checkLeft = (regIndex % regionWorldSizeX) > 0
+	var checkRight = floor(regIndex / regionWorldSizeX) < (regionWorldSizeX - 2)
+	var checkUp = regIndex >= regionWorldSizeX
+	var checkDown = regIndex <= regionCount - regionWorldSizeX
+	
+	if checkLeft and checkUp:
+		checkRegions[regIndex - 1 - regionWorldSizeX] = true
+	if checkUp:
+		checkRegions[regIndex - regionWorldSizeX] = true
+	if checkUp and checkRight:
+		checkRegions[regIndex - regionWorldSizeX + 1] = true
+	if checkLeft:
+		checkRegions[regIndex - 1] = true
+	if checkRight:
+		checkRegions[regIndex + 1] = true
+	if checkDown and checkLeft:
+		checkRegions[regIndex + regionWorldSizeX - 1] = true
+	if checkDown:
+		checkRegions[regIndex + regionWorldSizeX] = true
+	if checkDown and checkRight:
+		checkRegions[regIndex + regionWorldSizeX + 1] = true
 
 func ClearWorld():
 	var pixelCount = pixelWorldSizeX * pixelWorldSizeY
@@ -183,6 +201,15 @@ func UpdateSim(delta):
 	
 	var image = sprite.get_texture().get_data()
 	image.lock()
+	if forceCount > 0:
+		if ApplyForce(forcePos, image):
+			ActivateRegion(forcePos)
+		if forceRight:
+			forcePos.x = min(forcePos.x + 1, pixelWorldSizeX - 1)
+		else:
+			forcePos.x = max(forcePos.x - 1, 0)
+		forceCount -= 1
+	
 	var regionFinalIndex = (regionWorldSizeX * regionWorldSizeY) - 1
 	for i in range(regionFinalIndex, -1, -1):
 		var checkRegionNextFrame = false
@@ -208,21 +235,87 @@ func UpdateSim(delta):
 func _input(event):
 	if event.is_action_pressed("debug_button_1"):
 		pass
-	if event.is_action_pressed("spawn_pixel") or event.is_action_pressed("spawn_bulk_pixels"):
+	if event.is_action_pressed("spawn_pixel"): #apply rightwards force
+		var simPosX = floor(event.position.x / pixelSizeScale)
+		var simPosY = floor(event.position.y / pixelSizeScale)
+		var simPos = Vector2(simPosX, simPosY)
+		print(simPos)
+		forcePos = simPos
+		forceCount = FORCE_COUNT
+		forceRight = false
+		#var image = sprite.get_texture().get_data()
+		#ApplyForceRight(simPos, image)
+		
+	if event.is_action_pressed("spawn_bulk_pixels"):
 		var simPosX = floor(event.position.x / pixelSizeScale)
 		var simPosY = floor(event.position.y / pixelSizeScale)
 		var simPos = Vector2(simPosX, simPosY)
 		print(simPos)
 		
-		if event.is_action_pressed("spawn_bulk_pixels"):
-			CreateBulkDust(Vector2(simPosX, simPosY))
-			CreateBulkDust(Vector2(simPosX+5, simPosY))
-			CreateBulkDust(Vector2(simPosX-5, simPosY))
-			CreateBulkDust(Vector2(simPosX+10, simPosY))
-			CreateBulkDust(Vector2(simPosX-10, simPosY))
-		else:
-			CreateDust([simPos])
+		CreateBulkDust(Vector2(simPosX, simPosY))
+		CreateBulkDust(Vector2(simPosX+5, simPosY))
+		CreateBulkDust(Vector2(simPosX-5, simPosY))
+		CreateBulkDust(Vector2(simPosX+10, simPosY))
+		CreateBulkDust(Vector2(simPosX-10, simPosY))
 		
+		
+#	if event.is_action_pressed("spawn_pixel") or event.is_action_pressed("spawn_bulk_pixels"):
+#		var simPosX = floor(event.position.x / pixelSizeScale)
+#		var simPosY = floor(event.position.y / pixelSizeScale)
+#		var simPos = Vector2(simPosX, simPosY)
+#		print(simPos)
+#
+#		if event.is_action_pressed("spawn_bulk_pixels"):
+#			CreateBulkDust(Vector2(simPosX, simPosY))
+#			CreateBulkDust(Vector2(simPosX+5, simPosY))
+#			CreateBulkDust(Vector2(simPosX-5, simPosY))
+#			CreateBulkDust(Vector2(simPosX+10, simPosY))
+#			CreateBulkDust(Vector2(simPosX-10, simPosY))
+#		else:
+#			CreateDust([simPos])
+
+func ApplyForce(pos, image):
+	# -     #
+	# -    ##      RIGHT EXAMPLE
+	# -   ###      # = pixels to attempt to move
+	# -  ####      @ = passed in pos
+	# - @####
+	var mod = 1 # left
+	if forceRight:
+		mod = -1 # right
+	var sweepHeight = 5
+	var somethingMoved = false
+	var checkNum = 1
+	var xStart = pos.x - ((sweepHeight - 1) * mod)
+	var yStart = pos.y - (sweepHeight - 1)
+	for y in range(yStart, yStart+sweepHeight, 1):
+		var c = 1
+		for x in range(xStart, xStart+(sweepHeight * mod), mod):
+			if c <= checkNum:
+				if GetPixel(Vector2(x, y)) == PixelType.DUST:
+					var currentPos = Vector2(x, y)
+					
+					var dirPos = Vector2(x-mod, y)
+					var dirUpPos = Vector2(x-mod, y-1)
+					var dirUpUpPos = Vector2(x-mod, y-2)
+					
+					var dirPosInBounds = IsInBounds(dirPos)
+					var dirUpPosInBounds = IsInBounds(dirUpPos)
+					var dirUpUpPosInBounds = IsInBounds(dirUpUpPos)
+					
+					if dirPosInBounds and GetPixel(dirPos) == PixelType.EMPTY:
+						MovePixel(currentPos, dirPos, image)
+						somethingMoved = true
+					elif dirUpPosInBounds and GetPixel(dirUpPos) == PixelType.EMPTY:
+						MovePixel(currentPos, dirUpPos, image)
+						somethingMoved = true
+					elif dirUpUpPosInBounds and GetPixel(dirUpUpPos) == PixelType.EMPTY:
+						MovePixel(currentPos, dirUpUpPos, image)
+						somethingMoved = true
+			c += 1
+		checkNum += 1
+	return somethingMoved
+	
 func ConvertRegionIndexToPosStart(rIndex):
 	var x = (rIndex % regionWorldSizeX) * REGION_SIZE
 	var y = floor(rIndex / regionWorldSizeX) * REGION_SIZE
