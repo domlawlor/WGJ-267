@@ -1,8 +1,9 @@
-[gd_scene load_steps=27 format=2]
+[gd_scene load_steps=28 format=2]
 
 [ext_resource path="res://Art/TileSet64.png" type="Texture" id=1]
 [ext_resource path="res://DustSim.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Art/1.png" type="Texture" id=3]
+[ext_resource path="res://Player.tscn" type="PackedScene" id=4]
 
 [sub_resource type="TileSet" id=23]
 0/name = "TileSet64.png 0"
@@ -285,3 +286,6 @@ format = 1
 tile_data = PoolIntArray( 131072, 0, 0, 131073, 0, 1, 131074, 0, 1, 131075, 0, 1, 131076, 0, 1, 131077, 0, 1, 131078, 0, 2, 196608, 0, 65536, 196609, 1, 0, 196610, 1, 65536, 196611, 1, 131072, 196612, 1, 262144, 196613, 1, 327680, 196614, 0, 65538, 262144, 0, 65536, 262145, 0, 131073, 262146, 0, 131073, 262147, 0, 131073, 262148, 0, 131073, 262149, 0, 131073, 262150, 0, 131074, 327680, 0, 65536, 327681, 0, 65538, 393216, 0, 65536, 393217, 0, 65538, 458752, 0, 65536, 458753, 0, 65538, 458756, 0, 0, 458757, 0, 1, 458758, 0, 1, 458759, 0, 1, 458760, 0, 1, 458761, 0, 1, 458762, 0, 1 )
 
 [node name="DustSim" parent="." instance=ExtResource( 2 )]
+
+[node name="Player" parent="." instance=ExtResource( 4 )]
+position = Vector2( 59, 125 )

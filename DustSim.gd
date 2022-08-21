@@ -30,12 +30,14 @@ var regionWorldSizeX : int
 var regionWorldSizeY : int
 var checkRegions = []
 
-var FORCE_COUNT = 5
+var FORCE_COUNT = 8
 var forceCount = 0
 var forcePos : Vector2 = Vector2.ZERO
 var forceRight = true
 
 func _ready():
+	Events.connect("sweep", self, "_on_sweep")
+	
 	sprite.visible = true
 	pixelSizeScale = sprite.scale.x
 	
@@ -235,44 +237,20 @@ func UpdateSim(delta):
 func _input(event):
 	if event.is_action_pressed("debug_button_1"):
 		pass
-	if event.is_action_pressed("spawn_pixel"): #apply rightwards force
+	if event.is_action_pressed("spawn_pixel") or event.is_action_pressed("spawn_bulk_pixels"):
 		var simPosX = floor(event.position.x / pixelSizeScale)
 		var simPosY = floor(event.position.y / pixelSizeScale)
 		var simPos = Vector2(simPosX, simPosY)
 		print(simPos)
-		forcePos = simPos
-		forceCount = FORCE_COUNT
-		forceRight = false
-		#var image = sprite.get_texture().get_data()
-		#ApplyForceRight(simPos, image)
-		
-	if event.is_action_pressed("spawn_bulk_pixels"):
-		var simPosX = floor(event.position.x / pixelSizeScale)
-		var simPosY = floor(event.position.y / pixelSizeScale)
-		var simPos = Vector2(simPosX, simPosY)
-		print(simPos)
-		
-		CreateBulkDust(Vector2(simPosX, simPosY))
-		CreateBulkDust(Vector2(simPosX+5, simPosY))
-		CreateBulkDust(Vector2(simPosX-5, simPosY))
-		CreateBulkDust(Vector2(simPosX+10, simPosY))
-		CreateBulkDust(Vector2(simPosX-10, simPosY))
-		
-		
-#	if event.is_action_pressed("spawn_pixel") or event.is_action_pressed("spawn_bulk_pixels"):
-#		var simPosX = floor(event.position.x / pixelSizeScale)
-#		var simPosY = floor(event.position.y / pixelSizeScale)
-#		var simPos = Vector2(simPosX, simPosY)
-#		print(simPos)
-#
-#		if event.is_action_pressed("spawn_bulk_pixels"):
-#			CreateBulkDust(Vector2(simPosX, simPosY))
-#			CreateBulkDust(Vector2(simPosX+5, simPosY))
-#			CreateBulkDust(Vector2(simPosX-5, simPosY))
-#			CreateBulkDust(Vector2(simPosX+10, simPosY))
-#			CreateBulkDust(Vector2(simPosX-10, simPosY))
-#		else:
-#			CreateDust([simPos])
+
+		if event.is_action_pressed("spawn_bulk_pixels"):
+			CreateBulkDust(Vector2(simPosX, simPosY))
+			CreateBulkDust(Vector2(simPosX+5, simPosY))
+			CreateBulkDust(Vector2(simPosX-5, simPosY))
+			CreateBulkDust(Vector2(simPosX+10, simPosY))
+			CreateBulkDust(Vector2(simPosX-10, simPosY))
+		else:
+			CreateDust([simPos])
 
 func ApplyForce(pos, image):
 	# -     #
@@ -320,6 +298,15 @@ func ConvertRegionIndexToPosStart(rIndex):
 	var x = (rIndex % regionWorldSizeX) * REGION_SIZE
 	var y = floor(rIndex / regionWorldSizeX) * REGION_SIZE
 	return Vector2(x, y)
+
+func _on_sweep(pos, facingRight):
+	var simPosX = floor(pos.x / pixelSizeScale)
+	var simPosY = floor(pos.y / pixelSizeScale)
+	var simPos = Vector2(simPosX, simPosY)
+	print("sweep pos:" + str(simPos))
+	forcePos = simPos
+	forceCount = FORCE_COUNT
+	forceRight = facingRight
 
 func _physics_process(delta):
 	UpdateSim(delta)
