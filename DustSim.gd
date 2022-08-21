@@ -74,7 +74,7 @@ func ActivateRegion(pos):
 	var checkLeft = (regIndex % regionWorldSizeX) > 0
 	var checkRight = (regIndex % regionWorldSizeX) < (regionWorldSizeX - 1)
 	var checkUp = regIndex >= regionWorldSizeX
-	var checkDown = regIndex <= regionCount - regionWorldSizeX
+	var checkDown = regIndex < regionCount - regionWorldSizeX
 	
 	if checkLeft and checkUp:
 		checkRegions[regIndex - 1 - regionWorldSizeX] = true
