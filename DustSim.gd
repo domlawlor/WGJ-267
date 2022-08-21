@@ -110,8 +110,8 @@ func ClearWorld():
 
 func SetLevelCollisions():
 	for i in range(0, pixelTypes.size()):
-		colTest.position.x = (i % pixelWorldSizeX) * pixelSizeScale
-		colTest.position.y = floor(i / pixelWorldSizeX) * pixelSizeScale
+		colTest.position.x = ((i % pixelWorldSizeX) * pixelSizeScale) + 1
+		colTest.position.y = (floor(i / pixelWorldSizeX) * pixelSizeScale) + 1
 		var col = colTest.move_and_collide(Vector2.ZERO, true, true, true)
 		if col != null:
 			pixelTypes[i] = PixelType.COLLISION
