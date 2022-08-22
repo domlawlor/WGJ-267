@@ -21,11 +21,18 @@ margin_bottom = 20.0
 custom_constants/separation = 15
 
 [node name="LoadLevel1" type="Button" parent="Menu/LevelList"]
-margin_right = 92.0
+margin_right = 100.0
 margin_bottom = 20.0
 text = "Load Level 1"
 
+[node name="DomsTestLevel" type="Button" parent="Menu/LevelList"]
+margin_top = 35.0
+margin_right = 100.0
+margin_bottom = 55.0
+text = "Doms Testing"
+
 [node name="Main2D" type="Node2D" parent="."]
+z_index = -1
 
 [node name="Camera2D" type="Camera2D" parent="."]
 anchor_mode = 0
@@ -33,3 +40,4 @@ current = true
 zoom = Vector2( 0.5, 0.5 )
 
 [connection signal="pressed" from="Menu/LevelList/LoadLevel1" to="." method="_on_LoadLevel1_pressed"]
+[connection signal="pressed" from="Menu/LevelList/DomsTestLevel" to="." method="_on_DomsTestLevel_pressed"]

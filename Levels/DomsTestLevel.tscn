@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://DustSim.tscn" type="PackedScene" id=1]
+
+[node name="DomsTestLevel" type="Node2D"]
+
+[node name="DustSim" parent="." instance=ExtResource( 1 )]
