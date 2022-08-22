@@ -8,14 +8,17 @@ export(Color) var dustColourD
 enum PixelType {
 	EMPTY
 	DUST
+	FLYING_DUST
 	COLLISION
 	KILL
 }
 # pick pixel scale size here
-#onready var sprite : Sprite = $Sprite_4x
-onready var sprite : Sprite = $Sprite_2x
+onready var sprite : Sprite = $Sprite_4x
+#onready var sprite : Sprite = $Sprite_2x
 
 onready var colTest : KinematicBody2D = $CollisionTestArea
+
+const FIRE_DUST_TEST = false
 
 const USE_DIRTY_RECTS = true
 var enabledDebugDrawing = false
@@ -32,6 +35,7 @@ var pixelTypes = []
 
 # just using this as a test for adding more state. Will incorporate type if it works
 var pixelState = [] # pixel array
+var pixelVelocity = []
 
 var REGION_SIZE = 16
 var regionWorldSizeX : int
@@ -87,9 +91,9 @@ func GetPixelState(pos):
 func SetPixelState(pos, state):
 	pixelState[(pos.y * pixelWorldSizeX) + pos.x] = state
 
+
 func GetPixel(pos):
 	return pixelTypes[(pos.y * pixelWorldSizeX) + pos.x]
-
 
 func SetPixel(pos, type):
 	pixelTypes[(pos.y * pixelWorldSizeX) + pos.x] = type
@@ -153,6 +157,9 @@ func ClearWorld():
 	pixelState.resize(pixelCount)
 	pixelState.fill(false)
 	
+	pixelVelocity.resize(pixelCount)
+	pixelVelocity.fill(Vector2.ZERO)
+	
 	var regionCount = regionWorldSizeX * regionWorldSizeY
 	checkRegions.resize(regionCount)
 	checkRegions.fill(true)
@@ -188,7 +195,55 @@ func _on_spawn_dust(pos, amount):
 		for y in range(0, amount):
 			positions.push_back(Vector2(xStart + x, yStart + y))
 	CreateDust(positions)
+
+func GetDustColor():
+	var color
+	var randIdx = randi() % 4
+	match(randIdx):
+		0:
+			color = dustColourA
+		1:
+			color = dustColourB
+		2:
+			color = dustColourC
+		3:
+			color = dustColourD
+	return color
+
+func FireDust(pos, canMakeDust):
+	var xRand = randf()
+	var velX = -xRand if randi() % 2 else xRand
+	var velY = -randf()
+	var vel = Vector2(velX, velY)
+	vel = vel.normalized()
+	FireDustInDir(pos, vel, canMakeDust)
+
+func FireDustInDir(pos, vel, canMakeDust):
+	# pick a random direction from simPos and fire it with a fixed velocity
+	var image = sprite.get_texture().get_data()
+	image.lock()
 	
+	var pixelType = GetPixel(pos)
+	if !canMakeDust and pixelType != PixelType.DUST:
+		return
+	if canMakeDust and pixelType != PixelType.EMPTY:
+		return
+	
+	#randomise launch a bit
+	vel = vel.normalized()
+	
+	SetPixel(pos, PixelType.FLYING_DUST)
+	pixelVelocity[(pos.y * pixelWorldSizeX) + pos.x] = vel
+	
+	if pixelType == PixelType.EMPTY:
+		var color = GetDustColor()
+		image.set_pixelv(pos, color)
+		ActivateRegion(pos)
+		Global.DustRemaining += 1
+		Events.emit_signal("dust_amount_changed")
+	
+	image.unlock()
+	sprite.get_texture().set_data(image)
 	
 func CreateDust(positions):
 	var amountCreated : int = 0
@@ -200,21 +255,11 @@ func CreateDust(positions):
 			continue
 		
 		#print("CreateDust xPos:", pos.x, ", yPos:", pos.y)
-		var color
-		var randIdx = randi() % 4
-		match(randIdx):
-			0:
-				color = dustColourA
-			1:
-				color = dustColourB
-			2:
-				color = dustColourC
-			3:
-				color = dustColourD
-		
 		SetPixel(pos, PixelType.DUST)
 		
+		var color = GetDustColor()
 		image.set_pixelv(pos, color)
+		
 		amountCreated += 1
 	
 	image.unlock()
@@ -248,6 +293,35 @@ func MovePixel(srcPos, destPos, image):
 		#print("kill! " + str(Global.DustRemaining))
 	SetPixel(srcPos, PixelType.EMPTY)
 	image.set_pixelv(srcPos, Color.transparent)
+
+func UpdateFlyingDustPixel(pos, delta, image):
+	var movePos = null
+	
+	var vel = pixelVelocity[(pos.y * pixelWorldSizeX) + pos.x]
+	
+	var FLYING_DUST_GRAVITY = 2
+	vel.y += delta * FLYING_DUST_GRAVITY
+	var destPos = pos + (vel * delta * pixelSizeScale * 20)
+	destPos = destPos.round()
+	
+	destPos.x = clamp(destPos.x, 0, pixelWorldSizeX-1)
+	destPos.y = clamp(destPos.y, 0, pixelWorldSizeY-1)
+	
+	var destPosType = GetPixel(destPos)
+	if destPosType == PixelType.EMPTY or destPosType == PixelType.KILL:
+		MovePixel(pos, destPos, image)
+		
+	var hitOtherDust = destPosType == PixelType.DUST or destPosType == PixelType.FLYING_DUST
+	var hitCollision = destPosType == PixelType.COLLISION
+	var hitScreenEdge = destPos.x == 0 or destPos.y == 0 or destPos.y == pixelWorldSizeX-1 or destPos.x == pixelWorldSizeX-1
+	if hitOtherDust or hitCollision or hitScreenEdge:
+		SetPixel(destPos, PixelType.DUST)
+		vel = Vector2.ZERO
+	
+	ActivateRegion(pos)		
+	ActivateRegion(destPos)	
+	pixelVelocity[(destPos.y * pixelWorldSizeX) + destPos.x] = vel
+	pixelVelocity[(pos.y * pixelWorldSizeX) + pos.x] = Vector2.ZERO
 
 func UpdateDustPixelSim(pos, image):
 	var movePos = null
@@ -329,11 +403,13 @@ func _process(event):
 	var simPosX = simPos.x
 	var simPosY = simPos.y
 	
-	if Input.is_action_pressed("debug_button_4"):
+	if Input.is_action_just_pressed("debug_button_4"):
 		enabledDebugDrawing = !enabledDebugDrawing
 		
+	if Input.is_action_pressed("fire_dust"):
+		FireDust(simPos, true)
 	elif Input.is_action_pressed("spawn_bulk_pixels"):
-		CreateBulkDust(Vector2(simPosX, simPosY))
+		CreateBulkDust(simPos)
 	elif Input.is_action_pressed("spawn_pixel"):
 		CreateDust([simPos])
 
@@ -354,19 +430,23 @@ func ApplyForce(pos, image):
 		var c = 1
 		for x in range(xStart, xStart+(sweepHeight * mod), mod):
 			if c <= checkNum:
-				if GetPixel(Vector2(x, y)) == PixelType.DUST:
-					var currentPos = Vector2(x, y)
-					
-					var dirPos = Vector2(x-mod, y)
-					var dirUpPos = Vector2(x-mod, y-1)
-					var dirUpUpPos = Vector2(x-mod, y-2)
-					
-					if IsPositionFreeToMove(dirPos):
-						MovePixel(currentPos, dirPos, image)
-					elif IsPositionFreeToMove(dirUpPos):
-						MovePixel(currentPos, dirUpPos, image)
-					elif IsPositionFreeToMove(dirUpUpPos):
-						MovePixel(currentPos, dirUpUpPos, image)
+				var currentPos = Vector2(x, y)
+				
+				if FIRE_DUST_TEST:
+					var dirUpPos = Vector2(-mod, -1)
+					FireDustInDir(currentPos, dirUpPos, false)
+				else:
+					if GetPixel(currentPos) == PixelType.DUST:
+						var dirPos = Vector2(x-mod, y)
+						var dirUpPos = Vector2(x-mod, y-1)
+						var dirUpUpPos = Vector2(x-mod, y-2)
+
+						if IsPositionFreeToMove(dirPos):
+							MovePixel(currentPos, dirPos, image)
+						elif IsPositionFreeToMove(dirUpPos):
+							MovePixel(currentPos, dirUpPos, image)
+						elif IsPositionFreeToMove(dirUpUpPos):
+							MovePixel(currentPos, dirUpUpPos, image)
 			c += 1
 		checkNum += 1
 
@@ -454,8 +534,11 @@ func UpdateSim_DirtyRect(delta):
 					var pos = Vector2(xPos, yPos)
 					var pixelVisited = GetPixelState(pos)
 					var pixelType = GetPixel(pos)
-					if !pixelVisited and pixelType == PixelType.DUST:
-						UpdateDustPixelSim(pos, image)
+					if !pixelVisited:
+						if pixelType == PixelType.DUST:
+							UpdateDustPixelSim(pos, image)
+						elif pixelType == PixelType.FLYING_DUST:
+							UpdateFlyingDustPixel(pos, delta, image)
 					SetPixelState(pos, true)
 					xPos += 1
 				yPos -= 1
