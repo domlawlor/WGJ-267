@@ -14,7 +14,7 @@ enum PlayerState {
 var SWEEP_OFFSET : int = 20
 var WALK_SPEED = 120
 var LADDER_SPEED = 100
-var GRAVITY = 18
+var GRAVITY = 1
 
 var m_state = PlayerState.AIR
 var m_velocity : Vector2 = Vector2.ZERO
@@ -55,6 +55,8 @@ func _process(delta):
 		if col == null:
 			m_velocity.y += GRAVITY
 			SetPlayerState(PlayerState.AIR)
+		else:
+			m_velocity.y = 0
 		
 	if Input.is_action_pressed("sweep") and sweepTimer.is_stopped():
 		var posX : int
