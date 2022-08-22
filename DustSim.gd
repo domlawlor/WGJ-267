@@ -386,8 +386,8 @@ func UpdateSim(delta):
 	sprite.get_texture().set_data(image)
 
 func _input(event):
-	if event.is_action_pressed("debug_button_1"):
-		pass
+	if event.is_action_pressed("debug_button_4"):
+		enabledDebugDrawing = !enabledDebugDrawing
 	if event.is_action_pressed("spawn_pixel") or event.is_action_pressed("spawn_bulk_pixels"):
 		var unscaledX = event.position.x / 2
 		var unscaledY = event.position.y / 2
@@ -624,7 +624,7 @@ func _physics_process(delta):
 
 # Debug code by Dom, will merge sort out soon
 func _draw():
-	if false and USE_THREAD_VERSION:
+	if enabledDebugDrawing and USE_THREAD_VERSION:
 		var regionSize = Vector2(REGION_SIZE * pixelSizeScale, REGION_SIZE * pixelSizeScale)
 
 		var default_font = Control.new().get_font("font")

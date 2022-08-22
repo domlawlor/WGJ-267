@@ -24,9 +24,14 @@ var m_facingRight : bool = true
 func _ready():
 	Events.connect("ladder_climbing_activate", self, "_on_ladder_climbing_activate")
 	Events.connect("ladder_climbing_deactivate", self, "_on_ladder_climbing_deactivate")
+	Events.connect("debug_set_player_pos", self, "_on_debug_set_player_pos")
 	animatedSprite.play("idle")
 
+
 func _process(delta):
+	if Input.is_action_just_pressed("debug_button_1"):
+		var mousePos = get_viewport().get_mouse_position()
+		Events.emit_signal("debug_set_player_pos", mousePos / 2)
 	if Input.is_action_pressed("moveLeft"):
 		m_velocity.x = -WALK_SPEED
 		m_facingRight = false
@@ -123,3 +128,9 @@ func _on_ladder_climbing_deactivate():
 
 func _on_SweepTimer_timeout():
 	SetPlayerState(PlayerState.AIR)
+
+func _on_debug_set_player_pos(mousePos):
+	print("in _on_debug_set_player_pos")
+	position = mousePos
+	m_state = PlayerState.GROUND
+	m_ladderActive = false
