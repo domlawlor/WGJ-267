@@ -9,6 +9,7 @@ enum PixelType {
 	EMPTY
 	DUST
 	COLLISION
+	KILL
 }
 
 const USE_THREAD_VERSION = false
@@ -241,7 +242,10 @@ func SetLevelCollisions():
 		colTest.position.y = (floor(i / pixelWorldSizeX) * pixelSizeScale) + 1
 		var col = colTest.move_and_collide(Vector2.ZERO, true, true, true)
 		if col != null:
-			pixelTypes[i] = PixelType.COLLISION
+			if col.collider.is_in_group("dust_kill"):
+				pixelTypes[i] = PixelType.KILL
+			else:
+				pixelTypes[i] = PixelType.COLLISION
 
 func _on_spawn_dust(pos, amount):
 	var simPos = GetSimPos(pos)
@@ -259,7 +263,7 @@ func CreateDust(positions):
 	image.lock()
 	
 	for pos in positions:
-		if !IsInBounds(pos) or !IsPixelFree(pos):
+		if !IsPositionEmpty(pos):
 			continue
 		
 		#print("CreateDust xPos:", pos.x, ", yPos:", pos.y)
@@ -302,11 +306,11 @@ func IsInBounds(pos):
 	var inYBounds = pos.y < pixelWorldSizeY and pos.y >= 0
 	return inXBounds and inYBounds
 
-func IsPixelFree(pos):
-	return pixelTypes[(pos.y * pixelWorldSizeX) + pos.x] == PixelType.EMPTY
-	
 func MovePixel(srcPos, destPos, image):
-	SetPixel(destPos, GetPixel(srcPos))
+	var destPosType = GetPixel(destPos)
+	assert(destPosType == PixelType.EMPTY or destPosType == PixelType.KILL)
+	if destPosType == PixelType.EMPTY:
+		SetPixel(destPos, GetPixel(srcPos))
 	SetPixel(srcPos, PixelType.EMPTY)
 	
 	# now move color
@@ -316,40 +320,34 @@ func MovePixel(srcPos, destPos, image):
 
 func UpdateDustPixelSim(pos, image):
 	var downPos = Vector2(pos.x, pos.y + 1)
-	var downPosInBounds = IsInBounds(downPos)
-	var downClear = downPosInBounds and GetPixel(downPos) == PixelType.EMPTY
+	var downClear = IsPositionFreeToMove(downPos)
 	
 	if downClear:
 		var randNum = randi() % 15
 		if randNum == 1:
 			var leftPos = Vector2(pos.x - 1, pos.y)
 			var rightPos = Vector2(pos.x + 1, pos.y)
-			var leftPosInBounds = IsInBounds(leftPos)
-			var rightPosInBounds = IsInBounds(rightPos)
 			var randLR = randi() % 2
 			if randLR == 1:
-				if leftPosInBounds and GetPixel(leftPos) == PixelType.EMPTY:
+				if IsPositionFreeToMove(leftPos):
 					MovePixel(pos, leftPos, image)
-				elif rightPosInBounds and GetPixel(rightPos) == PixelType.EMPTY:
+				elif IsPositionFreeToMove(rightPos):
 					MovePixel(pos, rightPos, image)
 			else:
-				if rightPosInBounds and GetPixel(rightPos) == PixelType.EMPTY:
+				if IsPositionFreeToMove(rightPos):
 					MovePixel(pos, rightPos, image)
-				elif leftPosInBounds and GetPixel(leftPos) == PixelType.EMPTY:
+				elif IsPositionFreeToMove(leftPos):
 					MovePixel(pos, leftPos, image)
 			return
 	
 	var downRightPos = Vector2(pos.x + 1, pos.y + 1)
 	var downLeftPos = Vector2(pos.x - 1, pos.y + 1)
 	
-	var downRightPosInBounds = IsInBounds(downRightPos)
-	var downLeftPosInBounds = IsInBounds(downLeftPos)
-	
 	if downClear:
 		MovePixel(pos, downPos, image)
-	elif downRightPosInBounds and GetPixel(downRightPos) == PixelType.EMPTY:
+	elif IsPositionFreeToMove(downRightPos):
 		MovePixel(pos, downRightPos, image)
-	elif downLeftPosInBounds and GetPixel(downLeftPos) == PixelType.EMPTY:
+	elif IsPositionFreeToMove(downLeftPos):
 		MovePixel(pos, downLeftPos, image)
 
 # One idea is we could get rid of delta by running in fixed time steps
@@ -435,18 +433,26 @@ func ApplyForce(pos, image):
 					var dirUpPos = Vector2(x-mod, y-1)
 					var dirUpUpPos = Vector2(x-mod, y-2)
 					
-					var dirPosInBounds = IsInBounds(dirPos)
-					var dirUpPosInBounds = IsInBounds(dirUpPos)
-					var dirUpUpPosInBounds = IsInBounds(dirUpUpPos)
-					
-					if dirPosInBounds and GetPixel(dirPos) == PixelType.EMPTY:
+					if IsPositionFreeToMove(dirPos):
 						MovePixel(currentPos, dirPos, image)
-					elif dirUpPosInBounds and GetPixel(dirUpPos) == PixelType.EMPTY:
+					elif IsPositionFreeToMove(dirUpPos):
 						MovePixel(currentPos, dirUpPos, image)
-					elif dirUpUpPosInBounds and GetPixel(dirUpUpPos) == PixelType.EMPTY:
+					elif IsPositionFreeToMove(dirUpUpPos):
 						MovePixel(currentPos, dirUpUpPos, image)
 			c += 1
 		checkNum += 1
+
+func IsPositionEmpty(pos):
+	if !IsInBounds(pos):
+		return false
+	var posType = GetPixel(pos)
+	return posType == PixelType.EMPTY
+
+func IsPositionFreeToMove(pos):
+	if !IsInBounds(pos):
+		return false
+	var posType = GetPixel(pos)
+	return posType == PixelType.EMPTY or posType == PixelType.KILL
 	
 func ConvertRegionIndexToPosStart(rIndex):
 	var x = (rIndex % regionWorldSizeX) * REGION_SIZE
