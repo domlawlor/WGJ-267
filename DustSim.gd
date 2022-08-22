@@ -11,15 +11,16 @@ enum PixelType {
 	COLLISION
 	KILL
 }
-
-const USE_THREAD_VERSION = false
-var enabledDebugDrawing = false
-
 # pick pixel scale size here
-onready var sprite : Sprite = $Sprite_4x
-#onready var sprite : Sprite = $Sprite_2x
+#onready var sprite : Sprite = $Sprite_4x
+onready var sprite : Sprite = $Sprite_2x
 
 onready var colTest : KinematicBody2D = $CollisionTestArea
+
+const USE_DIRTY_RECTS = true
+var enabledDebugDrawing = false
+
+const DIRTY_RECT_BOUNDARY = 1
 
 var worldSizeX : int = 640
 var worldSizeY : int = 480
@@ -29,31 +30,23 @@ var pixelWorldSizeX : int
 var pixelWorldSizeY : int
 var pixelTypes = []
 
-var REGION_SIZE = 8
+# just using this as a test for adding more state. Will incorporate type if it works
+var pixelState = [] # pixel array
+
+var REGION_SIZE = 16
 var regionWorldSizeX : int
 var regionWorldSizeY : int
 
 var checkRegions = []
 
-## Threading data
-const simStageCount = 4 # always will be 4 for checkboarding. No more, no less
-var simStages = [[],[],[],[]] # 4 stages, with regionGrid positions to be filled in each
-
-const THREAD_COUNT = 16
-
-var simThreads = []
-var simThreadsData = []
-
 var activeRegionsBufferNum = 0
 var nextRegionsBufferNum = 1
 var checkRegionsBuffers = [[], []]
-#var nextCheckRegions = [] #TODO Double buffer these two
 
 var regionHalfSizeX : int
 var regionHalfSizeY : int
 
-var regionGridTotal : int
-#####
+var totalRegionCount : int
 
 var FORCE_COUNT = 20
 var forceCount = 0
@@ -81,112 +74,50 @@ func _ready():
 	regionHalfSizeX = REGION_SIZE / 2
 	regionHalfSizeY = REGION_SIZE / 2
 	
-	regionGridTotal = regionWorldSizeX * regionWorldSizeY
+	totalRegionCount = regionWorldSizeX * regionWorldSizeY
 	
 	print("TextureSize-", sprite.get_texture().get_size())
 	print("Image-", sprite.get_texture().get_data().get_size())
 	ClearWorld()
 	SetLevelCollisions()
-	
-	if USE_THREAD_VERSION:
-		# setup the checkboarding positions we use each stage
-		for yPos in range(regionWorldSizeY):
-			for xPos in range(regionWorldSizeX):
-				var gridPos = Vector2(xPos, yPos)
-				var xEven = (xPos % 2) == 0
-				var yEven = (yPos % 2) == 0
-				if xEven and yEven:
-					simStages[0].push_back(gridPos)
-				elif xEven and !yEven:
-					simStages[1].push_back(gridPos)
-				elif !xEven and yEven:
-					simStages[2].push_back(gridPos)
-				elif !xEven and !yEven:
-					simStages[3].push_back(gridPos)
-		
-		for threadNum in range(THREAD_COUNT):
-			var thread = Thread.new()
-			var result = thread.start(self, "_thread_function", threadNum, Thread.PRIORITY_HIGH)
-			assert(result == OK)
-			simThreads.push_back(thread)
-			
-			simThreadsData.push_back({
-				stopQueued = false,
-				idle = true,
-				startWorkSemaphore = Semaphore.new(),
-				regionWorkData = []
-			})
-		
-		
 
-# TODO: Pull these values from elsewhere
-# TODO: also this fixes us to one screens worth of pixels. 
-#		Change in future to bigger world, only updating whats close to the player
+func GetPixelState(pos):
+	return pixelState[(pos.y * pixelWorldSizeX) + pos.x]
 
-func _exit_tree():
-	CleanupThreads()
-
-func CleanupThreads():
-	for threadData in simThreadsData:
-		threadData.stopQueued = true
-		threadData.workData = [] # clean out any work somehow still here
-		threadData.startWorkSemaphore.post()
-	
-	var threadLastIdx = simThreads.size()-1
-	
-	var threadsDone = false
-	while !threadsDone:
-		threadsDone = true
-		for thread in simThreads:
-			threadsDone = threadsDone and thread.is_alive()
-		
-	for thread in simThreads:	
-		thread.wait_to_finish()	
-	simThreads = []
+func SetPixelState(pos, state):
+	pixelState[(pos.y * pixelWorldSizeX) + pos.x] = state
 
 func GetPixel(pos):
 	return pixelTypes[(pos.y * pixelWorldSizeX) + pos.x]
 
+
 func SetPixel(pos, type):
 	pixelTypes[(pos.y * pixelWorldSizeX) + pos.x] = type
 	ActivateRegion(pos)
-	
-	#
-	if false and USE_THREAD_VERSION:
-		ActivateRegion(Vector2(pos.x, pos.y + 1))
-		ActivateRegion(Vector2(pos.x, pos.y - 1))
-		ActivateRegion(Vector2(pos.x + 1, pos.y))
-		ActivateRegion(Vector2(pos.x + 1, pos.y + 1))
-		ActivateRegion(Vector2(pos.x + 1, pos.y - 1))
-		ActivateRegion(Vector2(pos.x - 1, pos.y))
-		ActivateRegion(Vector2(pos.x - 1, pos.y + 1))
-		ActivateRegion(Vector2(pos.x - 1, pos.y - 1))
 
 func ActivateRegion(pos):
 	var regX = floor(pos.x / REGION_SIZE)
 	var regY = floor(pos.y / REGION_SIZE)
 	var regIndex : int = regY * regionWorldSizeX + regX
 	
-	if USE_THREAD_VERSION:
-		#if regIndex < 0 or regIndex > regionGridTotal:
-		#	return
-		
+	if USE_DIRTY_RECTS:
 		var regionBuffer = checkRegionsBuffers[nextRegionsBufferNum]
-		var region = regionBuffer[regIndex]
+		var dirtyRect = regionBuffer[regIndex]
 		
-		var dirtyRect = region.dirtyRect
-		assert(dirtyRect) 
+		if !dirtyRect:
+			# default values are intended. Makes the min and max functions work
+			regionBuffer[regIndex] = { 
+				minX = pixelWorldSizeX, 
+				minY = pixelWorldSizeX,
+				maxX = 0,
+				maxY = 0
+			}
+			dirtyRect = regionBuffer[regIndex]
 		
-		# stretch our dirty rect to fit our new pixel, plus a barrier of one around it
-		var minX = max(0, min(dirtyRect.minX, pos.x))
-		var minY = max(0, min(dirtyRect.minY, pos.y))
-		var maxX = min(pixelWorldSizeX, max(dirtyRect.maxX, pos.x))
-		var maxY = min(pixelWorldSizeY, max(dirtyRect.maxY, pos.y))
-		
-		regionBuffer[regIndex] = {
-			active = true,
-			dirtyRect = { minX = minX, minY = minY, maxX = maxX, maxY = maxY },
-		}
+		dirtyRect.minX = min(dirtyRect.minX, pos.x)
+		dirtyRect.minY = min(dirtyRect.minY, pos.y)
+		dirtyRect.maxX = max(dirtyRect.maxX, pos.x)
+		dirtyRect.maxY = max(dirtyRect.maxY, pos.y)
 		
 	else:
 		checkRegions[regIndex] = true #actual pos index
@@ -214,22 +145,22 @@ func ActivateRegion(pos):
 		if checkDown and checkRight:
 			checkRegions[regIndex + regionWorldSizeX + 1] = true
 
-func ResetRegions(regions):
-	regions.fill({ active = false, dirtyRect = {minX=pixelWorldSizeX, minY=pixelWorldSizeY, maxX=0, maxY=0}})
-
 func ClearWorld():
 	var pixelCount = pixelWorldSizeX * pixelWorldSizeY
 	pixelTypes.resize(pixelCount)
 	pixelTypes.fill(PixelType.EMPTY)
 	
+	pixelState.resize(pixelCount)
+	pixelState.fill(false)
+	
 	var regionCount = regionWorldSizeX * regionWorldSizeY
 	checkRegions.resize(regionCount)
 	checkRegions.fill(true)
 	
-	if USE_THREAD_VERSION:
+	if USE_DIRTY_RECTS:
 		for regionsBuffer in checkRegionsBuffers:
 			regionsBuffer.resize(regionCount)
-			ResetRegions(regionsBuffer)
+			regionsBuffer.fill(null)
 	
 	var image = sprite.get_texture().get_data()
 	image.lock()
@@ -282,6 +213,7 @@ func CreateDust(positions):
 				color = dustColourD
 		
 		SetPixel(pos, PixelType.DUST)
+		
 		image.set_pixelv(pos, color)
 		amountCreated += 1
 	
@@ -289,7 +221,7 @@ func CreateDust(positions):
 	sprite.get_texture().set_data(image)
 	Global.DustRemaining += amountCreated
 	Events.emit_signal("dust_amount_changed")
-	print("Dust remaining: " + str(Global.DustRemaining))
+	#print("Dust remaining: " + str(Global.DustRemaining))
 
 func CreateBulkDust(pos):
 	var positions = [pos]
@@ -299,7 +231,7 @@ func CreateBulkDust(pos):
 	positions.push_back(Vector2(pos.x + (randi() % 2), pos.y - (randi() % 14)))
 	positions.push_back(Vector2(pos.x + (randi() % 6), pos.y - (randi() % 14)))
 	positions.push_back(Vector2(pos.x - (randi() % 6), pos.y - (randi() % 14)))
-	positions.push_back(Vector2(pos.x - (randi() % 8), pos.y - (randi() % 14)))
+	positions.push_back(Vector2(pos.x - (randi() % 8), pos.y - (randi() % 14))) 
 	positions.push_back(Vector2(pos.x + (randi() % 8), pos.y - (randi() % 14)))
 	positions.push_back(Vector2(pos.x - (randi() % 10), pos.y - (randi() % 14)))
 	positions.push_back(Vector2(pos.x + (randi() % 10), pos.y - (randi() % 14)))
@@ -321,11 +253,13 @@ func MovePixel(srcPos, destPos, image):
 	else:
 		Global.DustRemaining -= 1 # destroy dust
 		Events.emit_signal("dust_amount_changed")
-		print("kill! " + str(Global.DustRemaining))
+		#print("kill! " + str(Global.DustRemaining))
 	SetPixel(srcPos, PixelType.EMPTY)
 	image.set_pixelv(srcPos, Color.transparent)
 
 func UpdateDustPixelSim(pos, image):
+	var movePos = null
+	
 	var downPos = Vector2(pos.x, pos.y + 1)
 	var downClear = IsPositionFreeToMove(downPos)
 	
@@ -337,25 +271,29 @@ func UpdateDustPixelSim(pos, image):
 			var randLR = randi() % 2
 			if randLR == 1:
 				if IsPositionFreeToMove(leftPos):
-					MovePixel(pos, leftPos, image)
+					movePos = leftPos
 				elif IsPositionFreeToMove(rightPos):
-					MovePixel(pos, rightPos, image)
+					movePos = rightPos
 			else:
 				if IsPositionFreeToMove(rightPos):
-					MovePixel(pos, rightPos, image)
+					movePos = rightPos
 				elif IsPositionFreeToMove(leftPos):
-					MovePixel(pos, leftPos, image)
-			return
-	
-	var downRightPos = Vector2(pos.x + 1, pos.y + 1)
-	var downLeftPos = Vector2(pos.x - 1, pos.y + 1)
-	
-	if downClear:
-		MovePixel(pos, downPos, image)
-	elif IsPositionFreeToMove(downRightPos):
-		MovePixel(pos, downRightPos, image)
-	elif IsPositionFreeToMove(downLeftPos):
-		MovePixel(pos, downLeftPos, image)
+					movePos = leftPos
+
+	if !movePos:
+		var downRightPos = Vector2(pos.x + 1, pos.y + 1)
+		var downLeftPos = Vector2(pos.x - 1, pos.y + 1)
+		
+		if downClear:
+			movePos = downPos
+		elif IsPositionFreeToMove(downRightPos):
+			movePos = downRightPos
+		elif IsPositionFreeToMove(downLeftPos):
+			movePos = downLeftPos
+		
+	if movePos:
+		MovePixel(pos, movePos, image)
+
 
 # One idea is we could get rid of delta by running in fixed time steps
 #	So in sim, accumulate the delta and once bigger than a fixedTimeStep, run the sim.
@@ -425,7 +363,7 @@ func ApplyForce(pos, image):
 	var mod = 1 # left
 	if forceRight:
 		mod = -1 # right
-	var sweepHeight = 8
+	var sweepHeight = 16
 	var checkNum = 1
 	var xStart = pos.x - ((sweepHeight - 1) * mod)
 	var yStart = pos.y - (sweepHeight - 1)
@@ -476,7 +414,7 @@ func GetSimPos(pos):
 	var simPosY = floor(pos.y / pixelSizeScale)
 	return Vector2(simPosX, simPosY)
 
-func UpdateSimThreaded(delta):
+func UpdateSim_DirtyRect(delta):
 	
 	var image = sprite.get_texture().get_data()
 	image.lock()
@@ -493,55 +431,51 @@ func UpdateSimThreaded(delta):
 	
 	#print("-- simStages starting -- ")
 	#var stagesStartTimeUSec = Time.get_ticks_usec()
-
+	
 	# flip the buffers, double buffer'in and all that
 	var oldActiveBufferNum = activeRegionsBufferNum
 	activeRegionsBufferNum = nextRegionsBufferNum
 	nextRegionsBufferNum = oldActiveBufferNum
-	ResetRegions(checkRegionsBuffers[nextRegionsBufferNum])
+	checkRegionsBuffers[nextRegionsBufferNum].fill(null)
 	
+	pixelState.fill(false)
+	
+	var regionsBuffer = checkRegionsBuffers[activeRegionsBufferNum]
+	
+	
+	var regionFinalIndex = totalRegionCount - 1
+	for regionIndex in range(regionFinalIndex, -1, -1):
+		var dirtyRect = regionsBuffer[regionIndex]
+			
+		#first check if this is active and we even need to do it
+		if dirtyRect:
+			dirtyRect.minX -= DIRTY_RECT_BOUNDARY
+			dirtyRect.maxX += DIRTY_RECT_BOUNDARY
+			dirtyRect.minY -= DIRTY_RECT_BOUNDARY
+			dirtyRect.maxY += DIRTY_RECT_BOUNDARY
 
-	# One idea is to only do one region stage!!! Try this.
-	# one stage covers all regions anyway I believe, then why checkerboard??
-	for stageNum in simStages.size():
-		#print("- SimStageNum - ", stageNum)
-		#var stageStartTimeUSec = Time.get_ticks_usec()
-		
-		var nextThreadToFill = 0
-		
-		var stageRegions = simStages[stageNum]
-		for regionPos in stageRegions:
+			var startX = max(0, dirtyRect.minX)
+			var startY = max(0, dirtyRect.minY)
+			var endX = min(pixelWorldSizeX-1, dirtyRect.maxX)
+			var endY = min(pixelWorldSizeY-1, dirtyRect.maxY)
 			
-			var regionIndex = (regionPos.y * regionWorldSizeX) + regionPos.x
+			if startX > endX or startY > endY:
+				print("ERROR in dirtyRect, not normalised - ", startX, ", ", startY, ", ", endX, ", ", endY)
+				continue
 			
-			var regionsBuffer = checkRegionsBuffers[activeRegionsBufferNum]
-			var region = regionsBuffer[regionIndex]
-			
-			#first check if this is active and we even need to do it
-			if region.active:
-				var threadNum = nextThreadToFill % THREAD_COUNT
-				nextThreadToFill += 1
-				var threadData = simThreadsData[threadNum]
-				
-				# push this region onto the work the threads need to do
-				threadData.regionWorkData.push_back({
-					regionPos = regionPos,
-					dirtyRect = region.dirtyRect,
-					image = image
-				})
-		
-		# workData all set, now just kick threads to do the work
-		for threadData in simThreadsData:
-			if threadData.regionWorkData:
-				threadData.idle = false
-				threadData.startWorkSemaphore.post()
-		
-		# wait until all threads are finished before starting next stage
-		var allIdle = false
-		while !allIdle:
-			allIdle = true
-			for threadData in simThreadsData:
-				allIdle = allIdle && threadData.idle
+			# starts at the bottom of the screen so falling pixels only update once
+			var yPos = endY
+			while yPos >= startY: 
+				var xPos = startX
+				while xPos <= endX:
+					var pos = Vector2(xPos, yPos)
+					var pixelVisited = GetPixelState(pos)
+					var pixelType = GetPixel(pos)
+					if !pixelVisited and pixelType == PixelType.DUST:
+						UpdateDustPixelSim(pos, image)
+					SetPixelState(pos, true)
+					xPos += 1
+				yPos -= 1
 		
 		#var stagesTimeMS = Global.USecToMSec(Time.get_ticks_usec() - stageStartTimeUSec)
 		#print("- EndStageNum - ", stageNum, ", timeTaken:", stagesTimeMS)
@@ -552,54 +486,10 @@ func UpdateSimThreaded(delta):
 	image.unlock()
 	sprite.get_texture().set_data(image)
 
-# thread keeps on looping until told to stop
-# allThreadData keeps the relevant info for doing work,
-# the only thread data need is the threadNum to index into the allThreadData
-func _thread_function(threadNum):
-	
-	var threadData = simThreadsData[threadNum]
-	
-	while !threadData.stopQueued:
-		threadData.idle = true
-		threadData.startWorkSemaphore.wait()
-		
-		while threadData.regionWorkData.size() > 0:
-			#var workStartTimeUSec = Time.get_ticks_usec()
-			var workData = threadData.regionWorkData.pop_back()
-			
-			#print("threadNum:", threadNum,  "   -   workData:", workData)
-			
-			var regionPos = workData.regionPos
-			var dirtyRect = workData.dirtyRect
-			var image = workData.image
-
-			var regionMidPoint = Vector2()
-			regionMidPoint.x = (regionPos.x * REGION_SIZE) + regionHalfSizeX
-			regionMidPoint.y = (regionPos.y * REGION_SIZE) + regionHalfSizeY
-			
-			var startX = max(0, max(dirtyRect.minX, regionMidPoint.x - REGION_SIZE))
-			var startY = max(0, max(dirtyRect.minY, regionMidPoint.y - REGION_SIZE))
-			var endX = min(pixelWorldSizeX, min(dirtyRect.maxX, regionMidPoint.x + REGION_SIZE))
-			var endY = min(pixelWorldSizeY, min(dirtyRect.maxY, regionMidPoint.y + REGION_SIZE))
-			
-			# starts at the bottom of the screen so falling pixels only update once
-			var yPos = endY
-			while yPos >= startY: 
-				var xPos = startX
-				while xPos <= endX:
-					var pos = Vector2(xPos, yPos)
-					var pixelType = GetPixel(pos)
-					if pixelType == PixelType.DUST:
-						UpdateDustPixelSim(pos, image)
-					xPos += 1
-				yPos -= 1
-				
-			#var totalMS = Global.USecToMSec(Time.get_ticks_usec() - workStartTimeUSec)
-			#print("ThreadWorkEnd - threadNum:", threadNum, ", regionPos =", regionPos, ", totalMS:", totalMS, ", regionIndex: ", regionIndex, ", skipped:", str(!checkRegion))
 
 func _physics_process(delta):
-	if USE_THREAD_VERSION:
-		UpdateSimThreaded(delta)
+	if USE_DIRTY_RECTS:
+		UpdateSim_DirtyRect(delta)
 	else:
 		UpdateSim(delta)
 	update()
@@ -637,21 +527,22 @@ func _physics_process(delta):
 
 # Debug code by Dom, will merge sort out soon
 func _draw():
-	if enabledDebugDrawing and USE_THREAD_VERSION:
-		var regionSize = Vector2(REGION_SIZE * pixelSizeScale, REGION_SIZE * pixelSizeScale)
+	if enabledDebugDrawing and USE_DIRTY_RECTS:
 
-		var default_font = Control.new().get_font("font")
+		var regionSize = Vector2(REGION_SIZE * pixelSizeScale, REGION_SIZE * pixelSizeScale)
 
 		var regionFinalIndex = (regionWorldSizeX * regionWorldSizeY) - 1
 		for i in range(regionFinalIndex, -1, -1):
 			var posStart = ConvertRegionIndexToPosStart(i)
-			var rect = Rect2(posStart.x * pixelSizeScale, posStart.y * pixelSizeScale, regionSize.x, regionSize.y)
-			var regionBuffer = checkRegionsBuffers[nextRegionsBufferNum]
-			var region = regionBuffer[i]
-			if region.active:
+
+			var scaledPos = Vector2(posStart.x * pixelSizeScale, posStart.y * pixelSizeScale)
+			var rect = Rect2(scaledPos, regionSize)
+			var regionBuffer = checkRegionsBuffers[activeRegionsBufferNum]
+			var regionDirtyRect = regionBuffer[i]
+			if regionDirtyRect:
 				draw_rect(rect, Color.gray, false)
-				
-				var dirtyRect = region.dirtyRect
+
+				var dirtyRect = regionDirtyRect
 				var drawDirtyRect = Rect2()
 				drawDirtyRect.position.x = dirtyRect.minX * pixelSizeScale
 				drawDirtyRect.position.y = dirtyRect.minY * pixelSizeScale
@@ -661,13 +552,4 @@ func _draw():
 			else:
 				draw_rect(rect, Color.black, false)
 
-#	var stageColors = [Color.black, Color.red, Color.green, Color.blue]
-#	for stageNum in simStages.size():
-#		var simStage = simStages[stageNum]
-#		for regionPos in simStage:
-#			var regionIndex = (regionPos.y * regionWorldSizeX) + regionPos.x
-#			var posStart = Vector2(regionPos.x * REGION_SIZE, regionPos.y * REGION_SIZE)
-#			var rect = Rect2(posStart, Vector2(REGION_SIZE-1, REGION_SIZE-1))
-#			draw_rect(rect, stageColors[stageNum % stageColors.size()], false)
-#			#draw_string(default_font, Vector2(posStart.x+(REGION_SIZE/2), posStart.y+(REGION_SIZE/2)), str(stageNum))
-#			#draw_string(default_font, Vector2(posStart.x+(REGION_SIZE/2), posStart.y+(REGION_SIZE/2)), str(regionIndex))
+
