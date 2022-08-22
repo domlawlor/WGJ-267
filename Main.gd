@@ -20,5 +20,12 @@ func load_level(level_name : String):
 		main_2d.add_child(level_instance)
 		levelList.visible = false
 
+func _process(delta):
+	if Input.is_action_just_pressed("toggle_menu"):
+		levelList.visible = !levelList.visible
+
 func _on_LoadLevel1_pressed():
 	load_level("Level1")
+	
+func _on_DomsTestLevel_pressed():
+	load_level("DomsTestLevel")
