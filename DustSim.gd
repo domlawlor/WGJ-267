@@ -13,6 +13,7 @@ enum PixelType {
 }
 
 const USE_THREAD_VERSION = false
+var enabledDebugDrawing = false
 
 # pick pixel scale size here
 onready var sprite : Sprite = $Sprite_4x
@@ -259,6 +260,7 @@ func _on_spawn_dust(pos, amount):
 	
 	
 func CreateDust(positions):
+	var amountCreated : int = 0
 	var image = sprite.get_texture().get_data()
 	image.lock()
 	
@@ -281,9 +283,12 @@ func CreateDust(positions):
 		
 		SetPixel(pos, PixelType.DUST)
 		image.set_pixelv(pos, color)
+		amountCreated += 1
 	
 	image.unlock()
 	sprite.get_texture().set_data(image)
+	Global.DustRemaining += amountCreated
+	print("Dust remaining: " + str(Global.DustRemaining))
 
 func CreateBulkDust(pos):
 	var positions = [pos]
@@ -310,7 +315,10 @@ func MovePixel(srcPos, destPos, image):
 	var destPosType = GetPixel(destPos)
 	assert(destPosType == PixelType.EMPTY or destPosType == PixelType.KILL)
 	if destPosType == PixelType.EMPTY:
-		SetPixel(destPos, GetPixel(srcPos))
+		SetPixel(destPos, GetPixel(srcPos)) # move dust
+	else:
+		Global.DustRemaining -= 1 # destroy dust
+		print("kill! " + str(Global.DustRemaining))
 	SetPixel(srcPos, PixelType.EMPTY)
 	
 	# now move color
