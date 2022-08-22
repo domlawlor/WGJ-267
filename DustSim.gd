@@ -11,11 +11,11 @@ enum PixelType {
 	COLLISION
 }
 
-const USE_THREAD_VERSION = true
+const USE_THREAD_VERSION = false
 
 # pick pixel scale size here
-#onready var sprite : Sprite = $Sprite_4x
-onready var sprite : Sprite = $Sprite_2x
+onready var sprite : Sprite = $Sprite_4x
+#onready var sprite : Sprite = $Sprite_2x
 
 onready var colTest : KinematicBody2D = $CollisionTestArea
 

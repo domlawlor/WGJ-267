@@ -7,18 +7,23 @@ onready var sweepTimer = $SweepTimer
 enum PlayerState {
 	GROUND
 	AIR
+	LADDER
 	SWEEPING
 }
 
 var SWEEP_OFFSET : int = 20
 var WALK_SPEED = 120
-var GRAVITY = 1
+var LADDER_SPEED = 100
+var GRAVITY = 18
 
 var m_state = PlayerState.AIR
 var m_velocity : Vector2 = Vector2.ZERO
+var m_ladderActive : bool = false
 var m_facingRight : bool = true
 
 func _ready():
+	Events.connect("ladder_climbing_activate", self, "_on_ladder_climbing_activate")
+	Events.connect("ladder_climbing_deactivate", self, "_on_ladder_climbing_deactivate")
 	animatedSprite.play("idle")
 
 func _process(delta):
@@ -40,10 +45,11 @@ func _process(delta):
 	
 		animatedSprite.flip_h = !m_facingRight
 	
-	var col = move_and_collide(Vector2.DOWN, true, true, true)
-	if col == null:
-		m_velocity.y += GRAVITY
-		m_state = PlayerState.AIR
+	if m_state != PlayerState.LADDER:
+		var col = move_and_collide(Vector2.DOWN, true, true, true)
+		if col == null:
+			m_velocity.y += GRAVITY
+			SetPlayerState(PlayerState.AIR)
 		
 	if Input.is_action_just_pressed("sweep") and sweepTimer.is_stopped():
 		var posX : int
@@ -51,19 +57,69 @@ func _process(delta):
 			posX = position.x + SWEEP_OFFSET
 		else:
 			posX = position.x - SWEEP_OFFSET
-		m_state = PlayerState.SWEEPING
+		SetPlayerState(PlayerState.SWEEPING)
 		sweepTimer.start()
 		animatedSprite.play("sweep")
 		Events.emit_signal("sweep", Vector2(posX, position.y), m_facingRight)
 	
-	col = move_and_collide(m_velocity * delta)
-	if col != null:
-		var ang = floor(rad2deg(col.get_angle()))
-		if ang == 0:
-			m_state = PlayerState.GROUND
+	var canClimbLadder = m_ladderActive and m_state != PlayerState.SWEEPING
+	if canClimbLadder:
+		if Input.is_action_pressed("ladderDown"):
+			m_velocity.y = LADDER_SPEED
+			SetPlayerState(PlayerState.LADDER)
+		elif Input.is_action_pressed("ladderUp"):
+			m_velocity.y = -LADDER_SPEED
+			SetPlayerState(PlayerState.LADDER)
+		elif m_state == PlayerState.LADDER:
 			m_velocity.y = 0
+	
+	var frameVel = m_velocity * delta
+	if m_state == PlayerState.LADDER:
+		print("frameVel: " + str(frameVel))
+		var col : KinematicCollision2D = move_and_collide(frameVel, true, true, true)
+		if col != null and !col.collider.is_in_group("ladder_top"):
+			move_and_collide(frameVel)   # the bug is because we end up in here even though we appear to be only colliding with a ladder_top block
+			SetPlayerState(PlayerState.GROUND)
 		else:
-			m_velocity.x = 0
+			position.y += frameVel.y
+	else:
+		var col = move_and_collide(frameVel)
+		if col != null:
+			var ang = floor(rad2deg(col.get_angle()))
+			if ang == 0:
+				SetPlayerState(PlayerState.GROUND)
+				m_velocity.y = 0
+			else:
+				m_velocity.x = 0
+
+func SetPlayerState(state):
+	if m_state == state:
+		return
+	
+	m_state = state
+	var fString = "PlayerState change: %s"
+	var output
+	match state:
+		PlayerState.AIR:
+			output = fString % "AIR"
+		PlayerState.GROUND:
+			output = fString % "GROUND"
+		PlayerState.LADDER:
+			output = fString % "LADDER"
+		PlayerState.SWEEPING:
+			output = fString % "SWEEPING"
+	print(output)
+
+func _on_ladder_climbing_activate():
+	print("ladder active")
+	m_ladderActive = true
+	
+func _on_ladder_climbing_deactivate():
+	print("ladder inactive")
+	m_ladderActive = false
+	if m_state == PlayerState.LADDER:
+		SetPlayerState(PlayerState.AIR)
+		m_velocity.y = 0
 
 func _on_SweepTimer_timeout():
-	m_state = PlayerState.AIR
+	SetPlayerState(PlayerState.AIR)
