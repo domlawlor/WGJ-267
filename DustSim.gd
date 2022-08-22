@@ -225,14 +225,6 @@ func CreateDust(positions):
 
 func CreateBulkDust(pos):
 	var positions = [pos]
-	positions.push_back(Vector2(pos.x - (randi() % 2), pos.y - (randi() % 14)))
-	positions.push_back(Vector2(pos.x + (randi() % 4), pos.y - (randi() % 14)))
-	positions.push_back(Vector2(pos.x - (randi() % 4), pos.y - (randi() % 14)))
-	positions.push_back(Vector2(pos.x + (randi() % 2), pos.y - (randi() % 14)))
-	positions.push_back(Vector2(pos.x + (randi() % 6), pos.y - (randi() % 14)))
-	positions.push_back(Vector2(pos.x - (randi() % 6), pos.y - (randi() % 14)))
-	positions.push_back(Vector2(pos.x - (randi() % 8), pos.y - (randi() % 14))) 
-	positions.push_back(Vector2(pos.x + (randi() % 8), pos.y - (randi() % 14)))
 	positions.push_back(Vector2(pos.x - (randi() % 10), pos.y - (randi() % 14)))
 	positions.push_back(Vector2(pos.x + (randi() % 10), pos.y - (randi() % 14)))
 	positions.push_back(Vector2(pos.x + (randi() % 12), pos.y - (randi() % 14)))
@@ -328,31 +320,24 @@ func UpdateSim(delta):
 	image.unlock()
 	sprite.get_texture().set_data(image)
 
-func _input(event):
-	if event.is_action_pressed("debug_button_4"):
+func _process(event):
+	var mousePos = get_viewport().get_mouse_position()
+	var unscaledX = mousePos.x / 2
+	var unscaledY = mousePos.y / 2
+	var pos = Vector2(unscaledX, unscaledY)
+	var simPos = GetSimPos(pos)
+	var simPosX = simPos.x
+	var simPosY = simPos.y
+	
+	if Input.is_action_pressed("debug_button_4"):
 		enabledDebugDrawing = !enabledDebugDrawing
-	if event.is_action_pressed("spawn_pixel") or event.is_action_pressed("spawn_bulk_pixels"):
-		var unscaledX = event.position.x / 2
-		var unscaledY = event.position.y / 2
-		var pos = Vector2(unscaledX, unscaledY)
-		var simPos = GetSimPos(pos)
-		var simPosX = simPos.x
-		var simPosY = simPos.y
 		
-		if event.is_action_pressed("spawn_bulk_pixels"):
-			CreateBulkDust(Vector2(simPosX, simPosY))
-			CreateBulkDust(Vector2(simPosX+5, simPosY))
-			CreateBulkDust(Vector2(simPosX-5, simPosY))
-			CreateBulkDust(Vector2(simPosX+10, simPosY))
-			CreateBulkDust(Vector2(simPosX-10, simPosY))
-			CreateBulkDust(Vector2(simPosX-15, simPosY))
-			CreateBulkDust(Vector2(simPosX+15, simPosY))
-			CreateBulkDust(Vector2(simPosX-20, simPosY))
-			CreateBulkDust(Vector2(simPosX+20, simPosY))
-			CreateBulkDust(Vector2(simPosX-25, simPosY))
-			CreateBulkDust(Vector2(simPosX+25, simPosY))
-		else:
-			CreateDust([simPos])
+	if Input.is_action_pressed("fire_dust"):
+		FireDust(simPos)
+	elif Input.is_action_pressed("spawn_bulk_pixels"):
+		CreateBulkDust(Vector2(simPosX, simPosY))
+	elif Input.is_action_pressed("spawn_pixel"):
+		CreateDust([simPos])
 
 func ApplyForce(pos, image):
 	# -     #
