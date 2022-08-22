@@ -288,6 +288,7 @@ func CreateDust(positions):
 	image.unlock()
 	sprite.get_texture().set_data(image)
 	Global.DustRemaining += amountCreated
+	Events.emit_signal("dust_amount_changed")
 	print("Dust remaining: " + str(Global.DustRemaining))
 
 func CreateBulkDust(pos):
@@ -319,6 +320,7 @@ func MovePixel(srcPos, destPos, image):
 		image.set_pixelv(destPos, image.get_pixelv(srcPos))
 	else:
 		Global.DustRemaining -= 1 # destroy dust
+		Events.emit_signal("dust_amount_changed")
 		print("kill! " + str(Global.DustRemaining))
 	SetPixel(srcPos, PixelType.EMPTY)
 	image.set_pixelv(srcPos, Color.transparent)

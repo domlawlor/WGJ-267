@@ -18,6 +18,7 @@
 [ext_resource path="res://Art/BackgroundObjects/Generator.png" type="Texture" id=16]
 [ext_resource path="res://Door.tscn" type="PackedScene" id=17]
 [ext_resource path="res://Levels/LevelProgression.gd" type="Script" id=18]
+[ext_resource path="res://Art/BackgroundObjects/MonitorLevelProgress.png" type="Texture" id=19]
 
 [sub_resource type="TileSet" id=23]
 0/name = "TileSet64.png 0"
@@ -439,9 +440,6 @@ tracks/0/keys = {
 "values": [ Vector2( 0, 0 ) ]
 }
 
-[sub_resource type="RectangleShape2D" id=37]
-extents = Vector2( 20.5, 72.5 )
-
 [node name="Level1" type="Node2D"]
 script = ExtResource( 18 )
 
@@ -499,7 +497,7 @@ tile_data = PoolIntArray( -1, 1, 0, -65536, 1, 0, -65535, 1, 0, -65534, 1, 0, -6
 [node name="BackgroundObjects" type="Node2D" parent="."]
 
 [node name="3Screens" type="Sprite" parent="BackgroundObjects"]
-position = Vector2( 326, 83 )
+position = Vector2( 314, 288 )
 scale = Vector2( 2, 2 )
 texture = ExtResource( 14 )
 
@@ -509,7 +507,7 @@ scale = Vector2( 2, 2 )
 texture = ExtResource( 15 )
 
 [node name="Web2" type="Sprite" parent="BackgroundObjects"]
-position = Vector2( 84, 336 )
+position = Vector2( 148, 272 )
 scale = Vector2( 2, 2 )
 texture = ExtResource( 5 )
 flip_h = true
@@ -530,9 +528,15 @@ visible = false
 position = Vector2( 128, 406 )
 scale = Vector2( 2, 2 )
 frames = SubResource( 36 )
-frame = 2
+frame = 3
 playing = true
 flip_h = true
+
+[node name="MonitorProgress" type="Sprite" parent="."]
+position = Vector2( 354, 88 )
+scale = Vector2( 2, 2 )
+texture = ExtResource( 19 )
+hframes = 10
 
 [node name="Door" parent="." instance=ExtResource( 17 )]
 position = Vector2( 0, 320 )
@@ -592,12 +596,6 @@ script = ExtResource( 13 )
 playback_speed = 0.7
 anims/OverlayHazeMovement = SubResource( 29 )
 anims/RESET = SubResource( 30 )
-
-[node name="LevelCompleteTrigger" type="Area2D" parent="."]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="LevelCompleteTrigger"]
-position = Vector2( -64.5, 386.5 )
-shape = SubResource( 37 )
 
 [connection signal="body_entered" from="LaddersOFFSCREEN/Area2D" to="LaddersOFFSCREEN" method="_on_Area2D_body_entered"]
 [connection signal="body_exited" from="LaddersOFFSCREEN/Area2D" to="LaddersOFFSCREEN" method="_on_Area2D_body_exited"]
