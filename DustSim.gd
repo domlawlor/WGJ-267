@@ -418,7 +418,7 @@ func ApplyForce(pos, image):
 	var mod = 1 # left
 	if forceRight:
 		mod = -1 # right
-	var sweepHeight = 5
+	var sweepHeight = 8
 	var checkNum = 1
 	var xStart = pos.x - ((sweepHeight - 1) * mod)
 	var yStart = pos.y - (sweepHeight - 1)

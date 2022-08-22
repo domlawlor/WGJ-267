@@ -106,7 +106,7 @@ position = Vector2( 0, -13 )
 shape = SubResource( 19 )
 
 [node name="SweepTimer" type="Timer" parent="."]
-wait_time = 0.3
+wait_time = 0.4
 one_shot = true
 
 [node name="SweepSFX" type="AudioStreamPlayer" parent="."]
