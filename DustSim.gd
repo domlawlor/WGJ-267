@@ -332,8 +332,6 @@ func _process(event):
 	if Input.is_action_pressed("debug_button_4"):
 		enabledDebugDrawing = !enabledDebugDrawing
 		
-	if Input.is_action_pressed("fire_dust"):
-		FireDust(simPos)
 	elif Input.is_action_pressed("spawn_bulk_pixels"):
 		CreateBulkDust(Vector2(simPosX, simPosY))
 	elif Input.is_action_pressed("spawn_pixel"):
