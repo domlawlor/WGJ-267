@@ -1,4 +1,4 @@
-[gd_scene load_steps=40 format=2]
+[gd_scene load_steps=44 format=2]
 
 [ext_resource path="res://Art/TileSet64.png" type="Texture" id=1]
 [ext_resource path="res://DustSim.tscn" type="PackedScene" id=2]
@@ -11,6 +11,8 @@
 [ext_resource path="res://DustSpawn.tscn" type="PackedScene" id=9]
 [ext_resource path="res://Art/ladder.png" type="Texture" id=10]
 [ext_resource path="res://Levels/Ladders.gd" type="Script" id=11]
+[ext_resource path="res://Art/Overlay_illumination.png" type="Texture" id=12]
+[ext_resource path="res://Levels/OverlayHaze.gd" type="Script" id=13]
 
 [sub_resource type="TileSet" id=23]
 0/name = "TileSet64.png 0"
@@ -339,6 +341,39 @@ extents = Vector2( 2.5, 89 )
 [sub_resource type="RectangleShape2D" id=28]
 extents = Vector2( 32, 32 )
 
+[sub_resource type="Animation" id=29]
+resource_name = "OverlayHazeMovement"
+length = 20.0
+loop = true
+step = 1.0
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:offset")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 10, 20 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 0, 0 ), Vector2( -1000, -200 ), Vector2( 0, 0 ) ]
+}
+
+[sub_resource type="Animation" id=30]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:offset")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( 0, 0 ) ]
+}
+
 [node name="Level1" type="Node2D"]
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
@@ -443,6 +478,18 @@ position = Vector2( 493, 120 )
 [node name="DustSpawn3" parent="DustSpawns" instance=ExtResource( 9 )]
 position = Vector2( 260, 312 )
 DustAmount = 15
+
+[node name="OverlayHaze" type="Sprite" parent="."]
+modulate = Color( 1, 1, 1, 0.235294 )
+position = Vector2( 0, -100 )
+texture = ExtResource( 12 )
+centered = false
+script = ExtResource( 13 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="OverlayHaze"]
+playback_speed = 0.7
+anims/OverlayHazeMovement = SubResource( 29 )
+anims/RESET = SubResource( 30 )
 
 [connection signal="body_entered" from="Ladders/Area2D" to="Ladders" method="_on_Area2D_body_entered"]
 [connection signal="body_exited" from="Ladders/Area2D" to="Ladders" method="_on_Area2D_body_exited"]
