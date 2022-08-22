@@ -316,15 +316,12 @@ func MovePixel(srcPos, destPos, image):
 	assert(destPosType == PixelType.EMPTY or destPosType == PixelType.KILL)
 	if destPosType == PixelType.EMPTY:
 		SetPixel(destPos, GetPixel(srcPos)) # move dust
+		image.set_pixelv(destPos, image.get_pixelv(srcPos))
 	else:
 		Global.DustRemaining -= 1 # destroy dust
 		print("kill! " + str(Global.DustRemaining))
 	SetPixel(srcPos, PixelType.EMPTY)
-	
-	# now move color
-	image.set_pixelv(destPos, image.get_pixelv(srcPos))
 	image.set_pixelv(srcPos, Color.transparent)
-	#print("Moved pixel: ", srcPos, " to ", destPos)
 
 func UpdateDustPixelSim(pos, image):
 	var downPos = Vector2(pos.x, pos.y + 1)

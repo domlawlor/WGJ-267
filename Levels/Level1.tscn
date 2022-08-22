@@ -530,6 +530,7 @@ visible = false
 position = Vector2( 128, 406 )
 scale = Vector2( 2, 2 )
 frames = SubResource( 36 )
+frame = 2
 playing = true
 flip_h = true
 
