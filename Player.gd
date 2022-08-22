@@ -1,8 +1,8 @@
 extends KinematicBody2D
 
 onready var animatedSprite = $AnimatedSprite
-#onready var animationPlayer = $AnimationPlayer
 onready var sweepTimer = $SweepTimer
+onready var sweepSFX = $SweepSFX
 
 enum PlayerState {
 	GROUND
@@ -65,6 +65,7 @@ func _process(delta):
 		SetPlayerState(PlayerState.SWEEPING)
 		sweepTimer.start()
 		animatedSprite.play("sweep")
+		sweepSFX.play()
 		Events.emit_signal("sweep", Vector2(posX, position.y), m_facingRight)
 	
 	var canClimbLadder = m_ladderActive and m_state != PlayerState.SWEEPING

@@ -1,9 +1,10 @@
-[gd_scene load_steps=23 format=2]
+[gd_scene load_steps=24 format=2]
 
 [ext_resource path="res://Art/Player/Idle.png" type="Texture" id=1]
 [ext_resource path="res://Art/Player/Walk.png" type="Texture" id=2]
 [ext_resource path="res://Art/Player/Special.png" type="Texture" id=3]
 [ext_resource path="res://Player.gd" type="Script" id=4]
+[ext_resource path="res://Audio/sweep01.mp3" type="AudioStream" id=5]
 
 [sub_resource type="AtlasTexture" id=1]
 atlas = ExtResource( 1 )
@@ -101,11 +102,15 @@ speed_scale = 2.0
 offset = Vector2( 0, -24 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2( -0.5, -13 )
+position = Vector2( 0, -13 )
 shape = SubResource( 19 )
 
 [node name="SweepTimer" type="Timer" parent="."]
 wait_time = 0.3
 one_shot = true
+
+[node name="SweepSFX" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 5 )
+volume_db = -3.0
 
 [connection signal="timeout" from="SweepTimer" to="." method="_on_SweepTimer_timeout"]
