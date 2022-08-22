@@ -558,7 +558,7 @@ func _physics_process(delta):
 		UpdateSim_DirtyRect(delta)
 	else:
 		UpdateSim(delta)
-	update()
+	#update()
 
 # DEBUG: DRAW REGION - uncomment _draw() and update()
 #func _draw():
@@ -582,12 +582,14 @@ func _physics_process(delta):
 #
 #	var pixelFinalIndex = (pixelWorldSizeX * pixelWorldSizeY) - 1
 #	for i in range(pixelFinalIndex, -1, -1):
-#		if pixelTypes[i] == PixelType.COLLISION:
+#		if pixelTypes[i] == PixelType.COLLISION or pixelTypes[i] == PixelType.KILL:
 #			var x = (i % pixelWorldSizeX) * pixelSizeScale
 #			var y = floor(i / pixelWorldSizeX) * pixelSizeScale
 #			var pos = Vector2(x, y)
 #			var rect = Rect2(pos, rectSize)
 #			var c = Color(0, 1, 1, 0.9)
+#			if pixelTypes[i] == PixelType.KILL:
+#				c = Color(1, 1, 0, 0.9)
 #			draw_rect(rect, c, true)
 
 

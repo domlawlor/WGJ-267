@@ -79,7 +79,7 @@
 2/z_index = 0
 
 [sub_resource type="RectangleShape2D" id=31]
-extents = Vector2( 96, 28 )
+extents = Vector2( 104, 28 )
 
 [sub_resource type="ConvexPolygonShape2D" id=1]
 points = PoolVector2Array( 64, 64, 0, 64, 0, 0, 64, 0 )
@@ -478,7 +478,7 @@ position = Vector2( 556, 483 )
 collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AcidPit"]
-position = Vector2( 4, 1 )
+position = Vector2( -4, 1 )
 shape = SubResource( 31 )
 
 [node name="ColorRect" type="ColorRect" parent="AcidPit"]
@@ -528,7 +528,7 @@ visible = false
 position = Vector2( 128, 406 )
 scale = Vector2( 2, 2 )
 frames = SubResource( 36 )
-frame = 1
+frame = 3
 playing = true
 flip_h = true
 

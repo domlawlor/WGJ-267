@@ -122,7 +122,7 @@ func SetPlayerState(state):
 func _on_ladder_climbing_activate():
 	print("ladder active")
 	m_ladderActive = true
-	
+
 func _on_ladder_climbing_deactivate():
 	print("ladder inactive")
 	m_ladderActive = false
