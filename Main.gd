@@ -12,7 +12,9 @@ func _ready():
 func unload_level():
 	if (is_instance_valid(level_instance)):
 		level_instance.queue_free()
+		main_2d.remove_child(level_instance)
 	level_instance = null
+	
 
 func load_level(level_name : String):
 	unload_level()
