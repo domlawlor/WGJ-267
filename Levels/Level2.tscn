@@ -556,6 +556,7 @@ shape = SubResource( 28 )
 [node name="Door" parent="." instance=ExtResource( 17 )]
 position = Vector2( 576, 64 )
 scale = Vector2( 2, 2 )
+LevelNum = 2
 
 [node name="AcidPit" type="KinematicBody2D" parent="." groups=["dust_kill"]]
 position = Vector2( 556, 483 )
