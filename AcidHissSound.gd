@@ -13,7 +13,6 @@ func _ready():
 
 func _process(delta):
 	self.volume_db = max(SILENT_DB, self.volume_db - (DECAY * delta))
-	print("db: " + str(self.volume_db))
 
 func _on_dust_amount_changed(amount):
 	if amount < 0:

@@ -13,7 +13,7 @@
 [ext_resource path="res://Levels/Ladders.gd" type="Script" id=11]
 [ext_resource path="res://Art/Overlay_illumination.png" type="Texture" id=12]
 [ext_resource path="res://Levels/OverlayHaze.gd" type="Script" id=13]
-[ext_resource path="res://Art/BackgroundObjects/Monitor1.png" type="Texture" id=14]
+[ext_resource path="res://Art/BackgroundObjects/Capsule2.png" type="Texture" id=14]
 [ext_resource path="res://Art/BackgroundObjects/Web1.png" type="Texture" id=15]
 [ext_resource path="res://Art/BackgroundObjects/Generator.png" type="Texture" id=16]
 [ext_resource path="res://Door.tscn" type="PackedScene" id=17]
@@ -388,13 +388,13 @@ points = PoolVector2Array( 64, 64, 48, 64, 48, 0, 64, 0 )
 0/z_index = 0
 
 [sub_resource type="RectangleShape2D" id=27]
-extents = Vector2( 2.5, 89 )
+extents = Vector2( 2.5, 62 )
 
 [sub_resource type="RectangleShape2D" id=28]
 extents = Vector2( 32, 32 )
 
 [sub_resource type="RectangleShape2D" id=31]
-extents = Vector2( 104, 28 )
+extents = Vector2( 96, 28 )
 
 [sub_resource type="Animation" id=29]
 resource_name = "OverlayHazeMovement"
@@ -441,7 +441,7 @@ tracks/0/keys = {
 "values": [ Vector2( 0, 0 ) ]
 }
 
-[node name="Level1" type="Node2D"]
+[node name="Level2" type="Node2D"]
 script = ExtResource( 18 )
 
 [node name="Background" type="Node2D" parent="."]
@@ -461,7 +461,7 @@ texture = ExtResource( 6 )
 position = Vector2( -78, -240 )
 tile_set = SubResource( 23 )
 format = 1
-tile_data = PoolIntArray( 3, 2, 0, 4, 2, 1, 5, 2, 1, 6, 2, 1, 7, 2, 131073, 65539, 2, 65536, 131075, 2, 65536, 196611, 2, 65536, 262147, 2, 65536, 393215, 2, 1, 327680, 2, 1, 327681, 2, 1, 327682, 2, 1, 327683, 2, 65539, 393219, 2, 65536, 458753, 2, 65536, 458755, 2, 65536, 524289, 2, 65536, 524291, 2, 65536 )
+tile_data = PoolIntArray( 393215, 2, 1, 458753, 2, 65536, 524289, 2, 65536 )
 
 [node name="ForeDark" type="Sprite" parent="Background"]
 position = Vector2( 217, 21 )
@@ -472,42 +472,42 @@ texture = ExtResource( 8 )
 position = Vector2( -78, -240 )
 tile_set = SubResource( 23 )
 format = 1
-tile_data = PoolIntArray( 2, 0, 65536, 65538, 0, 65536, 65544, 0, 0, 131075, 0, 1, 131080, 0, 65537, 196616, 0, 65536, 262146, 0, 2, 262152, 0, 65536, 327682, 0, 65536, 327686, 0, 0, 327687, 0, 1, 327688, 0, 131073, 327690, 0, 1, 393218, 0, 65540, 393219, 0, 1, 393220, 0, 1, 393221, 0, 1, 393222, 0, 131073 )
+tile_data = PoolIntArray( 2, 0, 65536, 6, 2, 65536, 65537, 2, 1, 65538, 2, 1, 65539, 2, 1, 65540, 2, 1, 65541, 2, 1, 65542, 2, 65537, 65543, 2, 1, 65544, 2, 2, 131074, 0, 65536, 131078, 2, 65536, 131080, 2, 131072, 131081, 2, 1, 131082, 2, 1, 131083, 2, 1, 196609, 0, 0, 196610, 0, 131073, 196614, 2, 65536, 262145, 0, 65536, 262150, 2, 65540, 262151, 2, 1, 262152, 2, 1, 327680, 0, 1, 327681, 0, 65539, 327686, 2, 65536, 393217, 0, 65540, 393218, 0, 1, 393219, 0, 1, 393220, 0, 2, 393222, 2, 65536, 458753, 0, 65536 )
 
 [node name="MonitorProgress" type="Sprite" parent="."]
-position = Vector2( 354, 88 )
+position = Vector2( 378, 152 )
 scale = Vector2( 2, 2 )
 texture = ExtResource( 19 )
 hframes = 10
 
 [node name="TimerScreen" parent="." instance=ExtResource( 20 )]
-position = Vector2( 190, 233 )
+position = Vector2( 31, 303 )
 
 [node name="BackgroundObjects" type="Node2D" parent="."]
 
-[node name="3Screens" type="Sprite" parent="BackgroundObjects"]
-position = Vector2( 314, 288 )
+[node name="Capsule" type="Sprite" parent="BackgroundObjects"]
+position = Vector2( 383, 400 )
 scale = Vector2( 2, 2 )
 texture = ExtResource( 14 )
 
 [node name="Web" type="Sprite" parent="BackgroundObjects"]
-position = Vector2( 274, 208 )
+position = Vector2( 222, 272 )
 scale = Vector2( 2, 2 )
 texture = ExtResource( 15 )
 
 [node name="Web2" type="Sprite" parent="BackgroundObjects"]
-position = Vector2( 148, 272 )
+position = Vector2( 84, 144 )
 scale = Vector2( 2, 2 )
 texture = ExtResource( 5 )
 flip_h = true
 
 [node name="Web3" type="Sprite" parent="BackgroundObjects"]
-position = Vector2( 556, 80 )
+position = Vector2( 620, 400 )
 scale = Vector2( 2, 2 )
 texture = ExtResource( 5 )
 
 [node name="Web4" type="Sprite" parent="BackgroundObjects"]
-position = Vector2( 466, 272 )
+position = Vector2( 458, 400 )
 scale = Vector2( 2, 2 )
 texture = ExtResource( 7 )
 flip_h = true
@@ -517,46 +517,46 @@ visible = false
 position = Vector2( 128, 406 )
 scale = Vector2( 2, 2 )
 frames = SubResource( 36 )
+frame = 2
 playing = true
 flip_h = true
 
 [node name="DustSim" parent="." instance=ExtResource( 2 )]
 
 [node name="Player" parent="." instance=ExtResource( 4 )]
-position = Vector2( 95, 128 )
+position = Vector2( 96, 64 )
 
 [node name="TileMapForeground" type="TileMap" parent="."]
 tile_set = SubResource( 16 )
 collision_mask = 2
 format = 1
-tile_data = PoolIntArray( -1, 1, 0, -65536, 1, 0, -65535, 1, 0, -65534, 1, 0, -65533, 1, 0, -65532, 1, 0, -65531, 1, 0, -65530, 1, 0, -65529, 1, 0, -65528, 1, 0, -65527, 1, 0, -65526, 1, 0, 65535, 1, 0, 0, 0, 65538, 8, 0, 131072, 9, 0, 65537, 10, 1, 0, 131071, 1, 0, 65536, 0, 65538, 65545, 0, 65536, 65546, 1, 0, 196607, 1, 0, 131072, 0, 65537, 131073, 0, 1, 131074, 0, 1, 131075, 2, 0, 131076, 0, 1, 131077, 0, 1, 131078, 0, 1, 131079, 0, 2, 131081, 0, 65536, 131082, 1, 0, 262143, 1, 0, 196608, 1, 65536, 196609, 1, 262144, 196610, 0, 131074, 196613, 1, 0, 196614, 1, 65536, 196615, 0, 131074, 196617, 0, 65536, 196618, 1, 0, 327679, 1, 0, 262144, 1, 131072, 262145, 0, 131074, 262153, 0, 65536, 262154, 1, 0, 327686, 0, 0, 327687, 0, 1, 327688, 2, 0, 327689, 0, 131072, 327690, 1, 0, 393226, 1, 0, 524287, 1, 0, 458752, 0, 1, 458753, 0, 1, 458754, 0, 1, 458755, 0, 1, 458756, 0, 1, 458757, 0, 1, 458758, 0, 2, 458762, 1, 0, 589823, 1, 0, 524288, 1, 0, 524289, 1, 0, 524290, 1, 0, 524291, 1, 0, 524292, 1, 0, 524293, 1, 0, 524294, 1, 0, 524295, 1, 0, 524296, 1, 0, 524297, 1, 0, 524298, 1, 0 )
+tile_data = PoolIntArray( -1, 1, 0, -65536, 1, 0, -65535, 1, 0, -65534, 1, 0, -65533, 1, 0, -65532, 1, 0, -65531, 1, 0, -65530, 1, 0, -65529, 1, 0, -65528, 1, 0, -65527, 1, 0, -65526, 1, 0, 65535, 1, 0, 0, 0, 65538, 9, 0, 131072, 10, 1, 0, 131071, 1, 0, 65536, 0, 65537, 65537, 0, 1, 65538, 0, 2, 196607, 1, 0, 131072, 0, 65538, 262143, 1, 0, 196608, 0, 131074, 196611, 0, 0, 196612, 2, 0, 196613, 0, 1, 196614, 0, 1, 196615, 0, 1, 196617, 0, 1, 196618, 1, 0, 327679, 1, 0, 262153, 0, 65536, 262154, 1, 0, 393215, 1, 0, 327683, 0, 0, 327684, 0, 1, 327685, 0, 1, 327686, 0, 1, 327687, 0, 1, 327688, 2, 0, 327689, 0, 131074, 327690, 1, 0, 458751, 1, 0, 393226, 1, 0, 524287, 1, 0, 458755, 0, 0, 458756, 0, 1, 458757, 0, 1, 458758, 0, 2, 458762, 1, 0, 589823, 1, 0, 524288, 1, 0, 524289, 1, 0, 524290, 1, 0, 524291, 1, 0, 524292, 1, 0, 524293, 1, 0, 524294, 1, 0, 524295, 1, 0, 524296, 1, 0, 524297, 1, 0, 524298, 1, 0 )
 
-[node name="LaddersOFFSCREEN" type="Node2D" parent="."]
-position = Vector2( 1000, 0 )
+[node name="Ladders" type="Node2D" parent="."]
 script = ExtResource( 11 )
 
-[node name="Tilemap" type="TileMap" parent="LaddersOFFSCREEN"]
+[node name="Tilemap" type="TileMap" parent="Ladders"]
 tile_set = SubResource( 26 )
 format = 1
+tile_data = PoolIntArray( 196616, 0, 0, 262152, 0, 0 )
 
-[node name="Area2D" type="Area2D" parent="LaddersOFFSCREEN" groups=["ladder"]]
+[node name="Area2D" type="Area2D" parent="Ladders" groups=["ladder"]]
 position = Vector2( 100, 0 )
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="LaddersOFFSCREEN/Area2D"]
-position = Vector2( 316.5, 216 )
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ladders/Area2D"]
+position = Vector2( 444, 253 )
 shape = SubResource( 27 )
 
-[node name="StaticBody2D" type="StaticBody2D" parent="LaddersOFFSCREEN" groups=["ladder_top"]]
+[node name="StaticBody2D" type="StaticBody2D" parent="Ladders" groups=["ladder_top"]]
 position = Vector2( 416, 159 )
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="LaddersOFFSCREEN/StaticBody2D"]
-position = Vector2( 0, 1 )
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ladders/StaticBody2D"]
+position = Vector2( 128, 65 )
 shape = SubResource( 28 )
 
 [node name="Door" parent="." instance=ExtResource( 17 )]
-position = Vector2( 0, 320 )
+position = Vector2( 576, 64 )
 scale = Vector2( 2, 2 )
-IsLeftOfLevel = true
 
 [node name="AcidPit" type="KinematicBody2D" parent="." groups=["dust_kill"]]
 position = Vector2( 556, 483 )
@@ -566,25 +566,36 @@ collision_mask = 2
 position = Vector2( -4, 1 )
 shape = SubResource( 31 )
 
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="AcidPit"]
+position = Vector2( -460, 1 )
+shape = SubResource( 31 )
+
 [node name="ColorRect" type="ColorRect" parent="AcidPit"]
 margin_left = -108.0
 margin_top = -27.0
-margin_right = 121.0
+margin_right = 120.0
+margin_bottom = 36.0
+color = Color( 0.337255, 1, 0, 1 )
+
+[node name="ColorRect2" type="ColorRect" parent="AcidPit"]
+margin_left = -593.0
+margin_top = -27.0
+margin_right = -364.0
 margin_bottom = 36.0
 color = Color( 0.337255, 1, 0, 1 )
 
 [node name="DustSpawns" type="Node2D" parent="."]
 
 [node name="DustSpawn" parent="DustSpawns" instance=ExtResource( 9 )]
-position = Vector2( 194, 118 )
-DustAmount = 12
+position = Vector2( 127, 59 )
+DustAmount = 15
 
 [node name="DustSpawn2" parent="DustSpawns" instance=ExtResource( 9 )]
-position = Vector2( 453, 119 )
-DustAmount = 18
+position = Vector2( 466, 188 )
+DustAmount = 20
 
 [node name="DustSpawn3" parent="DustSpawns" instance=ExtResource( 9 )]
-position = Vector2( 418, 310 )
+position = Vector2( 349, 313 )
 DustAmount = 14
 
 [node name="OverlayHaze" type="Sprite" parent="."]
@@ -600,5 +611,5 @@ playback_speed = 0.7
 anims/OverlayHazeMovement = SubResource( 29 )
 anims/RESET = SubResource( 30 )
 
-[connection signal="body_entered" from="LaddersOFFSCREEN/Area2D" to="LaddersOFFSCREEN" method="_on_Area2D_body_entered"]
-[connection signal="body_exited" from="LaddersOFFSCREEN/Area2D" to="LaddersOFFSCREEN" method="_on_Area2D_body_exited"]
+[connection signal="body_entered" from="Ladders/Area2D" to="Ladders" method="_on_Area2D_body_entered"]
+[connection signal="body_exited" from="Ladders/Area2D" to="Ladders" method="_on_Area2D_body_exited"]

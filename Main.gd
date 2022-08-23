@@ -44,6 +44,9 @@ func _on_LoadLevel0_pressed():
 	
 func _on_LoadLevel1_pressed():
 	load_level("Level1")
+
+func _on_LoadLevel2_pressed():
+	load_level("Level2")
 	
 func _on_DomsTestLevel_pressed():
 	load_level("DomsTestLevel")
@@ -53,6 +56,8 @@ func _on_level_exited(num):
 		0:
 			load_level("Level1")
 		1:
+			load_level("Level2")
+		2:
 			levelList.visible = true
 
 func _on_start_countdown_timer():

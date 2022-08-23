@@ -78,6 +78,30 @@
 2/shapes = [  ]
 2/z_index = 0
 
+[sub_resource type="AtlasTexture" id=32]
+atlas = ExtResource( 16 )
+region = Rect2( 0, 0, 42, 42 )
+
+[sub_resource type="AtlasTexture" id=33]
+atlas = ExtResource( 16 )
+region = Rect2( 42, 0, 42, 42 )
+
+[sub_resource type="AtlasTexture" id=34]
+atlas = ExtResource( 16 )
+region = Rect2( 84, 0, 42, 42 )
+
+[sub_resource type="AtlasTexture" id=35]
+atlas = ExtResource( 16 )
+region = Rect2( 126, 0, 42, 42 )
+
+[sub_resource type="SpriteFrames" id=36]
+animations = [ {
+"frames": [ SubResource( 32 ), SubResource( 33 ), SubResource( 34 ), SubResource( 35 ) ],
+"loop": true,
+"name": "default",
+"speed": 5.0
+} ]
+
 [sub_resource type="ConvexPolygonShape2D" id=1]
 points = PoolVector2Array( 64, 64, 0, 64, 0, 0, 64, 0 )
 
@@ -346,30 +370,6 @@ points = PoolVector2Array( 64, 64, 48, 64, 48, 0, 64, 0 )
 } ]
 2/z_index = 0
 
-[sub_resource type="AtlasTexture" id=32]
-atlas = ExtResource( 16 )
-region = Rect2( 0, 0, 42, 42 )
-
-[sub_resource type="AtlasTexture" id=33]
-atlas = ExtResource( 16 )
-region = Rect2( 42, 0, 42, 42 )
-
-[sub_resource type="AtlasTexture" id=34]
-atlas = ExtResource( 16 )
-region = Rect2( 84, 0, 42, 42 )
-
-[sub_resource type="AtlasTexture" id=35]
-atlas = ExtResource( 16 )
-region = Rect2( 126, 0, 42, 42 )
-
-[sub_resource type="SpriteFrames" id=36]
-animations = [ {
-"frames": [ SubResource( 32 ), SubResource( 33 ), SubResource( 34 ), SubResource( 35 ) ],
-"loop": true,
-"name": "default",
-"speed": 5.0
-} ]
-
 [sub_resource type="TileSet" id=26]
 0/name = "ladder.png 0"
 0/texture = ExtResource( 10 )
@@ -473,11 +473,14 @@ tile_set = SubResource( 23 )
 format = 1
 tile_data = PoolIntArray( -65532, 0, 65536, 4, 0, 65536, 65540, 0, 65536, 131076, 0, 65536, 196612, 0, 65536, 262146, 0, 1, 262147, 0, 1, 262148, 0, 4, 262149, 0, 1, 262150, 0, 1, 262151, 0, 2, 262152, 0, 65536, 327687, 0, 131072, 327688, 0, 1, 327689, 0, 1, 327690, 0, 1 )
 
-[node name="TileMapForeground" type="TileMap" parent="."]
-tile_set = SubResource( 16 )
-collision_mask = 2
-format = 1
-tile_data = PoolIntArray( -1, 1, 0, -65536, 1, 0, -65535, 1, 0, -65534, 1, 0, -65533, 1, 0, -65532, 1, 0, -65531, 1, 0, -65530, 1, 0, -65529, 1, 0, -65528, 1, 0, -65527, 1, 0, -65526, 1, 0, 65535, 1, 0, 0, 0, 65538, 7, 0, 131072, 8, 0, 131073, 9, 0, 131073, 10, 1, 0, 131071, 1, 0, 65536, 0, 65538, 196607, 1, 0, 131072, 0, 65537, 131073, 0, 2, 262143, 1, 0, 196608, 0, 65537, 196609, 0, 65537, 196610, 0, 1, 196611, 0, 1, 196612, 0, 1, 196613, 0, 1, 196614, 2, 0, 196615, 0, 1, 196616, 0, 1, 196617, 0, 1, 196618, 1, 0, 327679, 1, 0, 262144, 0, 65537, 262145, 1, 65536, 262146, 0, 65538, 262152, 1, 65536, 262153, 0, 65536, 262154, 1, 0, 393215, 1, 0, 327680, 1, 0, 327681, 1, 131072, 327682, 0, 65538, 327689, 0, 65536, 327690, 1, 0, 458751, 1, 0, 393216, 1, 327680, 393217, 1, 196608, 393218, 0, 65537, 393219, 0, 1, 393220, 0, 2, 393225, 0, 65536, 393226, 1, 0, 524287, 1, 0, 458752, 1, 262144, 458753, 0, 65537, 458754, 0, 65537, 458755, 0, 65537, 458756, 0, 65538, 458761, 0, 65536, 458762, 1, 0, 589823, 1, 0, 524288, 1, 0, 524289, 1, 0, 524290, 1, 0, 524291, 1, 0, 524292, 1, 0, 524293, 1, 0, 524294, 1, 0, 524295, 1, 0, 524296, 1, 0, 524297, 1, 0, 524298, 1, 0 )
+[node name="MonitorProgress" type="Sprite" parent="."]
+position = Vector2( 255, 344 )
+scale = Vector2( 2, 2 )
+texture = ExtResource( 19 )
+hframes = 10
+
+[node name="TimerScreen" parent="." instance=ExtResource( 15 )]
+position = Vector2( 360, 82 )
 
 [node name="BackgroundObjects" type="Node2D" parent="."]
 
@@ -508,15 +511,19 @@ visible = false
 position = Vector2( 128, 406 )
 scale = Vector2( 2, 2 )
 frames = SubResource( 36 )
-frame = 3
 playing = true
 flip_h = true
 
-[node name="MonitorProgress" type="Sprite" parent="."]
-position = Vector2( 255, 344 )
-scale = Vector2( 2, 2 )
-texture = ExtResource( 19 )
-hframes = 10
+[node name="DustSim" parent="." instance=ExtResource( 2 )]
+
+[node name="Player" parent="." instance=ExtResource( 4 )]
+position = Vector2( 95, 128 )
+
+[node name="TileMapForeground" type="TileMap" parent="."]
+tile_set = SubResource( 16 )
+collision_mask = 2
+format = 1
+tile_data = PoolIntArray( -1, 1, 0, -65536, 1, 0, -65535, 1, 0, -65534, 1, 0, -65533, 1, 0, -65532, 1, 0, -65531, 1, 0, -65530, 1, 0, -65529, 1, 0, -65528, 1, 0, -65527, 1, 0, -65526, 1, 0, 65535, 1, 0, 0, 0, 65538, 7, 0, 131072, 8, 0, 131073, 9, 0, 131073, 10, 1, 0, 131071, 1, 0, 65536, 0, 65538, 196607, 1, 0, 131072, 0, 65537, 131073, 0, 2, 262143, 1, 0, 196608, 0, 65537, 196609, 0, 65537, 196610, 0, 1, 196611, 0, 1, 196612, 0, 1, 196613, 0, 1, 196614, 2, 0, 196615, 0, 1, 196616, 0, 1, 196617, 0, 1, 196618, 1, 0, 327679, 1, 0, 262144, 0, 65537, 262145, 1, 65536, 262146, 0, 65538, 262152, 1, 65536, 262153, 0, 65536, 262154, 1, 0, 393215, 1, 0, 327680, 1, 0, 327681, 1, 131072, 327682, 0, 65538, 327689, 0, 65536, 327690, 1, 0, 458751, 1, 0, 393216, 1, 327680, 393217, 1, 196608, 393218, 0, 65537, 393219, 0, 1, 393220, 0, 2, 393225, 0, 65536, 393226, 1, 0, 524287, 1, 0, 458752, 1, 262144, 458753, 0, 65537, 458754, 0, 65537, 458755, 0, 65537, 458756, 0, 65538, 458761, 0, 65536, 458762, 1, 0, 589823, 1, 0, 524288, 1, 0, 524289, 1, 0, 524290, 1, 0, 524291, 1, 0, 524292, 1, 0, 524293, 1, 0, 524294, 1, 0, 524295, 1, 0, 524296, 1, 0, 524297, 1, 0, 524298, 1, 0 )
 
 [node name="LaddersOFFSCREEN" type="Node2D" parent="."]
 position = Vector2( 1000, 0 )
@@ -539,14 +546,6 @@ position = Vector2( 416, 159 )
 [node name="CollisionShape2D" type="CollisionShape2D" parent="LaddersOFFSCREEN/StaticBody2D"]
 position = Vector2( 0, 1 )
 shape = SubResource( 28 )
-
-[node name="TimerScreen" parent="." instance=ExtResource( 15 )]
-position = Vector2( 360, 82 )
-
-[node name="DustSim" parent="." instance=ExtResource( 2 )]
-
-[node name="Player" parent="." instance=ExtResource( 4 )]
-position = Vector2( 95, 128 )
 
 [node name="Door" parent="." instance=ExtResource( 17 )]
 position = Vector2( 576, 64 )

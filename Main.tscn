@@ -33,10 +33,16 @@ margin_right = 100.0
 margin_bottom = 55.0
 text = "Load Level 1"
 
-[node name="DomsTestLevel" type="Button" parent="Menu/LevelList"]
+[node name="LoadLevel2" type="Button" parent="Menu/LevelList"]
 margin_top = 70.0
 margin_right = 100.0
 margin_bottom = 90.0
+text = "Load Level 2"
+
+[node name="DomsTestLevel" type="Button" parent="Menu/LevelList"]
+margin_top = 105.0
+margin_right = 100.0
+margin_bottom = 125.0
 text = "Doms Testing"
 
 [node name="Main2D" type="Node2D" parent="."]
@@ -57,5 +63,6 @@ volume_db = -10.0
 
 [connection signal="pressed" from="Menu/LevelList/LoadLevel0" to="." method="_on_LoadLevel0_pressed"]
 [connection signal="pressed" from="Menu/LevelList/LoadLevel1" to="." method="_on_LoadLevel1_pressed"]
+[connection signal="pressed" from="Menu/LevelList/LoadLevel2" to="." method="_on_LoadLevel2_pressed"]
 [connection signal="pressed" from="Menu/LevelList/DomsTestLevel" to="." method="_on_DomsTestLevel_pressed"]
 [connection signal="timeout" from="TimeLimit" to="." method="_on_TimeLimit_timeout"]
