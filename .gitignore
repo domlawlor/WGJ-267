@@ -363,3 +363,9 @@ $RECYCLE.BIN/
 *.msm
 *.msp
 *.lnk
+
+#####################
+### Working files ###
+#####################
+
+WorkingFiles/

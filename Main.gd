@@ -3,11 +3,13 @@ extends Control
 onready var menu : Control = $Menu
 onready var levelList : VBoxContainer = $Menu/LevelList
 onready var main_2d : Node2D = $Main2D
+onready var bgm : AudioStreamPlayer = $BGM
 
 var level_instance : Node2D
 
 func _ready():
 	Events.connect("level_exited", self, "_on_level_exited")
+	bgm.play()
 
 func unload_level():
 	if (is_instance_valid(level_instance)):
