@@ -523,11 +523,6 @@ scale = Vector2( 2, 2 )
 texture = ExtResource( 19 )
 hframes = 10
 
-[node name="Door" parent="." instance=ExtResource( 17 )]
-position = Vector2( 0, 320 )
-scale = Vector2( 2, 2 )
-IsLeftOfLevel = true
-
 [node name="LaddersOFFSCREEN" type="Node2D" parent="."]
 position = Vector2( 1000, 0 )
 script = ExtResource( 11 )
@@ -554,6 +549,11 @@ shape = SubResource( 28 )
 
 [node name="Player" parent="." instance=ExtResource( 4 )]
 position = Vector2( 95, 128 )
+
+[node name="Door" parent="." instance=ExtResource( 17 )]
+position = Vector2( 0, 320 )
+scale = Vector2( 2, 2 )
+IsLeftOfLevel = true
 
 [node name="AcidPit" type="KinematicBody2D" parent="." groups=["dust_kill"]]
 position = Vector2( 556, 483 )
