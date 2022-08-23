@@ -17,8 +17,6 @@ onready var sprite_2x : Sprite = $Sprite_2x
 onready var sprite_4x : Sprite = $Sprite_4x
 var sprite : Sprite # set in _ready
 
-onready var colTest : KinematicBody2D = $CollisionTestArea
-
 const FIRE_DUST_TEST = false
 
 var enabledDebugDrawCollision = false
@@ -166,7 +164,11 @@ func SetLevelCollisions():
 		
 		var collisions = space_state.intersect_point(testPos)
 		for col in collisions:
-			if col.collider.is_in_group("dust_kill"):
+			var collider = col.collider
+			if collider.is_in_group("player"):
+				continue
+			
+			if collider.is_in_group("dust_kill"):
 				pixelTypes[i] = PixelType.KILL
 			else:
 				pixelTypes[i] = PixelType.COLLISION

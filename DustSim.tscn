@@ -1,7 +1,6 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://DustSim.gd" type="Script" id=1]
-[ext_resource path="res://CollisionTestArea.tscn" type="PackedScene" id=2]
 
 [sub_resource type="Image" id=5]
 data = {
@@ -51,5 +50,3 @@ visible = false
 scale = Vector2( 2, 2 )
 texture = SubResource( 4 )
 offset = Vector2( 160, 120 )
-
-[node name="CollisionTestArea" parent="." instance=ExtResource( 2 )]

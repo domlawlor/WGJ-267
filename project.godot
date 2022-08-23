@@ -120,6 +120,12 @@ debug_button_5={
 
 pointing/emulate_mouse_from_touch=false
 
+[layer_names]
+
+2d_physics/layer_1="player"
+2d_physics/layer_2="walls"
+2d_physics/layer_3="lava"
+
 [network]
 
 limits/debugger_stdout/max_chars_per_second=200000
