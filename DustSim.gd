@@ -12,16 +12,19 @@ enum PixelType {
 	COLLISION
 	KILL
 }
-# pick pixel scale size here
-onready var sprite : Sprite = $Sprite_4x
-#onready var sprite : Sprite = $Sprite_2x
+
+onready var sprite_2x : Sprite = $Sprite_2x
+onready var sprite_4x : Sprite = $Sprite_4x
+var sprite : Sprite # set in _ready
 
 onready var colTest : KinematicBody2D = $CollisionTestArea
 
 const FIRE_DUST_TEST = false
 
 const USE_DIRTY_RECTS = true
-var enabledDebugDrawing = false
+var enabledDebugDrawCollision = false
+var enabledDebugDrawRegions = false
+var enabledDebugDrawDirtyRects = false
 
 const DIRTY_RECT_BOUNDARY = 1
 
@@ -61,8 +64,15 @@ func _ready():
 	Events.connect("sweep", self, "_on_sweep")
 	Events.connect("spawn_dust", self, "_on_spawn_dust")
 	
+	if Global.DUST_SCALE == 1:
+		sprite = sprite_2x
+	elif Global.DUST_SCALE == 2:
+		sprite = sprite_4x
+	else:
+		assert(false) # bad DUST_SCALE value!
+	
 	sprite.visible = true
-	pixelSizeScale = sprite.scale.x
+	pixelSizeScale = Global.DUST_SIZE
 	
 	pixelWorldSizeX = worldSizeX / pixelSizeScale
 	pixelWorldSizeY = worldSizeY / pixelSizeScale
@@ -403,8 +413,14 @@ func _process(event):
 	var simPosX = simPos.x
 	var simPosY = simPos.y
 	
+	if Input.is_action_just_pressed("debug_button_2"):
+		enabledDebugDrawCollision = !enabledDebugDrawCollision
+	
+	if Input.is_action_just_pressed("debug_button_3"):
+		enabledDebugDrawRegions = !enabledDebugDrawRegions
+	
 	if Input.is_action_just_pressed("debug_button_4"):
-		enabledDebugDrawing = !enabledDebugDrawing
+		enabledDebugDrawDirtyRects = !enabledDebugDrawDirtyRects
 		
 	if Input.is_action_pressed("fire_dust"):
 		FireDust(simPos, true)
@@ -423,8 +439,7 @@ func ApplyForce(pos, image):
 	if forceRight:
 		mod = -1 # right
 	
-	# weird calc to make sweepHeight consistent for both 4x and 2x dust
-	var sweepHeight = (6 - pixelSizeScale) * 4    # 4x=8, 2x=16
+	var sweepHeight : int = 16 / Global.DUST_SCALE
 	var checkNum = 1
 	var xStart = pos.x - ((sweepHeight - 1) * mod)
 	var yStart = pos.y - (sweepHeight - 1)
@@ -560,47 +575,39 @@ func _physics_process(delta):
 		UpdateSim_DirtyRect(delta)
 	else:
 		UpdateSim(delta)
-	#update()
+	update()
 
-# DEBUG: DRAW REGION - uncomment _draw() and update()
-#func _draw():
-#	var scaledRegionSize = REGION_SIZE * pixelSizeScale
-#	var regionRectSize = Vector2(scaledRegionSize, scaledRegionSize)
-#
-#	var regionFinalIndex = (pixelWorldSizeX / REGION_SIZE) * (pixelWorldSizeY / REGION_SIZE) - 1
-#	for i in range(regionFinalIndex, -1, -1):
-#		var posStart = ConvertRegionIndexToPosStart(i)
-#		var scaledPos = posStart * pixelSizeScale
-#		var rect = Rect2(scaledPos, regionRectSize)
-#		var c = Color(0, 1, 0, 0.2)
-#		if !checkRegions[i]:
-#			c.g = 0
-#			c.r = 1
-#		draw_rect(rect, c, true)
-
-# DEBUG: DRAW COLLISION - uncomment _draw() and update()
-#func _draw():
-#	var rectSize = Vector2(pixelSizeScale, pixelSizeScale)
-#
-#	var pixelFinalIndex = (pixelWorldSizeX * pixelWorldSizeY) - 1
-#	for i in range(pixelFinalIndex, -1, -1):
-#		if pixelTypes[i] == PixelType.COLLISION or pixelTypes[i] == PixelType.KILL:
-#			var x = (i % pixelWorldSizeX) * pixelSizeScale
-#			var y = floor(i / pixelWorldSizeX) * pixelSizeScale
-#			var pos = Vector2(x, y)
-#			var rect = Rect2(pos, rectSize)
-#			var c = Color(0, 1, 1, 0.9)
-#			if pixelTypes[i] == PixelType.KILL:
-#				c = Color(1, 1, 0, 0.9)
-#			draw_rect(rect, c, true)
-
-
-# Debug code by Dom, will merge sort out soon
 func _draw():
-	if enabledDebugDrawing and USE_DIRTY_RECTS:
-
+	if enabledDebugDrawCollision:
+		var rectSize = Vector2(pixelSizeScale, pixelSizeScale)
+		var pixelFinalIndex = (pixelWorldSizeX * pixelWorldSizeY) - 1
+		for i in range(pixelFinalIndex, -1, -1):
+			if pixelTypes[i] == PixelType.COLLISION or pixelTypes[i] == PixelType.KILL:
+				var x = (i % pixelWorldSizeX) * pixelSizeScale
+				var y = floor(i / pixelWorldSizeX) * pixelSizeScale
+				var pos = Vector2(x, y)
+				var rect = Rect2(pos, rectSize)
+				var c = Color(0, 1, 1, 0.9)
+				if pixelTypes[i] == PixelType.KILL:
+					c = Color(1, 1, 0, 0.9)
+				draw_rect(rect, c, true)
+	
+	if enabledDebugDrawRegions:
+		var scaledRegionSize = REGION_SIZE * pixelSizeScale
+		var regionRectSize = Vector2(scaledRegionSize, scaledRegionSize)
+		var regionFinalIndex = (pixelWorldSizeX / REGION_SIZE) * (pixelWorldSizeY / REGION_SIZE) - 1
+		for i in range(regionFinalIndex, -1, -1):
+			var posStart = ConvertRegionIndexToPosStart(i)
+			var scaledPos = posStart * pixelSizeScale
+			var rect = Rect2(scaledPos, regionRectSize)
+			var c = Color(0, 1, 0, 0.2)
+			if !checkRegions[i]:
+				c.g = 0
+				c.r = 1
+			draw_rect(rect, c, true)
+	
+	if enabledDebugDrawDirtyRects and USE_DIRTY_RECTS:
 		var regionSize = Vector2(REGION_SIZE * pixelSizeScale, REGION_SIZE * pixelSizeScale)
-
 		var regionFinalIndex = (regionWorldSizeX * regionWorldSizeY) - 1
 		for i in range(regionFinalIndex, -1, -1):
 			var posStart = ConvertRegionIndexToPosStart(i)
@@ -621,5 +628,3 @@ func _draw():
 				draw_rect(drawDirtyRect, Color.yellow, false)
 			else:
 				draw_rect(rect, Color.black, false)
-
-
