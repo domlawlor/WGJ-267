@@ -1,16 +1,20 @@
 extends Node2D
 
-export(Color) var dustColourA
-export(Color) var dustColourB
-export(Color) var dustColourC
-export(Color) var dustColourD
+export(Array, Color) var dustColors = [
+	Color(0.368627, 0.796078, 0.407843, 1),
+	Color(0.0823529, 0.447059, 0.113725, 1),
+	Color(0.0705882, 0.392157, 0.0980392, 1),
+	Color(0.0534668, 0.285156, 0.0734209, 1)
+]
+export(Array, Color) var lavaColors = [Color.red, Color.brown, Color.crimson, Color.darkred]
 
 enum PixelType {
 	EMPTY
 	DUST
 	FLYING_DUST
+	LAVA
+	FLYING_LAVA
 	COLLISION
-	KILL
 }
 
 onready var sprite_2x : Sprite = $Sprite_2x
@@ -157,6 +161,7 @@ func SetLevelCollisions():
 	var space_rid = get_world_2d().space
 	var space_state = Physics2DServer.space_get_direct_state(space_rid)
 	
+	var lavaPositions = []
 	for i in range(0, pixelTypes.size()):
 		var testPos = Vector2()
 		testPos.x = ((i % pixelWorldSizeX) * pixelSizeScale) + 1
@@ -169,9 +174,11 @@ func SetLevelCollisions():
 				continue
 			
 			if collider.is_in_group("dust_kill"):
-				pixelTypes[i] = PixelType.KILL
+				var simPos = GetSimPos(testPos)
+				lavaPositions.push_back(simPos)
 			else:
 				pixelTypes[i] = PixelType.COLLISION
+	CreatePixels(lavaPositions, PixelType.LAVA)
 
 func _on_spawn_dust(pos, amount):
 	var simPos = GetSimPos(pos)
@@ -181,20 +188,18 @@ func _on_spawn_dust(pos, amount):
 	for x in range(0, amount):
 		for y in range(0, amount):
 			positions.push_back(Vector2(xStart + x, yStart + y))
-	CreateDust(positions)
+	CreatePixels(positions, PixelType.DUST)
 
-func GetDustColor():
-	var color
-	var randIdx = randi() % 4
-	match(randIdx):
-		0:
-			color = dustColourA
-		1:
-			color = dustColourB
-		2:
-			color = dustColourC
-		3:
-			color = dustColourD
+func GetPixelTypeColor(type):
+	var colorArray
+	if type == PixelType.DUST or type == PixelType.FLYING_DUST:
+		colorArray = dustColors
+	if type == PixelType.LAVA or type == PixelType.FLYING_LAVA:
+		colorArray = lavaColors	
+	assert(colorArray)
+	
+	var randIdx = randi() % colorArray.size()
+	var color = colorArray[randIdx]
 	return color
 
 func FireDust(pos, canMakeDust):
@@ -223,7 +228,7 @@ func FireDustInDir(pos, vel, canMakeDust):
 	pixelVelocity[(pos.y * pixelWorldSizeX) + pos.x] = vel
 	
 	if pixelType == PixelType.EMPTY:
-		var color = GetDustColor()
+		var color = GetPixelTypeColor(PixelType.DUST)
 		image.set_pixelv(pos, color)
 		ActivateRegion(pos)
 		Global.DustRemaining += 1
@@ -232,36 +237,37 @@ func FireDustInDir(pos, vel, canMakeDust):
 	image.unlock()
 	sprite.get_texture().set_data(image)
 	
-func CreateDust(positions):
-	var amountCreated : int = 0
+func CreatePixels(positions, type):
+	var dustCreated : int = 0
 	var image = sprite.get_texture().get_data()
 	image.lock()
-	
+		
 	for pos in positions:
 		if !IsPositionEmpty(pos):
 			continue
-		
+			
 		#print("CreateDust xPos:", pos.x, ", yPos:", pos.y)
-		SetPixel(pos, PixelType.DUST)
+		SetPixel(pos, type)
 		
-		var color = GetDustColor()
+		var color = GetPixelTypeColor(type)
 		image.set_pixelv(pos, color)
 		
-		amountCreated += 1
+		if type == PixelType.DUST:
+			dustCreated += 1
 	
 	image.unlock()
 	sprite.get_texture().set_data(image)
-	Global.DustRemaining += amountCreated
-	Events.emit_signal("dust_amount_changed", amountCreated)
+	Global.DustRemaining += dustCreated
+	Events.emit_signal("dust_amount_changed", dustCreated)
 	#print("Dust remaining: " + str(Global.DustRemaining))
 
-func CreateBulkDust(pos):
+func CreateBulkPixels(pos, type):
 	var positions = [pos]
 	positions.push_back(Vector2(pos.x - (randi() % 10), pos.y - (randi() % 14)))
 	positions.push_back(Vector2(pos.x + (randi() % 10), pos.y - (randi() % 14)))
 	positions.push_back(Vector2(pos.x + (randi() % 12), pos.y - (randi() % 14)))
 	positions.push_back(Vector2(pos.x - (randi() % 12), pos.y - (randi() % 14)))
-	CreateDust(positions)
+	CreatePixels(positions, type)
 
 func IsInBounds(pos):
 	var inXBounds = pos.x < pixelWorldSizeX and pos.x >= 0
@@ -270,7 +276,8 @@ func IsInBounds(pos):
 
 func MovePixel(srcPos, destPos, image):
 	var destPosType = GetPixel(destPos)
-	assert(destPosType == PixelType.EMPTY or destPosType == PixelType.KILL)
+	assert(destPosType == PixelType.EMPTY or destPosType == PixelType.LAVA)
+	
 	if destPosType == PixelType.EMPTY:
 		SetPixel(destPos, GetPixel(srcPos)) # move dust
 		image.set_pixelv(destPos, image.get_pixelv(srcPos))
@@ -347,6 +354,47 @@ func UpdateDustPixelSim(pos, image):
 	if movePos:
 		MovePixel(pos, movePos, image)
 
+func MoveLavaPixel(srcPos, destPos, image):
+	var destPosType = GetPixel(destPos)
+	assert(destPosType != PixelType.COLLISION and destPosType != PixelType.LAVA)
+	
+	SetPixel(destPos, GetPixel(srcPos)) # move dust
+	image.set_pixelv(destPos, image.get_pixelv(srcPos))
+
+	SetPixel(srcPos, PixelType.EMPTY)
+	image.set_pixelv(srcPos, Color.transparent)
+	
+	if destPosType == PixelType.DUST or destPosType == PixelType.FLYING_DUST:
+		Global.DustRemaining -= 1 # destroy dust
+		Events.emit_signal("dust_amount_changed", -1)
+
+func UpdateLavaPixel(pos, image):
+	var movePos = null
+	
+	var vel = 3
+	
+	while vel > 0 and movePos == null:
+		var downPos = Vector2(pos.x, pos.y + vel)
+		var downRightPos = Vector2(pos.x + 1, pos.y + vel)
+		var downLeftPos = Vector2(pos.x - 1, pos.y + vel)
+		
+		var randLeftRight = -vel if randi() % 2 == 0 else vel
+		var leftOrRightPos = Vector2(pos.x + randLeftRight, pos.y)
+		
+		if IsPositionFreeForLava(downPos):
+			movePos = downPos
+		elif IsPositionFreeForLava(downRightPos):
+			movePos = downRightPos
+		elif IsPositionFreeForLava(downLeftPos):
+			movePos = downLeftPos
+		elif IsPositionFreeForLava(leftOrRightPos):
+			movePos = leftOrRightPos
+		
+		vel -= 1
+	
+	if movePos:
+		MoveLavaPixel(pos, movePos, image)
+
 
 # One idea is we could get rid of delta by running in fixed time steps
 #	So in sim, accumulate the delta and once bigger than a fixedTimeStep, run the sim.
@@ -411,6 +459,11 @@ func UpdateSim(delta):
 							UpdateDustPixelSim(pos, image)
 						elif pixelType == PixelType.FLYING_DUST:
 							UpdateFlyingDustPixel(pos, delta, image)
+						elif pixelType == PixelType.LAVA:
+							UpdateLavaPixel(pos, image)
+						elif pixelType == PixelType.FLYING_LAVA:
+							#UpdateFlyingDustPixel(pos, delta, image)
+							pass
 					SetPixelState(pos, true)
 					xPos += 1
 				yPos -= 1
@@ -435,7 +488,7 @@ func _input(event):
 	if event is InputEventScreenTouch:
 		if event.is_pressed():
 			var simPos = ScreenPosToSimPos(event.position)
-			CreateBulkDust(simPos)
+			CreateBulkPixels(simPos, PixelType.DUST)
 
 func _process(event):
 	var mousePos = get_viewport().get_mouse_position()
@@ -450,9 +503,9 @@ func _process(event):
 	if Input.is_action_pressed("fire_dust"):
 		FireDust(simPos, true)
 	elif Input.is_action_pressed("spawn_bulk_pixels"):
-		CreateBulkDust(simPos)
+		CreateBulkPixels(simPos, PixelType.LAVA)
 	elif Input.is_action_pressed("spawn_pixel"):
-		CreateDust([simPos])
+		CreatePixels([simPos], PixelType.LAVA)
 
 func ApplyForce(pos, image):
 	# -     #
@@ -497,6 +550,12 @@ func ApplyForce(pos, image):
 			c += 1
 		checkNum += 1
 
+func IsPositionFreeForLava(pos):
+	if !IsInBounds(pos):
+		return false
+	var posType = GetPixel(pos)
+	return posType != PixelType.COLLISION and posType != PixelType.LAVA
+
 func IsPositionEmpty(pos):
 	if !IsInBounds(pos):
 		return false
@@ -507,7 +566,7 @@ func IsPositionFreeToMove(pos):
 	if !IsInBounds(pos):
 		return false
 	var posType = GetPixel(pos)
-	return posType == PixelType.EMPTY or posType == PixelType.KILL
+	return posType == PixelType.EMPTY or posType == PixelType.LAVA
 	
 func ConvertRegionIndexToPosStart(rIndex):
 	var x = (rIndex % regionWorldSizeX) * REGION_SIZE
@@ -533,13 +592,13 @@ func _draw():
 		var rectSize = Vector2(pixelSizeScale, pixelSizeScale)
 		var pixelFinalIndex = (pixelWorldSizeX * pixelWorldSizeY) - 1
 		for i in range(pixelFinalIndex, -1, -1):
-			if pixelTypes[i] == PixelType.COLLISION or pixelTypes[i] == PixelType.KILL:
+			if pixelTypes[i] == PixelType.COLLISION or pixelTypes[i] == PixelType.LAVA:
 				var x = (i % pixelWorldSizeX) * pixelSizeScale
 				var y = floor(i / pixelWorldSizeX) * pixelSizeScale
 				var pos = Vector2(x, y)
 				var rect = Rect2(pos, rectSize)
 				var c = Color(0, 1, 1, 0.9)
-				if pixelTypes[i] == PixelType.KILL:
+				if pixelTypes[i] == PixelType.LAVA:
 					c = Color(1, 1, 0, 0.9)
 				draw_rect(rect, c, true)
 	

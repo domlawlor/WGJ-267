@@ -471,7 +471,7 @@ extents = Vector2( 2.5, 89 )
 extents = Vector2( 32, 32 )
 
 [sub_resource type="RectangleShape2D" id=31]
-extents = Vector2( 128, 55 )
+extents = Vector2( 117.5, 55.5 )
 
 [sub_resource type="Animation" id=29]
 resource_name = "OverlayHazeMovement"
@@ -589,7 +589,6 @@ visible = false
 position = Vector2( 128, 406 )
 scale = Vector2( 2, 2 )
 frames = SubResource( 36 )
-frame = 3
 playing = true
 flip_h = true
 
@@ -637,20 +636,13 @@ shape = SubResource( 28 )
 position = Vector2( 576, 64 )
 scale = Vector2( 2, 2 )
 
-[node name="AcidPit" type="KinematicBody2D" parent="." groups=["dust_kill"]]
+[node name="LavaPit" type="KinematicBody2D" parent="." groups=["dust_kill"]]
 position = Vector2( 556, 483 )
 collision_mask = 2
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="AcidPit"]
-position = Vector2( -108, -26 )
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LavaPit"]
+position = Vector2( -107.5, -39.5 )
 shape = SubResource( 31 )
-
-[node name="ColorRect" type="ColorRect" parent="AcidPit"]
-margin_left = -236.0
-margin_top = -81.0
-margin_right = 20.0
-margin_bottom = 36.0
-color = Color( 0.337255, 1, 0, 1 )
 
 [node name="DustSpawns" type="Node2D" parent="."]
 
