@@ -454,9 +454,12 @@ func ApplyForce(pos, image):
 					FireDustInDir(currentPos, dirUpPos, false)
 				else:
 					if GetPixel(currentPos) == PixelType.DUST:
-						var dirPos = Vector2(x-mod, y)
-						var dirUpPos = Vector2(x-mod, y-1)
-						var dirUpUpPos = Vector2(x-mod, y-2)
+						var xMod = mod
+						if Global.DUST_SCALE == 1:
+							xMod = mod * 2
+						var dirPos = Vector2(x-xMod, y)
+						var dirUpPos = Vector2(x-xMod, y-1)
+						var dirUpUpPos = Vector2(x-xMod, y-2)
 
 						if IsPositionFreeToMove(dirPos):
 							MovePixel(currentPos, dirPos, image)
