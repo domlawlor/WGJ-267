@@ -16,7 +16,7 @@ enum PlayerState {
 var SWEEP_OFFSET : int = 20
 var WALK_SPEED = 120
 var LADDER_SPEED = 100
-var GRAVITY = 1
+var GRAVITY = 18
 var SINK_SPEED = 10
 
 var m_spawnPos : Vector2
