@@ -5,10 +5,17 @@ onready var levelList : VBoxContainer = $Menu/LevelList
 onready var main_2d : Node2D = $Main2D
 onready var bgm : AudioStreamPlayer = $BGM
 
+onready var timeLimit : Timer = $TimeLimit
+
 var level_instance : Node2D
+
+export var TotalTimeLimitSec : float = 120.0
 
 func _ready():
 	Events.connect("level_exited", self, "_on_level_exited")
+	Events.connect("start_countdown_timer", self, "_on_start_countdown_timer")
+	Events.emit_signal("start_countdown_timer")
+	
 	bgm.play()
 
 func unload_level():
@@ -16,7 +23,6 @@ func unload_level():
 		level_instance.queue_free()
 		main_2d.remove_child(level_instance)
 	level_instance = null
-	
 
 func load_level(level_name : String):
 	unload_level()
@@ -30,6 +36,8 @@ func load_level(level_name : String):
 func _process(delta):
 	if Input.is_action_just_pressed("toggle_menu"):
 		levelList.visible = !levelList.visible
+	
+	Global.TimeLimitTimeLeft = timeLimit.time_left
 
 func _on_LoadLevel0_pressed():
 	load_level("Level0")
@@ -46,3 +54,9 @@ func _on_level_exited(num):
 			load_level("Level1")
 		1:
 			levelList.visible = true
+
+func _on_start_countdown_timer():
+	timeLimit.start(TotalTimeLimitSec)
+	
+func _on_TimeLimit_timeout():
+	Events.emit_signal("countdown_timer_end_hit")

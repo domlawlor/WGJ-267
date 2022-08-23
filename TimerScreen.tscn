@@ -1,0 +1,51 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://TimerScreen.gd" type="Script" id=1]
+[ext_resource path="res://Art/BackgroundObjects/Monitor4.png" type="Texture" id=2]
+[ext_resource path="res://timerScreenB.tres" type="Theme" id=3]
+[ext_resource path="res://timerScreenA.tres" type="Theme" id=4]
+
+[node name="TimerScreen" type="Node2D"]
+script = ExtResource( 1 )
+
+[node name="Sprite" type="Sprite" parent="."]
+position = Vector2( 5, -10 )
+scale = Vector2( 1.5, 1.5 )
+texture = ExtResource( 2 )
+
+[node name="LabelA" type="Label" parent="."]
+visible = false
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -12.0
+margin_top = -8.0
+margin_right = 23.0
+margin_bottom = 12.0
+rect_scale = Vector2( 0.75, 0.75 )
+theme = ExtResource( 4 )
+text = "00:00"
+align = 1
+valign = 1
+
+[node name="LabelB" type="Label" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -17.0
+margin_top = -10.0
+margin_right = 18.0
+margin_bottom = 10.0
+theme = ExtResource( 3 )
+text = "00:00"
+align = 1
+valign = 1
+
+[node name="ColorRect" type="ColorRect" parent="."]
+margin_left = -15.0
+margin_top = -6.0
+margin_right = 17.0
+margin_bottom = 5.0
+color = Color( 0.27451, 0.776471, 0.341176, 0.447059 )

@@ -1,4 +1,4 @@
-[gd_scene load_steps=55 format=2]
+[gd_scene load_steps=56 format=2]
 
 [ext_resource path="res://Art/TileSet64.png" type="Texture" id=1]
 [ext_resource path="res://DustSim.tscn" type="PackedScene" id=2]
@@ -14,6 +14,7 @@
 [ext_resource path="res://Art/Overlay_illumination.png" type="Texture" id=12]
 [ext_resource path="res://Levels/OverlayHaze.gd" type="Script" id=13]
 [ext_resource path="res://Art/BackgroundObjects/Monitor1.png" type="Texture" id=14]
+[ext_resource path="res://TimerScreen.tscn" type="PackedScene" id=15]
 [ext_resource path="res://Art/BackgroundObjects/Generator.png" type="Texture" id=16]
 [ext_resource path="res://Door.tscn" type="PackedScene" id=17]
 [ext_resource path="res://Levels/LevelProgression.gd" type="Script" id=18]
@@ -538,6 +539,9 @@ position = Vector2( 416, 159 )
 [node name="CollisionShape2D" type="CollisionShape2D" parent="LaddersOFFSCREEN/StaticBody2D"]
 position = Vector2( 0, 1 )
 shape = SubResource( 28 )
+
+[node name="TimerScreen" parent="." instance=ExtResource( 15 )]
+position = Vector2( 360, 82 )
 
 [node name="DustSim" parent="." instance=ExtResource( 2 )]
 
