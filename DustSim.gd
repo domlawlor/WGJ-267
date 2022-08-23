@@ -156,11 +156,16 @@ func ClearWorld():
 	sprite.get_texture().set_data(image)
 
 func SetLevelCollisions():
+	var space_rid = get_world_2d().space
+	var space_state = Physics2DServer.space_get_direct_state(space_rid)
+	
 	for i in range(0, pixelTypes.size()):
-		colTest.position.x = ((i % pixelWorldSizeX) * pixelSizeScale) + 1
-		colTest.position.y = (floor(i / pixelWorldSizeX) * pixelSizeScale) + 1
-		var col = colTest.move_and_collide(Vector2.ZERO, true, true, true)
-		if col != null:
+		var testPos = Vector2()
+		testPos.x = ((i % pixelWorldSizeX) * pixelSizeScale) + 1
+		testPos.y = (floor(i / pixelWorldSizeX) * pixelSizeScale) + 1
+		
+		var collisions = space_state.intersect_point(testPos)
+		for col in collisions:
 			if col.collider.is_in_group("dust_kill"):
 				pixelTypes[i] = PixelType.KILL
 			else:
