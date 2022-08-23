@@ -1,5 +1,6 @@
 extends Node2D
 
+export var LevelNum : int = 0
 export var IsLeftOfLevel : bool = false
 
 onready var sprite = $Sprite
@@ -20,11 +21,11 @@ func _on_level_complete():
 
 func _on_LevelCompleteTriggerL_body_entered(body):
 	if IsLeftOfLevel and body.is_in_group("player"):
-		Events.emit_signal("level_exited")
+		Events.emit_signal("level_exited", LevelNum)
 
 func _on_LevelCompleteTriggerR_body_entered(body):
 	if !IsLeftOfLevel and body.is_in_group("player"):
-		Events.emit_signal("level_exited")
+		Events.emit_signal("level_exited", LevelNum)
 
 func OpenDoor():
 	openSFX.play()

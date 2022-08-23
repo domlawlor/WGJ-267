@@ -17,16 +17,11 @@ var m_progress : int = 0
 
 func _ready():
 	Events.connect("dust_amount_changed", self, "_on_dust_amount_changed")
-	Events.connect("level_exited", self, "_on_level_exited")
 	
 	m_totalDust = Global.DustRemaining as float
 	print("total dust:" + str(m_totalDust))
 	SetState(LevelState.PLAY)
 
-#func _process(delta):
-#	if m_state == LevelState.LOADING:
-#		return
-	
 func SetState(state):
 	if m_state == state:
 		return
@@ -56,6 +51,3 @@ func _on_dust_amount_changed():
 		if m_progress == 9:
 			SetState(LevelState.COMPLETE)
 			Events.emit_signal("level_complete")
-
-func _on_level_exited():
-	self.queue_free()
