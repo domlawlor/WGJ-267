@@ -56,8 +56,6 @@ func _process(delta):
 		if col == null:
 			m_velocity.y += GRAVITY
 			SetPlayerState(PlayerState.AIR)
-		else:
-			m_velocity.y = 0
 		
 	if Input.is_action_pressed("sweep") and sweepTimer.is_stopped():
 		var posX : int
