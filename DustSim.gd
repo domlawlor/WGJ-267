@@ -250,7 +250,7 @@ func FireDustInDir(pos, vel, canMakeDust):
 		image.set_pixelv(pos, color)
 		ActivateRegion(pos)
 		Global.DustRemaining += 1
-		Events.emit_signal("dust_amount_changed")
+		Events.emit_signal("dust_amount_changed", 1)
 	
 	image.unlock()
 	sprite.get_texture().set_data(image)
@@ -275,7 +275,7 @@ func CreateDust(positions):
 	image.unlock()
 	sprite.get_texture().set_data(image)
 	Global.DustRemaining += amountCreated
-	Events.emit_signal("dust_amount_changed")
+	Events.emit_signal("dust_amount_changed", amountCreated)
 	#print("Dust remaining: " + str(Global.DustRemaining))
 
 func CreateBulkDust(pos):
@@ -299,7 +299,7 @@ func MovePixel(srcPos, destPos, image):
 		image.set_pixelv(destPos, image.get_pixelv(srcPos))
 	else:
 		Global.DustRemaining -= 1 # destroy dust
-		Events.emit_signal("dust_amount_changed")
+		Events.emit_signal("dust_amount_changed", -1)
 		#print("kill! " + str(Global.DustRemaining))
 	SetPixel(srcPos, PixelType.EMPTY)
 	image.set_pixelv(srcPos, Color.transparent)

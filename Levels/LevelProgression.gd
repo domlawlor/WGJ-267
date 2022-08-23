@@ -38,7 +38,7 @@ func SetState(state):
 			output = fString % "COMPLETE"
 	print(output)
 	
-func _on_dust_amount_changed():
+func _on_dust_amount_changed(amount):
 	if m_state == LevelState.PLAY:
 		var oldProgress = m_progress
 		var percentangeRemaining = float(Global.DustRemaining / m_totalDust)

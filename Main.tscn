@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://Main.gd" type="Script" id=1]
 [ext_resource path="res://Audio/music.mp3" type="AudioStream" id=2]
+[ext_resource path="res://AcidHissSound.tscn" type="PackedScene" id=3]
 
 [node name="Main" type="Control"]
 script = ExtResource( 1 )
@@ -49,6 +50,8 @@ zoom = Vector2( 0.5, 0.5 )
 [node name="BGM" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 2 )
 volume_db = -10.0
+
+[node name="AcidHissSound" parent="." instance=ExtResource( 3 )]
 
 [node name="TimeLimit" type="Timer" parent="."]
 

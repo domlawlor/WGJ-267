@@ -1,0 +1,15 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+path="res://.import/acidhiss.mp3-aee3a89e44b759e22e0446ac1e9a48d7.mp3str"
+
+[deps]
+
+source_file="res://Audio/acidhiss.mp3"
+dest_files=[ "res://.import/acidhiss.mp3-aee3a89e44b759e22e0446ac1e9a48d7.mp3str" ]
+
+[params]
+
+loop=true
+loop_offset=0
