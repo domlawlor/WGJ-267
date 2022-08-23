@@ -11,6 +11,7 @@ enum PlayerState {
 	LADDER
 	SWEEPING
 	DEAD
+	FROZEN
 }
 
 var SWEEP_OFFSET : int = 20
@@ -29,6 +30,7 @@ func _ready():
 	Events.connect("ladder_climbing_activate", self, "_on_ladder_climbing_activate")
 	Events.connect("ladder_climbing_deactivate", self, "_on_ladder_climbing_deactivate")
 	Events.connect("debug_set_player_pos", self, "_on_debug_set_player_pos")
+	Events.connect("hit_time_limit", self, "_on_hit_time_limit")
 	
 	m_spawnPos = position
 	ResetPlayer()
@@ -50,6 +52,9 @@ func _process(delta):
 	if Input.is_action_just_pressed("debug_button_1"):
 		var mousePos = get_viewport().get_mouse_position()
 		Events.emit_signal("debug_set_player_pos", mousePos / 2)
+	
+	if m_state == PlayerState.FROZEN:
+		return
 	
 	if m_state == PlayerState.DEAD:
 		position.y += SINK_SPEED * delta
@@ -159,6 +164,10 @@ func _on_ladder_climbing_deactivate():
 
 func _on_SweepTimer_timeout():
 	SetPlayerState(PlayerState.AIR)
+
+func _on_hit_time_limit():
+	m_state = PlayerState.FROZEN
+	
 
 func _on_debug_set_player_pos(mousePos):
 	position = mousePos

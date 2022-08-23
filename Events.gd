@@ -8,7 +8,9 @@ signal dust_amount_changed(amount)
 signal level_complete()
 signal level_exited(num)
 
-signal start_countdown_timer()
-signal countdown_timer_end_hit()
+signal start_time_limit()
+signal hit_time_limit()
+
+signal show_death_screen()
 
 signal debug_set_player_pos(pos)

@@ -6,21 +6,24 @@ onready var main_2d : Node2D = $Main2D
 onready var bgm : AudioStreamPlayer = $BGM
 
 onready var timeLimit : Timer = $TimeLimit
+onready var animationPlayer : AnimationPlayer = $AnimationPlayer
 
 var level_instance : Node2D
 
-export var TotalTimeLimitSec : float = 120.0
+export var TotalTimeLimitSec : float = 30.0
 
 func _ready():
 	Events.connect("level_exited", self, "_on_level_exited")
-	Events.connect("start_countdown_timer", self, "_on_start_countdown_timer")
-	Events.emit_signal("start_countdown_timer")
+	Events.connect("start_time_limit", self, "_on_start_time_limit")
+	Events.connect("show_death_screen", self, "_on_show_death_screen")
+	Events.emit_signal("start_time_limit")
 	
 	bgm.play()
 
 func _exit():
 	Events.disconnect("level_exited", self, "_on_level_exited")
-	Events.disconnect("start_countdown_timer", self, "_on_start_countdown_timer")
+	Events.disconnect("start_time_limit", self, "_on_start_time_limit")
+	Events.disconnect("show_death_screen", self, "_on_show_death_screen")
 
 func unload_level():
 	if (is_instance_valid(level_instance)):
@@ -40,6 +43,10 @@ func load_level(level_name : String):
 func _process(delta):
 	if Input.is_action_just_pressed("toggle_menu"):
 		levelList.visible = !levelList.visible
+	
+	if Input.is_action_just_pressed("debug_button_3"):
+		animationPlayer.play("RESET")
+		animationPlayer.play("death")
 	
 	Global.TimeLimitTimeLeft = timeLimit.time_left
 
@@ -64,8 +71,12 @@ func _on_level_exited(num):
 		2:
 			levelList.visible = true
 
-func _on_start_countdown_timer():
+func _on_start_time_limit():
 	timeLimit.start(TotalTimeLimitSec)
 	
 func _on_TimeLimit_timeout():
-	Events.emit_signal("countdown_timer_end_hit")
+	Events.emit_signal("hit_time_limit")
+
+func _on_show_death_screen():
+	animationPlayer.play("deathScreen")
+
