@@ -11,6 +11,7 @@ signal level_exited(num)
 signal start_time_limit()
 signal hit_time_limit()
 
+signal player_death_animation()
 signal show_death_screen()
 
 signal debug_set_player_pos(pos)

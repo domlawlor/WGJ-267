@@ -31,6 +31,7 @@ func _ready():
 	Events.connect("ladder_climbing_deactivate", self, "_on_ladder_climbing_deactivate")
 	Events.connect("debug_set_player_pos", self, "_on_debug_set_player_pos")
 	Events.connect("hit_time_limit", self, "_on_hit_time_limit")
+	Events.connect("player_death_animation", self, "_on_player_death_animation")
 	
 	m_spawnPos = position
 	ResetPlayer()
@@ -39,6 +40,8 @@ func _exit_tree():
 	Events.disconnect("ladder_climbing_activate", self, "_on_ladder_climbing_activate")
 	Events.disconnect("ladder_climbing_deactivate", self, "_on_ladder_climbing_deactivate")
 	Events.disconnect("debug_set_player_pos", self, "_on_debug_set_player_pos")
+	Events.disconnect("hit_time_limit", self, "_on_hit_time_limit")
+	Events.disconnect("player_death_animation", self, "_on_player_death_animation")
 
 func ResetPlayer():
 	position = m_spawnPos
@@ -167,7 +170,7 @@ func _on_SweepTimer_timeout():
 
 func _on_hit_time_limit():
 	m_state = PlayerState.FROZEN
-	
+	animatedSprite.play("idle")
 
 func _on_debug_set_player_pos(mousePos):
 	position = mousePos
@@ -176,3 +179,6 @@ func _on_debug_set_player_pos(mousePos):
 
 func _on_RespawnTimer_timeout():
 	ResetPlayer()
+
+func _on_player_death_animation():
+	animatedSprite.play("dead")

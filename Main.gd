@@ -19,6 +19,7 @@ func _ready():
 	Events.emit_signal("start_time_limit")
 	
 	bgm.play()
+	animationPlayer.play("RESET")
 
 func _exit():
 	Events.disconnect("level_exited", self, "_on_level_exited")
@@ -46,7 +47,7 @@ func _process(delta):
 	
 	if Input.is_action_just_pressed("debug_button_3"):
 		animationPlayer.play("RESET")
-		animationPlayer.play("death")
+		animationPlayer.play("deathScreen")
 	
 	Global.TimeLimitTimeLeft = timeLimit.time_left
 
@@ -76,6 +77,9 @@ func _on_start_time_limit():
 	
 func _on_TimeLimit_timeout():
 	Events.emit_signal("hit_time_limit")
+
+func TriggerPlayerDeathAnimation():
+	Events.emit_signal("player_death_animation")
 
 func _on_show_death_screen():
 	animationPlayer.play("deathScreen")
