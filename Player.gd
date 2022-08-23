@@ -2,6 +2,7 @@ extends KinematicBody2D
 
 onready var animatedSprite = $AnimatedSprite
 onready var sweepTimer = $SweepTimer
+onready var respawnTimer = $RespawnTimer
 onready var sweepSFX = $SweepSFX
 
 enum PlayerState {
@@ -9,30 +10,46 @@ enum PlayerState {
 	AIR
 	LADDER
 	SWEEPING
+	DEAD
 }
 
 var SWEEP_OFFSET : int = 20
 var WALK_SPEED = 120
 var LADDER_SPEED = 100
 var GRAVITY = 1
+var SINK_SPEED = 10
 
-var m_state = PlayerState.AIR
-var m_velocity : Vector2 = Vector2.ZERO
-var m_ladderActive : bool = false
-var m_facingRight : bool = true
+var m_spawnPos : Vector2
+var m_state
+var m_velocity : Vector2
+var m_ladderActive : bool
+var m_facingRight : bool
 
 func _ready():
 	Events.connect("ladder_climbing_activate", self, "_on_ladder_climbing_activate")
 	Events.connect("ladder_climbing_deactivate", self, "_on_ladder_climbing_deactivate")
 	Events.connect("debug_set_player_pos", self, "_on_debug_set_player_pos")
-	animatedSprite.play("idle")
+	
+	m_spawnPos = position
+	ResetPlayer()
 
+func ResetPlayer():
+	position = m_spawnPos
+	animatedSprite.play("idle")
+	m_state = PlayerState.AIR
+	m_velocity = Vector2.ZERO
+	m_ladderActive = false
+	m_facingRight = true
 
 func _process(delta):
 	if Input.is_action_just_pressed("debug_button_1"):
 		var mousePos = get_viewport().get_mouse_position()
 		Events.emit_signal("debug_set_player_pos", mousePos / 2)
-		
+	
+	if m_state == PlayerState.DEAD:
+		position.y += SINK_SPEED * delta
+		return
+	
 	if Input.is_action_pressed("moveLeft"):
 		m_velocity.x = -WALK_SPEED
 		m_facingRight = false
@@ -92,6 +109,11 @@ func _process(delta):
 	else:
 		var col = move_and_collide(frameVel)
 		if col != null:
+			if col.collider.is_in_group("dust_kill"):
+				SetPlayerState(PlayerState.DEAD)
+				animatedSprite.play("dead")
+				respawnTimer.start()
+				return
 			var ang = floor(rad2deg(col.get_angle()))
 			if ang == 0:
 				SetPlayerState(PlayerState.GROUND)
@@ -115,6 +137,8 @@ func SetPlayerState(state):
 			output = fString % "LADDER"
 		PlayerState.SWEEPING:
 			output = fString % "SWEEPING"
+		PlayerState.DEAD:
+			output = fString % "DEAD"
 	print(output)
 
 func _on_ladder_climbing_activate():
@@ -135,3 +159,6 @@ func _on_debug_set_player_pos(mousePos):
 	position = mousePos
 	m_state = PlayerState.GROUND
 	m_ladderActive = false
+
+func _on_RespawnTimer_timeout():
+	ResetPlayer()
