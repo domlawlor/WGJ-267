@@ -404,14 +404,22 @@ func UpdateSim(delta):
 	image.unlock()
 	sprite.get_texture().set_data(image)
 
-func _process(event):
-	var mousePos = get_viewport().get_mouse_position()
-	var unscaledX = mousePos.x / 2
-	var unscaledY = mousePos.y / 2
+func ScreenPosToSimPos(screenPos):
+	var unscaledX = screenPos.x / 2
+	var unscaledY = screenPos.y / 2
 	var pos = Vector2(unscaledX, unscaledY)
 	var simPos = GetSimPos(pos)
-	var simPosX = simPos.x
-	var simPosY = simPos.y
+	return simPos
+
+func _input(event):
+	if event is InputEventScreenTouch:
+		if event.is_pressed():
+			var simPos = ScreenPosToSimPos(event.position)
+			CreateBulkDust(simPos)
+
+func _process(event):
+	var mousePos = get_viewport().get_mouse_position()
+	var simPos = ScreenPosToSimPos(mousePos)
 	
 	if Input.is_action_just_pressed("debug_button_2"):
 		enabledDebugDrawCollision = !enabledDebugDrawCollision
