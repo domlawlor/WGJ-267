@@ -21,7 +21,6 @@ onready var colTest : KinematicBody2D = $CollisionTestArea
 
 const FIRE_DUST_TEST = false
 
-const USE_DIRTY_RECTS = true
 var enabledDebugDrawCollision = false
 var enabledDebugDrawRegions = false
 var enabledDebugDrawDirtyRects = false
@@ -43,8 +42,6 @@ var pixelVelocity = []
 var REGION_SIZE = 16
 var regionWorldSizeX : int
 var regionWorldSizeY : int
-
-var checkRegions = []
 
 var activeRegionsBufferNum = 0
 var nextRegionsBufferNum = 1
@@ -118,50 +115,23 @@ func ActivateRegion(pos):
 	var regY = floor(pos.y / REGION_SIZE)
 	var regIndex : int = regY * regionWorldSizeX + regX
 	
-	if USE_DIRTY_RECTS:
-		var regionBuffer = checkRegionsBuffers[nextRegionsBufferNum]
-		var dirtyRect = regionBuffer[regIndex]
-		
-		if !dirtyRect:
-			# default values are intended. Makes the min and max functions work
-			regionBuffer[regIndex] = { 
-				minX = pixelWorldSizeX, 
-				minY = pixelWorldSizeX,
-				maxX = 0,
-				maxY = 0
-			}
-			dirtyRect = regionBuffer[regIndex]
-		
-		dirtyRect.minX = min(dirtyRect.minX, pos.x)
-		dirtyRect.minY = min(dirtyRect.minY, pos.y)
-		dirtyRect.maxX = max(dirtyRect.maxX, pos.x)
-		dirtyRect.maxY = max(dirtyRect.maxY, pos.y)
-		
-	else:
-		checkRegions[regIndex] = true #actual pos index
-		
-		var regionCount = regionWorldSizeX * regionWorldSizeY
-		var checkLeft = (regIndex % regionWorldSizeX) > 0
-		var checkRight = (regIndex % regionWorldSizeX) < (regionWorldSizeX - 1)
-		var checkUp = regIndex >= regionWorldSizeX
-		var checkDown = regIndex < regionCount - regionWorldSizeX
-		
-		if checkLeft and checkUp:
-			checkRegions[regIndex - 1 - regionWorldSizeX] = true
-		if checkUp:
-			checkRegions[regIndex - regionWorldSizeX] = true
-		if checkUp and checkRight:
-			checkRegions[regIndex - regionWorldSizeX + 1] = true
-		if checkLeft:
-			checkRegions[regIndex - 1] = true
-		if checkRight:
-			checkRegions[regIndex + 1] = true
-		if checkDown and checkLeft:
-			checkRegions[regIndex + regionWorldSizeX - 1] = true
-		if checkDown:
-			checkRegions[regIndex + regionWorldSizeX] = true
-		if checkDown and checkRight:
-			checkRegions[regIndex + regionWorldSizeX + 1] = true
+	var regionBuffer = checkRegionsBuffers[nextRegionsBufferNum]
+	var dirtyRect = regionBuffer[regIndex]
+	
+	if !dirtyRect:
+		# default values are intended. Makes the min and max functions work
+		regionBuffer[regIndex] = { 
+			minX = pixelWorldSizeX, 
+			minY = pixelWorldSizeX,
+			maxX = 0,
+			maxY = 0
+		}
+		dirtyRect = regionBuffer[regIndex]
+	
+	dirtyRect.minX = min(dirtyRect.minX, pos.x)
+	dirtyRect.minY = min(dirtyRect.minY, pos.y)
+	dirtyRect.maxX = max(dirtyRect.maxX, pos.x)
+	dirtyRect.maxY = max(dirtyRect.maxY, pos.y)
 
 func ClearWorld():
 	var pixelCount = pixelWorldSizeX * pixelWorldSizeY
@@ -175,13 +145,9 @@ func ClearWorld():
 	pixelVelocity.fill(Vector2.ZERO)
 	
 	var regionCount = regionWorldSizeX * regionWorldSizeY
-	checkRegions.resize(regionCount)
-	checkRegions.fill(true)
-	
-	if USE_DIRTY_RECTS:
-		for regionsBuffer in checkRegionsBuffers:
-			regionsBuffer.resize(regionCount)
-			regionsBuffer.fill(null)
+	for regionsBuffer in checkRegionsBuffers:
+		regionsBuffer.resize(regionCount)
+		regionsBuffer.fill(null)
 	
 	var image = sprite.get_texture().get_data()
 	image.lock()
@@ -381,6 +347,7 @@ func UpdateSim(delta):
 	var image = sprite.get_texture().get_data()
 	image.lock()
 	
+	# do the forces stuff first
 	if forceCount > 0:
 		ApplyForce(forcePos, image)
 		if forceCount % 2 == 0:
@@ -390,20 +357,62 @@ func UpdateSim(delta):
 				forcePos.x = max(forcePos.x - 1, 0)
 		forceCount -= 1
 	
-	var regionFinalIndex = (regionWorldSizeX * regionWorldSizeY) - 1
-	for i in range(regionFinalIndex, -1, -1):
-		if checkRegions[i]:
-			checkRegions[i] = false
-			var posStart = ConvertRegionIndexToPosStart(i)
-			for yMod in range(REGION_SIZE, 0, -1):
-				yMod -= 1
-				for xMod in REGION_SIZE:
-					var xPos = posStart.x + xMod
-					var yPos = posStart.y + yMod
+	#print("-- simStages starting -- ")
+	#var stagesStartTimeUSec = Time.get_ticks_usec()
+	
+	# flip the buffers, double buffer'in and all that
+	var oldActiveBufferNum = activeRegionsBufferNum
+	activeRegionsBufferNum = nextRegionsBufferNum
+	nextRegionsBufferNum = oldActiveBufferNum
+	checkRegionsBuffers[nextRegionsBufferNum].fill(null)
+	
+	pixelState.fill(false)
+	
+	var regionsBuffer = checkRegionsBuffers[activeRegionsBufferNum]
+	
+	
+	var regionFinalIndex = totalRegionCount - 1
+	for regionIndex in range(regionFinalIndex, -1, -1):
+		var dirtyRect = regionsBuffer[regionIndex]
+			
+		#first check if this is active and we even need to do it
+		if dirtyRect:
+			dirtyRect.minX -= DIRTY_RECT_BOUNDARY
+			dirtyRect.maxX += DIRTY_RECT_BOUNDARY
+			dirtyRect.minY -= DIRTY_RECT_BOUNDARY
+			dirtyRect.maxY += DIRTY_RECT_BOUNDARY
+
+			var startX = max(0, dirtyRect.minX)
+			var startY = max(0, dirtyRect.minY)
+			var endX = min(pixelWorldSizeX-1, dirtyRect.maxX)
+			var endY = min(pixelWorldSizeY-1, dirtyRect.maxY)
+			
+			if startX > endX or startY > endY:
+				print("ERROR in dirtyRect, not normalised - ", startX, ", ", startY, ", ", endX, ", ", endY)
+				continue
+			
+			# starts at the bottom of the screen so falling pixels only update once
+			var yPos = endY
+			while yPos >= startY: 
+				var xPos = startX
+				while xPos <= endX:
 					var pos = Vector2(xPos, yPos)
+					var pixelVisited = GetPixelState(pos)
 					var pixelType = GetPixel(pos)
-					if pixelType == PixelType.DUST:
-						UpdateDustPixelSim(pos, image)
+					if !pixelVisited:
+						if pixelType == PixelType.DUST:
+							UpdateDustPixelSim(pos, image)
+						elif pixelType == PixelType.FLYING_DUST:
+							UpdateFlyingDustPixel(pos, delta, image)
+					SetPixelState(pos, true)
+					xPos += 1
+				yPos -= 1
+		
+		#var stagesTimeMS = Global.USecToMSec(Time.get_ticks_usec() - stageStartTimeUSec)
+		#print("- EndStageNum - ", stageNum, ", timeTaken:", stagesTimeMS)
+	
+	#var allStagesTimeTakenMS = Global.USecToMSec(Time.get_ticks_usec() - stagesStartTimeUSec)
+	#print("-- simStages finished -- timeTaken: ", allStagesTimeTakenMS)
 	
 	image.unlock()
 	sprite.get_texture().set_data(image)
@@ -427,10 +436,7 @@ func _process(event):
 	
 	if Input.is_action_just_pressed("debug_button_2"):
 		enabledDebugDrawCollision = !enabledDebugDrawCollision
-	
-	if Input.is_action_just_pressed("debug_button_3"):
-		enabledDebugDrawRegions = !enabledDebugDrawRegions
-	
+			
 	if Input.is_action_just_pressed("debug_button_4"):
 		enabledDebugDrawDirtyRects = !enabledDebugDrawDirtyRects
 		
@@ -511,87 +517,8 @@ func GetSimPos(pos):
 	var simPosY = floor(pos.y / pixelSizeScale)
 	return Vector2(simPosX, simPosY)
 
-func UpdateSim_DirtyRect(delta):
-	
-	var image = sprite.get_texture().get_data()
-	image.lock()
-	
-	# do the forces stuff first
-	if forceCount > 0:
-		ApplyForce(forcePos, image)
-		if forceCount % 2 == 0:
-			if forceRight:
-				forcePos.x = min(forcePos.x + 1, pixelWorldSizeX - 1)
-			else:
-				forcePos.x = max(forcePos.x - 1, 0)
-		forceCount -= 1
-	
-	#print("-- simStages starting -- ")
-	#var stagesStartTimeUSec = Time.get_ticks_usec()
-	
-	# flip the buffers, double buffer'in and all that
-	var oldActiveBufferNum = activeRegionsBufferNum
-	activeRegionsBufferNum = nextRegionsBufferNum
-	nextRegionsBufferNum = oldActiveBufferNum
-	checkRegionsBuffers[nextRegionsBufferNum].fill(null)
-	
-	pixelState.fill(false)
-	
-	var regionsBuffer = checkRegionsBuffers[activeRegionsBufferNum]
-	
-	
-	var regionFinalIndex = totalRegionCount - 1
-	for regionIndex in range(regionFinalIndex, -1, -1):
-		var dirtyRect = regionsBuffer[regionIndex]
-			
-		#first check if this is active and we even need to do it
-		if dirtyRect:
-			dirtyRect.minX -= DIRTY_RECT_BOUNDARY
-			dirtyRect.maxX += DIRTY_RECT_BOUNDARY
-			dirtyRect.minY -= DIRTY_RECT_BOUNDARY
-			dirtyRect.maxY += DIRTY_RECT_BOUNDARY
-
-			var startX = max(0, dirtyRect.minX)
-			var startY = max(0, dirtyRect.minY)
-			var endX = min(pixelWorldSizeX-1, dirtyRect.maxX)
-			var endY = min(pixelWorldSizeY-1, dirtyRect.maxY)
-			
-			if startX > endX or startY > endY:
-				print("ERROR in dirtyRect, not normalised - ", startX, ", ", startY, ", ", endX, ", ", endY)
-				continue
-			
-			# starts at the bottom of the screen so falling pixels only update once
-			var yPos = endY
-			while yPos >= startY: 
-				var xPos = startX
-				while xPos <= endX:
-					var pos = Vector2(xPos, yPos)
-					var pixelVisited = GetPixelState(pos)
-					var pixelType = GetPixel(pos)
-					if !pixelVisited:
-						if pixelType == PixelType.DUST:
-							UpdateDustPixelSim(pos, image)
-						elif pixelType == PixelType.FLYING_DUST:
-							UpdateFlyingDustPixel(pos, delta, image)
-					SetPixelState(pos, true)
-					xPos += 1
-				yPos -= 1
-		
-		#var stagesTimeMS = Global.USecToMSec(Time.get_ticks_usec() - stageStartTimeUSec)
-		#print("- EndStageNum - ", stageNum, ", timeTaken:", stagesTimeMS)
-	
-	#var allStagesTimeTakenMS = Global.USecToMSec(Time.get_ticks_usec() - stagesStartTimeUSec)
-	#print("-- simStages finished -- timeTaken: ", allStagesTimeTakenMS)
-	
-	image.unlock()
-	sprite.get_texture().set_data(image)
-
-
 func _physics_process(delta):
-	if USE_DIRTY_RECTS:
-		UpdateSim_DirtyRect(delta)
-	else:
-		UpdateSim(delta)
+	UpdateSim(delta)
 	update()
 
 func _draw():
@@ -609,21 +536,7 @@ func _draw():
 					c = Color(1, 1, 0, 0.9)
 				draw_rect(rect, c, true)
 	
-	if enabledDebugDrawRegions:
-		var scaledRegionSize = REGION_SIZE * pixelSizeScale
-		var regionRectSize = Vector2(scaledRegionSize, scaledRegionSize)
-		var regionFinalIndex = (pixelWorldSizeX / REGION_SIZE) * (pixelWorldSizeY / REGION_SIZE) - 1
-		for i in range(regionFinalIndex, -1, -1):
-			var posStart = ConvertRegionIndexToPosStart(i)
-			var scaledPos = posStart * pixelSizeScale
-			var rect = Rect2(scaledPos, regionRectSize)
-			var c = Color(0, 1, 0, 0.2)
-			if !checkRegions[i]:
-				c.g = 0
-				c.r = 1
-			draw_rect(rect, c, true)
-	
-	if enabledDebugDrawDirtyRects and USE_DIRTY_RECTS:
+	if enabledDebugDrawDirtyRects:
 		var regionSize = Vector2(REGION_SIZE * pixelSizeScale, REGION_SIZE * pixelSizeScale)
 		var regionFinalIndex = (regionWorldSizeX * regionWorldSizeY) - 1
 		for i in range(regionFinalIndex, -1, -1):
