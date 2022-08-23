@@ -22,6 +22,9 @@ func _ready():
 	print("total dust:" + str(m_totalDust))
 	SetState(LevelState.PLAY)
 
+func _exit_tree():
+	Events.disconnect("dust_amount_changed", self, "_on_dust_amount_changed")
+
 func SetState(state):
 	if m_state == state:
 		return

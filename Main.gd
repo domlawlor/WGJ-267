@@ -18,6 +18,10 @@ func _ready():
 	
 	bgm.play()
 
+func _exit():
+	Events.disconnect("level_exited", self, "_on_level_exited")
+	Events.disconnect("start_countdown_timer", self, "_on_start_countdown_timer")
+
 func unload_level():
 	if (is_instance_valid(level_instance)):
 		level_instance.queue_free()

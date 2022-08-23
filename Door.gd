@@ -11,7 +11,10 @@ onready var animationDelay = $AnimationDelay
 func _ready():
 	Events.connect("level_complete", self, "_on_level_complete")
 	sprite.play("closed")
-	
+
+func _exit_tree():
+	Events.disconnect("level_complete", self, "_on_level_complete")
+
 func _unhandled_input(event):
 	if event.is_action_pressed("debug_button_5"):
 		OpenDoor()

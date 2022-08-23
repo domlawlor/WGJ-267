@@ -33,6 +33,11 @@ func _ready():
 	m_spawnPos = position
 	ResetPlayer()
 
+func _exit_tree():
+	Events.disconnect("ladder_climbing_activate", self, "_on_ladder_climbing_activate")
+	Events.disconnect("ladder_climbing_deactivate", self, "_on_ladder_climbing_deactivate")
+	Events.disconnect("debug_set_player_pos", self, "_on_debug_set_player_pos")
+
 func ResetPlayer():
 	position = m_spawnPos
 	animatedSprite.play("idle")

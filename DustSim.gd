@@ -95,6 +95,10 @@ func _ready():
 	ClearWorld()
 	SetLevelCollisions()
 
+func _exit_tree():
+	Events.disconnect("sweep", self, "_on_sweep")
+	Events.disconnect("spawn_dust", self, "_on_spawn_dust")
+
 func GetPixelState(pos):
 	return pixelState[(pos.y * pixelWorldSizeX) + pos.x]
 
