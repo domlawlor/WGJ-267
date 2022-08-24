@@ -86,8 +86,12 @@ func _process(delta):
 		if col == null:
 			m_velocity.y += GRAVITY
 			SetPlayerState(PlayerState.AIR)
-		
-	if Input.is_action_pressed("sweep") and sweepTimer.is_stopped():
+		else:
+			if m_state != PlayerState.SWEEPING:
+				SetPlayerState(PlayerState.GROUND)
+	
+	var canSweep = m_state == PlayerState.GROUND and sweepTimer.is_stopped()
+	if canSweep and Input.is_action_pressed("sweep"):
 		var posX : int
 		if m_facingRight:
 			posX = position.x + SWEEP_OFFSET
