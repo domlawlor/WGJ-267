@@ -21,7 +21,6 @@ func _ready():
 	Global.TOTAL_TIME_LIMIT_SEC = TotalTimeLimitSec
 	levelList.visible = false
 	bgm.play()
-	animationPlayer.play("RESET")
 	load_level("LevelTitle")
 
 func _exit():
@@ -49,10 +48,12 @@ func _process(delta):
 		levelList.visible = !levelList.visible
 	
 	if Input.is_action_just_pressed("debug_button_3"):
-		animationPlayer.play("RESET")
 		animationPlayer.play("deathScreen")
 	
-	if Global.gameState == Global.GameState.PLAYING:
+	if Global.gameState == Global.GameState.BLOCKING_RESTART:
+		if Input.is_action_just_pressed("button_ui_confirm"):
+			StartGame()
+	elif Global.gameState == Global.GameState.PLAYING:
 		Global.TimeLimitTimeLeft = timeLimit.time_left
 
 func _on_LoadLevelTitle_pressed():
@@ -81,6 +82,10 @@ func _on_level_exited(num):
 			levelList.visible = true
 
 func _on_start_game():
+	StartGame()
+	
+func StartGame():
+	animationPlayer.play("RESET")
 	Global.DustRemaining = 0
 	load_level("Level0")
 	Events.emit_signal("start_time_limit")
@@ -90,10 +95,14 @@ func _on_start_time_limit():
 	Global.gameState = Global.GameState.PLAYING
 	
 func _on_TimeLimit_timeout():
+	Global.gameState = Global.GameState.DEAD
 	Events.emit_signal("hit_time_limit")
 
 func TriggerPlayerDeathAnimation():
 	Events.emit_signal("player_death_animation")
+
+func AllowRestartInput():
+	Global.gameState = Global.GameState.BLOCKING_RESTART
 
 func _on_show_death_screen():
 	animationPlayer.play("deathScreen")
