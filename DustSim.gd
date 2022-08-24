@@ -525,6 +525,8 @@ func ApplyForce(pos, image):
 		var c = 1
 		for x in range(xStart, xStart+(sweepHeight * mod), mod):
 			if c <= checkNum:
+				var maxPower = (randi() % 4) + 3
+				var power = max((maxPower - c), 1)
 				var currentPos = Vector2(x, y)
 				
 				if FIRE_DUST_TEST:
@@ -534,7 +536,7 @@ func ApplyForce(pos, image):
 						continue
 					
 				if GetPixel(currentPos) == PixelType.DUST:
-					var xMod = mod
+					var xMod = mod * power
 					if Global.DUST_SCALE == 1:
 						xMod = mod * 2
 					var dirPos = Vector2(x-xMod, y)
