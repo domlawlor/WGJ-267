@@ -3,8 +3,8 @@
 [ext_resource path="res://Art/Fonts/SHPinscher-Regular.otf" type="DynamicFontData" id=1]
 
 [sub_resource type="DynamicFont" id=2]
-size = 25
-outline_size = 1
+size = 30
+outline_size = 2
 outline_color = Color( 0, 0, 0, 1 )
 font_data = ExtResource( 1 )
 
