@@ -24,6 +24,8 @@ onready var sprite_4x : Sprite = $Sprite_4x
 var sprite : Sprite # set in _ready
 
 const FIRE_DUST_TEST = false
+var FLYING_DUST_GRAVITY = 2
+var FLYING_LAVA_GRAVITY = 4
 
 var enabledDebugDrawCollision = false
 var enabledDebugDrawRegions = false
@@ -224,7 +226,6 @@ func FireDustInDir(pos, vel, canMakeDust):
 	if canMakeDust and pixelType != PixelType.EMPTY:
 		return
 	
-	#randomise launch a bit
 	vel = vel.normalized()
 	
 	SetPixel(pos, PixelType.FLYING_DUST)
@@ -305,27 +306,59 @@ func MovePixel(srcPos, destPos, image):
 func UpdateFlyingDustPixel(pos, delta, image):
 	var vel = pixelVelocity[(pos.y * pixelWorldSizeX) + pos.x]
 	
-	var FLYING_DUST_GRAVITY = 2
+	# apply gravity
 	vel.y += delta * FLYING_DUST_GRAVITY
-	var destPos = pos + (vel * delta * pixelSizeScale * 20)
-	destPos = destPos.round()
 	
-	destPos.x = clamp(destPos.x, 0, pixelWorldSizeX-1)
-	destPos.y = clamp(destPos.y, 0, pixelWorldSizeY-1)
+	var moveVec = vel * delta * pixelSizeScale * 200 #20
+	moveVec = moveVec.round()
 	
-	var destPosType = GetPixel(destPos)
-	if destPosType == PixelType.EMPTY or destPosType == PixelType.KILL:
-		MovePixel(pos, destPos, image)
+	var targetPos = pos + moveVec
+	
+	var x = pos.x
+	var y = pos.y
+	
+	var stepX = -1 if moveVec.x < 0 else 1
+	var stepY = -1 if moveVec.y < 0 else 1
+	
+	var xLeft = abs(moveVec.x)
+	var yLeft = abs(moveVec.y)
+
+	var testPos = pos
+	var lastValidPos = pos	
+	#print("--new test-- pos:", pos, ", moveVec:", moveVec, ", targetPos:", targetPos)
+	while testPos != targetPos:
+		if xLeft >= yLeft:
+			xLeft -= 1
+			x += stepX
+		else:
+			yLeft -= 1
+			y += stepY
+		testPos = Vector2(x, y)
+		#print("testPos - ", testPos)
+		if !IsInBounds(testPos):
+			#print("outside bounds")
+			break
+		var testPosType = GetPixel(testPos)
+		if testPosType != PixelType.EMPTY:
+			#print("hit non empty pixel")
+			break
+		lastValidPos = testPos
 		
+	print("lastValidPos:", lastValidPos)
+	var destPos = lastValidPos
+	var destPosType = GetPixel(destPos)
+	if destPosType == PixelType.EMPTY or destPosType == PixelType.LAVA or destPosType == PixelType.FLYING_LAVA:
+		MovePixel(pos, destPos, image)
+
 	var hitOtherDust = destPosType == PixelType.DUST or destPosType == PixelType.FLYING_DUST
 	var hitCollision = destPosType == PixelType.COLLISION
-	
+
 	var hitXAxisEdge =  destPos.x == 0 or destPos.x == pixelWorldSizeX-1
 	var hitYAxisEdge =  destPos.y == 0 or destPos.y == pixelWorldSizeY-1
 	if hitOtherDust or hitCollision or hitXAxisEdge or hitYAxisEdge:
 		SetPixel(destPos, PixelType.DUST)
 		vel = Vector2.ZERO
-	
+
 	ActivateRegion(pos)		
 	ActivateRegion(destPos)	
 	pixelVelocity[(destPos.y * pixelWorldSizeX) + destPos.x] = vel
@@ -549,9 +582,9 @@ func _process(event):
 	if Input.is_action_pressed("fire_dust"):
 		FireDust(simPos, true)
 	elif Input.is_action_pressed("spawn_bulk_pixels"):
-		CreateBulkPixels(simPos, PixelType.LAVA)
+		CreateBulkPixels(simPos, PixelType.DUST)
 	elif Input.is_action_pressed("spawn_pixel"):
-		CreatePixels([simPos], PixelType.SMOKE)
+		FireDust(simPos, true)
 
 func ApplyForce(pos, image):
 	# -     #
