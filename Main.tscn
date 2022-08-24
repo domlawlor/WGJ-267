@@ -1,9 +1,17 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://Main.gd" type="Script" id=1]
 [ext_resource path="res://Audio/music.mp3" type="AudioStream" id=2]
 [ext_resource path="res://AcidHissSound.tscn" type="PackedScene" id=3]
 [ext_resource path="res://deathScreen.tres" type="Theme" id=4]
+[ext_resource path="res://Audio/sweep01.mp3" type="AudioStream" id=5]
+[ext_resource path="res://Audio/janitor_startlevel01.wav" type="AudioStream" id=6]
+[ext_resource path="res://Audio/janitor_startlevel02.wav" type="AudioStream" id=7]
+[ext_resource path="res://Audio/janitor_startlevel03.wav" type="AudioStream" id=8]
+[ext_resource path="res://Audio/janitor_grunt01.wav" type="AudioStream" id=9]
+[ext_resource path="res://Audio/janitor_grunt02.wav" type="AudioStream" id=10]
+[ext_resource path="res://Audio/janitor_grunt03.wav" type="AudioStream" id=11]
+[ext_resource path="res://Audio/janitor_grunt04.wav" type="AudioStream" id=12]
 
 [sub_resource type="Animation" id=7]
 length = 0.001
@@ -198,14 +206,48 @@ zoom = Vector2( 0.5, 0.5 )
 stream = ExtResource( 2 )
 volume_db = -10.0
 
-[node name="AcidHissSound" parent="." instance=ExtResource( 3 )]
-
 [node name="TimeLimit" type="Timer" parent="."]
 one_shot = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 anims/RESET = SubResource( 7 )
 anims/deathScreen = SubResource( 6 )
+
+[node name="SFX" type="Node" parent="."]
+
+[node name="LavaHiss" parent="SFX" instance=ExtResource( 3 )]
+
+[node name="Sweep" type="AudioStreamPlayer" parent="SFX"]
+stream = ExtResource( 5 )
+volume_db = -5.0
+
+[node name="JanitorStart01" type="AudioStreamPlayer" parent="SFX"]
+stream = ExtResource( 6 )
+volume_db = -4.0
+
+[node name="JanitorStart02" type="AudioStreamPlayer" parent="SFX"]
+stream = ExtResource( 7 )
+volume_db = -4.0
+
+[node name="JanitorStart03" type="AudioStreamPlayer" parent="SFX"]
+stream = ExtResource( 8 )
+volume_db = -4.0
+
+[node name="JanitorGrunt01" type="AudioStreamPlayer" parent="SFX"]
+stream = ExtResource( 9 )
+volume_db = -4.0
+
+[node name="JanitorGrunt02" type="AudioStreamPlayer" parent="SFX"]
+stream = ExtResource( 10 )
+volume_db = -4.0
+
+[node name="JanitorGrunt03" type="AudioStreamPlayer" parent="SFX"]
+stream = ExtResource( 11 )
+volume_db = -4.0
+
+[node name="JanitorGrunt04" type="AudioStreamPlayer" parent="SFX"]
+stream = ExtResource( 12 )
+volume_db = -4.0
 
 [connection signal="pressed" from="Menu/LevelList/LoadLevelTitle" to="." method="_on_LoadLevelTitle_pressed"]
 [connection signal="pressed" from="Menu/LevelList/LoadLevel0" to="." method="_on_LoadLevel0_pressed"]

@@ -3,7 +3,8 @@ extends KinematicBody2D
 onready var animatedSprite = $AnimatedSprite
 onready var sweepTimer = $SweepTimer
 onready var respawnTimer = $RespawnTimer
-onready var sweepSFX = $SweepSFX
+onready var startSoundTimer = $StartSoundTimer
+onready var voiceCooldown = $VoiceCooldown
 
 enum PlayerState {
 	GROUND
@@ -14,17 +15,21 @@ enum PlayerState {
 	FROZEN
 }
 
-var SWEEP_OFFSET : int = 20
-var WALK_SPEED = 120
-var LADDER_SPEED = 100
-var GRAVITY = 18
-var SINK_SPEED = 10
+const SWEEP_OFFSET : int = 20
+const WALK_SPEED = 120
+const LADDER_SPEED = 100
+const GRAVITY = 18
+const SINK_SPEED = 10
+
+const GRUNT_DELAY_MIN : float = 2.0
+const GRUNT_DELAY_MAX : float = 5.0
 
 var m_spawnPos : Vector2
 var m_state
 var m_velocity : Vector2
 var m_ladderActive : bool
 var m_facingRight : bool
+var m_voiceActive : bool
 
 func _ready():
 	Events.connect("ladder_climbing_activate", self, "_on_ladder_climbing_activate")
@@ -50,6 +55,9 @@ func ResetPlayer():
 	m_velocity = Vector2.ZERO
 	m_ladderActive = false
 	m_facingRight = true
+	m_voiceActive = false
+	voiceCooldown.start(4.0)
+	startSoundTimer.start()
 
 func _process(delta):
 	if Input.is_action_just_pressed("debug_button_1"):
@@ -100,8 +108,11 @@ func _process(delta):
 		SetPlayerState(PlayerState.SWEEPING)
 		sweepTimer.start()
 		animatedSprite.play("sweep")
-		sweepSFX.play()
+		Events.emit_signal("sfx_sweep")
 		Events.emit_signal("sweep", Vector2(posX, position.y), m_facingRight)
+		if voiceCooldown.is_stopped():
+			Events.emit_signal("sfx_grunt")
+			voiceCooldown.start(rand_range(GRUNT_DELAY_MIN, GRUNT_DELAY_MAX))
 	
 	var canClimbLadder = m_ladderActive and m_state != PlayerState.SWEEPING
 	if canClimbLadder:
@@ -191,3 +202,9 @@ func _on_RespawnTimer_timeout():
 
 func _on_player_death_animation():
 	animatedSprite.play("dead")
+
+func _on_StartSoundTimer_timeout():
+	Events.emit_signal("sfx_janitorStart")
+
+func _on_VoiceCooldown_timeout():
+	m_voiceActive = true

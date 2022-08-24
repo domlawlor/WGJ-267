@@ -16,3 +16,8 @@ signal player_death_animation()
 signal show_death_screen()
 
 signal debug_set_player_pos(pos)
+
+# sfx
+signal sfx_sweep()
+signal sfx_janitorStart()
+signal sfx_grunt()

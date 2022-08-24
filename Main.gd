@@ -17,6 +17,9 @@ func _ready():
 	Events.connect("start_game", self, "_on_start_game")
 	Events.connect("start_time_limit", self, "_on_start_time_limit")
 	Events.connect("show_death_screen", self, "_on_show_death_screen")
+	Events.connect("sfx_sweep", self, "_on_sfx_sweep")
+	Events.connect("sfx_janitorStart", self, "_on_sfx_janitorStart")
+	Events.connect("sfx_grunt", self, "_on_sfx_grunt")
 	
 	Global.TOTAL_TIME_LIMIT_SEC = TotalTimeLimitSec
 	levelList.visible = false
@@ -27,6 +30,7 @@ func _exit():
 	Events.disconnect("level_exited", self, "_on_level_exited")
 	Events.disconnect("start_time_limit", self, "_on_start_time_limit")
 	Events.disconnect("show_death_screen", self, "_on_show_death_screen")
+	Events.disconnect("sfx_sweep", self, "_on_sfx_sweep")
 
 func unload_level():
 	if (is_instance_valid(level_instance)):
@@ -106,3 +110,27 @@ func AllowRestartInput():
 
 func _on_show_death_screen():
 	animationPlayer.play("deathScreen")
+
+# sfx
+func _on_sfx_sweep():
+	$SFX/Sweep.play()
+
+func _on_sfx_janitorStart():
+	var r = randi() % 3
+	if r == 0:
+		$SFX/JanitorStart01.play()
+	elif r == 1:
+		$SFX/JanitorStart02.play()
+	else:
+		$SFX/JanitorStart03.play()
+
+func _on_sfx_grunt():
+	var r = randi() % 4
+	if r == 0:
+		$SFX/JanitorGrunt01.play()
+	elif r == 1:
+		$SFX/JanitorGrunt02.play()
+	elif r == 2:
+		$SFX/JanitorGrunt03.play()
+	else:
+		$SFX/JanitorGrunt04.play()
