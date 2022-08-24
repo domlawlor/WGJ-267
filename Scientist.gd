@@ -10,6 +10,12 @@ func _ready():
 	scientistUsed = scientistA if randi() % 2 == 0 else scientistB
 	scientistUsed.visible = true
 
+func FaceLeft():
+	scientistUsed.flip_h = true
+
+func FaceRight():
+	scientistUsed.flip_h = false
+	
 func FlipH():
 	scientistUsed.flip_h = !scientistUsed.flip_h
 
