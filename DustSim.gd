@@ -7,6 +7,7 @@ export(Array, Color) var dustColors = [
 	Color(0.0534668, 0.285156, 0.0734209, 1)
 ]
 export(Array, Color) var lavaColors = [Color.red, Color.brown, Color.crimson, Color.darkred]
+export(Array, Color) var smokeColors = [Color.black]
 
 enum PixelType {
 	EMPTY
@@ -14,6 +15,7 @@ enum PixelType {
 	FLYING_DUST
 	LAVA
 	FLYING_LAVA
+	SMOKE
 	COLLISION
 }
 
@@ -104,7 +106,6 @@ func GetPixelState(pos):
 func SetPixelState(pos, state):
 	pixelState[(pos.y * pixelWorldSizeX) + pos.x] = state
 
-
 func GetPixel(pos):
 	return pixelTypes[(pos.y * pixelWorldSizeX) + pos.x]
 
@@ -194,8 +195,10 @@ func GetPixelTypeColor(type):
 	var colorArray
 	if type == PixelType.DUST or type == PixelType.FLYING_DUST:
 		colorArray = dustColors
-	if type == PixelType.LAVA or type == PixelType.FLYING_LAVA:
+	elif type == PixelType.LAVA or type == PixelType.FLYING_LAVA:
 		colorArray = lavaColors	
+	elif type == PixelType.SMOKE:
+		colorArray = smokeColors
 	assert(colorArray)
 	
 	var randIdx = randi() % colorArray.size()
@@ -274,6 +277,17 @@ func IsInBounds(pos):
 	var inYBounds = pos.y < pixelWorldSizeY and pos.y >= 0
 	return inXBounds and inYBounds
 
+func KillDust(pos, image):
+	Global.DustRemaining -= 1 # destroy dust
+	Events.emit_signal("dust_amount_changed", -1)
+	
+	var smokePos = Vector2(pos.x, pos.y - 1)
+	SetPixel(smokePos, PixelType.SMOKE)
+	
+	var color = GetPixelTypeColor(PixelType.SMOKE)
+	image.set_pixelv(smokePos, color)
+	#print("kill! " + str(Global.DustRemaining))
+	
 func MovePixel(srcPos, destPos, image):
 	var destPosType = GetPixel(destPos)
 	assert(destPosType == PixelType.EMPTY or destPosType == PixelType.LAVA)
@@ -281,12 +295,12 @@ func MovePixel(srcPos, destPos, image):
 	if destPosType == PixelType.EMPTY:
 		SetPixel(destPos, GetPixel(srcPos)) # move dust
 		image.set_pixelv(destPos, image.get_pixelv(srcPos))
+		SetPixel(srcPos, PixelType.EMPTY)
+		image.set_pixelv(srcPos, Color.transparent)
 	else:
-		Global.DustRemaining -= 1 # destroy dust
-		Events.emit_signal("dust_amount_changed", -1)
-		#print("kill! " + str(Global.DustRemaining))
-	SetPixel(srcPos, PixelType.EMPTY)
-	image.set_pixelv(srcPos, Color.transparent)
+		KillDust(srcPos, image)
+#	SetPixel(srcPos, PixelType.EMPTY)
+#	image.set_pixelv(srcPos, Color.transparent)
 
 func UpdateFlyingDustPixel(pos, delta, image):
 	var movePos = null
@@ -307,8 +321,10 @@ func UpdateFlyingDustPixel(pos, delta, image):
 		
 	var hitOtherDust = destPosType == PixelType.DUST or destPosType == PixelType.FLYING_DUST
 	var hitCollision = destPosType == PixelType.COLLISION
-	var hitScreenEdge = destPos.x == 0 or destPos.y == 0 or destPos.y == pixelWorldSizeX-1 or destPos.x == pixelWorldSizeX-1
-	if hitOtherDust or hitCollision or hitScreenEdge:
+	
+	var hitXAxisEdge =  destPos.x == 0 or destPos.x == pixelWorldSizeX-1
+	var hitYAxisEdge =  destPos.y == 0 or destPos.y == pixelWorldSizeY-1
+	if hitOtherDust or hitCollision or hitXAxisEdge or hitYAxisEdge:
 		SetPixel(destPos, PixelType.DUST)
 		vel = Vector2.ZERO
 	
@@ -365,8 +381,38 @@ func MoveLavaPixel(srcPos, destPos, image):
 	image.set_pixelv(srcPos, Color.transparent)
 	
 	if destPosType == PixelType.DUST or destPosType == PixelType.FLYING_DUST:
-		Global.DustRemaining -= 1 # destroy dust
-		Events.emit_signal("dust_amount_changed", -1)
+		KillDust(destPos, image)
+
+# if hits anything, will dissapear
+func MoveSmokePixel(srcPos, destPos, image):
+	var destPosType = GetPixel(destPos)
+	if destPosType == PixelType.EMPTY:
+		SetPixel(destPos, GetPixel(srcPos)) # move dust
+		image.set_pixelv(destPos, image.get_pixelv(srcPos))
+	SetPixel(srcPos, PixelType.EMPTY)
+	image.set_pixelv(srcPos, Color.transparent)
+
+func UpdateSmokePixel(pos, image):
+	var movePos = null
+	
+	# random chance to go upleft or upright
+	var randNum = randi() % 100
+	if randNum > 75:
+		ActivateRegion(pos) # dont update this round but still activate
+		return
+	if randNum < 15:
+		var randLeftRight = -1 if randi() % 2 == 0 else 1
+		var upLeftRightPos = Vector2(pos.x + randLeftRight, pos.y - 1)
+		# only move left or right if its empty. Else we'd rather go up 
+		if IsPositionEmpty(upLeftRightPos): 
+			movePos = upLeftRightPos
+	
+	var upPos = Vector2(pos.x, pos.y - 1)
+	if !movePos and IsInBounds(upPos):
+		movePos = upPos
+		
+	if movePos:
+		MoveSmokePixel(pos, movePos, image)
 
 func UpdateLavaPixel(pos, image):
 	var movePos = null
@@ -459,6 +505,8 @@ func UpdateSim(delta):
 							UpdateDustPixelSim(pos, image)
 						elif pixelType == PixelType.FLYING_DUST:
 							UpdateFlyingDustPixel(pos, delta, image)
+						elif pixelType == PixelType.SMOKE:
+							UpdateSmokePixel(pos, image)
 						elif pixelType == PixelType.LAVA:
 							UpdateLavaPixel(pos, image)
 						elif pixelType == PixelType.FLYING_LAVA:
@@ -505,7 +553,7 @@ func _process(event):
 	elif Input.is_action_pressed("spawn_bulk_pixels"):
 		CreateBulkPixels(simPos, PixelType.LAVA)
 	elif Input.is_action_pressed("spawn_pixel"):
-		CreatePixels([simPos], PixelType.LAVA)
+		CreatePixels([simPos], PixelType.SMOKE)
 
 func ApplyForce(pos, image):
 	# -     #
