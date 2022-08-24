@@ -49,7 +49,7 @@ func _on_dust_amount_changed(amount):
 	if m_state == LevelState.PLAY:
 		var oldProgress = m_progress
 		var percentangeRemaining = float(Global.DustRemaining / m_totalDust)
-		m_progress = floor(10 - (percentangeRemaining * 10))
+		m_progress = int(floor(10 - (percentangeRemaining * 10)))
 		if oldProgress == m_progress:
 			return
 		

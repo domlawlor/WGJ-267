@@ -15,7 +15,7 @@ enum PlayerState {
 	FROZEN
 }
 
-const SWEEP_OFFSET : int = 20
+const SWEEP_OFFSET : float = 20.0
 const WALK_SPEED = 120
 const LADDER_SPEED = 100
 const GRAVITY = 18
@@ -102,9 +102,9 @@ func _process(delta):
 	if canSweep and Input.is_action_pressed("sweep"):
 		var posX : int
 		if m_facingRight:
-			posX = position.x + SWEEP_OFFSET
+			posX = int(position.x + SWEEP_OFFSET)
 		else:
-			posX = position.x - SWEEP_OFFSET
+			posX = int(position.x - SWEEP_OFFSET)
 		SetPlayerState(PlayerState.SWEEPING)
 		sweepTimer.start()
 		animatedSprite.play("sweep")

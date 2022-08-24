@@ -75,15 +75,15 @@ func _ready():
 	sprite.visible = true
 	pixelSizeScale = Global.DUST_SIZE
 	
-	pixelWorldSizeX = worldSizeX / pixelSizeScale
-	pixelWorldSizeY = worldSizeY / pixelSizeScale
+	pixelWorldSizeX = int(float(worldSizeX) / pixelSizeScale)
+	pixelWorldSizeY = int(float(worldSizeY) / pixelSizeScale)
 	
 	assert(REGION_SIZE % 2 == 0) # pls, just don't make uneven
 	
 	#regionWorldSizeX = pixelWorldSizeX / REGION_SIZE
 	#regionWorldSizeY = pixelWorldSizeY / REGION_SIZE
-	regionWorldSizeX = ceil(pixelWorldSizeX as float / REGION_SIZE as float)
-	regionWorldSizeY = ceil(pixelWorldSizeY as float / REGION_SIZE as float)
+	regionWorldSizeX = int(ceil(pixelWorldSizeX as float / REGION_SIZE as float))
+	regionWorldSizeY = int(ceil(pixelWorldSizeY as float / REGION_SIZE as float))
 	
 	# just caching for the sake of any sort of speed increase
 	regionHalfSizeX = REGION_SIZE / 2
@@ -166,7 +166,7 @@ func SetLevelCollisions():
 	for i in range(0, pixelTypes.size()):
 		var testPos = Vector2()
 		testPos.x = ((i % pixelWorldSizeX) * pixelSizeScale) + 1
-		testPos.y = (floor(i / pixelWorldSizeX) * pixelSizeScale) + 1
+		testPos.y = (floor(i / float(pixelWorldSizeX)) * pixelSizeScale) + 1
 		
 		var collisions = space_state.intersect_point(testPos)
 		for col in collisions:
@@ -303,8 +303,6 @@ func MovePixel(srcPos, destPos, image):
 #	image.set_pixelv(srcPos, Color.transparent)
 
 func UpdateFlyingDustPixel(pos, delta, image):
-	var movePos = null
-	
 	var vel = pixelVelocity[(pos.y * pixelWorldSizeX) + pos.x]
 	
 	var FLYING_DUST_GRAVITY = 2
@@ -565,7 +563,7 @@ func ApplyForce(pos, image):
 	if forceRight:
 		mod = -1 # right
 	
-	var sweepHeight : int = 16 / Global.DUST_SCALE
+	var sweepHeight : int = int(16.0 / Global.DUST_SCALE)
 	var checkNum = 1
 	var xStart = pos.x - ((sweepHeight - 1) * mod)
 	var yStart = pos.y - (sweepHeight - 1)
@@ -644,7 +642,7 @@ func _draw():
 		for i in range(pixelFinalIndex, -1, -1):
 			if pixelTypes[i] == PixelType.COLLISION or pixelTypes[i] == PixelType.LAVA:
 				var x = (i % pixelWorldSizeX) * pixelSizeScale
-				var y = floor(i / pixelWorldSizeX) * pixelSizeScale
+				var y = floor(i / float(pixelWorldSizeX)) * pixelSizeScale
 				var pos = Vector2(x, y)
 				var rect = Rect2(pos, rectSize)
 				var c = Color(0, 1, 1, 0.9)

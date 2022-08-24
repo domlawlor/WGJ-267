@@ -33,7 +33,7 @@ func MSecToTimeString(msec : int):
 	workingTimeLeft = (workingTimeLeft - secComp) / 60
 	var minComp = workingTimeLeft % 60
 	workingTimeLeft = (workingTimeLeft - minComp) / 60
-	var hourComp = workingTimeLeft
+	#var hourComp = workingTimeLeft
 	#var hourComp = workingTimeLeft % 60
 	
 	var formatString = "%s:%s"
