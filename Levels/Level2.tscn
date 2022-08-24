@@ -1,4 +1,4 @@
-[gd_scene load_steps=57 format=2]
+[gd_scene load_steps=58 format=2]
 
 [ext_resource path="res://Art/TileSet64.png" type="Texture" id=1]
 [ext_resource path="res://DustSim.tscn" type="PackedScene" id=2]
@@ -393,8 +393,11 @@ extents = Vector2( 2.5, 62 )
 [sub_resource type="RectangleShape2D" id=28]
 extents = Vector2( 32, 32 )
 
-[sub_resource type="RectangleShape2D" id=31]
-extents = Vector2( 87.5, 25 )
+[sub_resource type="RectangleShape2D" id=37]
+extents = Vector2( 84, 23 )
+
+[sub_resource type="RectangleShape2D" id=38]
+extents = Vector2( 82.5, 19.5 )
 
 [sub_resource type="Animation" id=29]
 resource_name = "OverlayHazeMovement"
@@ -517,6 +520,7 @@ visible = false
 position = Vector2( 128, 406 )
 scale = Vector2( 2, 2 )
 frames = SubResource( 36 )
+frame = 2
 playing = true
 flip_h = true
 
@@ -563,12 +567,12 @@ position = Vector2( 556, 483 )
 collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AcidPit"]
-position = Vector2( -12.5, -2 )
-shape = SubResource( 31 )
+position = Vector2( -13, -4 )
+shape = SubResource( 37 )
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="AcidPit"]
-position = Vector2( -460, 1 )
-shape = SubResource( 31 )
+position = Vector2( -459.5, -4.5 )
+shape = SubResource( 38 )
 
 [node name="DustSpawns" type="Node2D" parent="."]
 

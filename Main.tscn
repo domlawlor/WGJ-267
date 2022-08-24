@@ -150,27 +150,33 @@ margin_right = 50.0
 margin_bottom = 62.5
 custom_constants/separation = 15
 
-[node name="LoadLevel0" type="Button" parent="Menu/LevelList"]
-margin_right = 100.0
+[node name="LoadLevelTitle" type="Button" parent="Menu/LevelList"]
+margin_right = 112.0
 margin_bottom = 20.0
+text = "Load Level Title"
+
+[node name="LoadLevel0" type="Button" parent="Menu/LevelList"]
+margin_top = 35.0
+margin_right = 112.0
+margin_bottom = 55.0
 text = "Load Level 0"
 
 [node name="LoadLevel1" type="Button" parent="Menu/LevelList"]
-margin_top = 35.0
-margin_right = 100.0
-margin_bottom = 55.0
+margin_top = 70.0
+margin_right = 112.0
+margin_bottom = 90.0
 text = "Load Level 1"
 
 [node name="LoadLevel2" type="Button" parent="Menu/LevelList"]
-margin_top = 70.0
-margin_right = 100.0
-margin_bottom = 90.0
+margin_top = 105.0
+margin_right = 112.0
+margin_bottom = 125.0
 text = "Load Level 2"
 
 [node name="DomsTestLevel" type="Button" parent="Menu/LevelList"]
-margin_top = 105.0
-margin_right = 100.0
-margin_bottom = 125.0
+margin_top = 140.0
+margin_right = 112.0
+margin_bottom = 160.0
 text = "Doms Testing"
 
 [node name="Main2D" type="Node2D" parent="."]
@@ -194,6 +200,7 @@ one_shot = true
 anims/RESET = SubResource( 7 )
 anims/deathScreen = SubResource( 6 )
 
+[connection signal="pressed" from="Menu/LevelList/LoadLevelTitle" to="." method="_on_LoadLevelTitle_pressed"]
 [connection signal="pressed" from="Menu/LevelList/LoadLevel0" to="." method="_on_LoadLevel0_pressed"]
 [connection signal="pressed" from="Menu/LevelList/LoadLevel1" to="." method="_on_LoadLevel1_pressed"]
 [connection signal="pressed" from="Menu/LevelList/LoadLevel2" to="." method="_on_LoadLevel2_pressed"]

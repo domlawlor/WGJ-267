@@ -21,7 +21,6 @@ func _ready():
 	Events.connect("dust_amount_changed", self, "_on_dust_amount_changed")
 	Events.connect("hit_time_limit", self, "_on_hit_time_limit")
 	
-	
 	m_totalDust = Global.DustRemaining as float
 	print("total dust:" + str(m_totalDust))
 	SetState(LevelState.PLAY)

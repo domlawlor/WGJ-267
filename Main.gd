@@ -51,6 +51,9 @@ func _process(delta):
 	
 	Global.TimeLimitTimeLeft = timeLimit.time_left
 
+func _on_LoadLevelTitle_pressed():
+	load_level("LevelTitle")
+
 func _on_LoadLevel0_pressed():
 	load_level("Level0")
 	
@@ -83,4 +86,3 @@ func TriggerPlayerDeathAnimation():
 
 func _on_show_death_screen():
 	animationPlayer.play("deathScreen")
-

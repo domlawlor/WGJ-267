@@ -484,7 +484,7 @@ extents = Vector2( 2.5, 89 )
 [sub_resource type="RectangleShape2D" id=28]
 extents = Vector2( 32, 32 )
 
-[sub_resource type="RectangleShape2D" id=31]
+[sub_resource type="RectangleShape2D" id=39]
 extents = Vector2( 117.5, 55.5 )
 
 [sub_resource type="Animation" id=29]
@@ -603,6 +603,7 @@ visible = false
 position = Vector2( 128, 406 )
 scale = Vector2( 2, 2 )
 frames = SubResource( 36 )
+frame = 2
 playing = true
 flip_h = true
 
@@ -656,7 +657,7 @@ collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="LavaPit"]
 position = Vector2( -107.5, -39.5 )
-shape = SubResource( 31 )
+shape = SubResource( 39 )
 
 [node name="DustSpawns" type="Node2D" parent="."]
 
