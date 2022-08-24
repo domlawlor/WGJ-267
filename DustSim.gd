@@ -296,9 +296,11 @@ func MovePixel(srcPos, destPos, image):
 	if destPosType == PixelType.EMPTY:
 		SetPixel(destPos, GetPixel(srcPos)) # move dust
 		image.set_pixelv(destPos, image.get_pixelv(srcPos))
-		SetPixel(srcPos, PixelType.EMPTY)
-		image.set_pixelv(srcPos, Color.transparent)
-	else:
+		
+	SetPixel(srcPos, PixelType.EMPTY)
+	image.set_pixelv(srcPos, Color.transparent)
+	
+	if destPosType != PixelType.EMPTY:
 		KillDust(srcPos, image)
 #	SetPixel(srcPos, PixelType.EMPTY)
 #	image.set_pixelv(srcPos, Color.transparent)
