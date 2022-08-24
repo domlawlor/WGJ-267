@@ -388,10 +388,10 @@ points = PoolVector2Array( 64, 64, 48, 64, 48, 0, 64, 0 )
 0/z_index = 0
 
 [sub_resource type="RectangleShape2D" id=27]
-extents = Vector2( 2.5, 62 )
+extents = Vector2( 2.5, 63.5 )
 
-[sub_resource type="RectangleShape2D" id=28]
-extents = Vector2( 32, 32 )
+[sub_resource type="RectangleShape2D" id=39]
+extents = Vector2( 32, 5 )
 
 [sub_resource type="RectangleShape2D" id=37]
 extents = Vector2( 84, 23 )
@@ -520,7 +520,6 @@ visible = false
 position = Vector2( 128, 406 )
 scale = Vector2( 2, 2 )
 frames = SubResource( 36 )
-frame = 1
 playing = true
 flip_h = true
 
@@ -547,15 +546,15 @@ tile_data = PoolIntArray( 196616, 0, 0, 262152, 0, 0 )
 position = Vector2( 100, 0 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Ladders/Area2D"]
-position = Vector2( 444, 253 )
+position = Vector2( 444, 251.5 )
 shape = SubResource( 27 )
 
-[node name="StaticBody2D" type="StaticBody2D" parent="Ladders" groups=["ladder_top"]]
-position = Vector2( 416, 159 )
+[node name="StaticBody2D" type="StaticBody2D" parent="Ladders"]
+position = Vector2( 544, 202 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Ladders/StaticBody2D"]
-position = Vector2( 128, 65 )
-shape = SubResource( 28 )
+position = Vector2( 0, -5 )
+shape = SubResource( 39 )
 
 [node name="Door" parent="." instance=ExtResource( 17 )]
 position = Vector2( 576, 64 )

@@ -4,6 +4,8 @@ signal sweep(pos, facingRight)
 signal spawn_dust(pos, amount)
 signal ladder_climbing_activate()
 signal ladder_climbing_deactivate()
+signal player_using_ladder(usingLadder)
+
 signal dust_amount_changed(amount)
 signal level_complete()
 signal level_exited(num)

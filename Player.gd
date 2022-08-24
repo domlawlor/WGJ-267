@@ -127,9 +127,9 @@ func _process(delta):
 	
 	var frameVel = m_velocity * delta
 	if m_state == PlayerState.LADDER:
-		print("frameVel: " + str(frameVel))
+		#print("frameVel: " + str(frameVel))
 		var col : KinematicCollision2D = move_and_collide(frameVel, true, true, true)
-		if col != null and !col.collider.is_in_group("ladder_top"):
+		if col != null:
 			move_and_collide(frameVel)   # the bug is because we end up in here even though we appear to be only colliding with a ladder_top block
 			SetPlayerState(PlayerState.GROUND)
 		else:
@@ -157,6 +157,13 @@ func SetPlayerState(state):
 	if m_state == state:
 		return
 	
+	if state == PlayerState.LADDER and m_state != PlayerState.LADDER:
+		print("player_using_ladder - true")
+		Events.emit_signal("player_using_ladder", true)
+	elif state != PlayerState.LADDER and m_state == PlayerState.LADDER:
+		print("player_using_ladder - false")
+		Events.emit_signal("player_using_ladder", false)
+	
 	m_state = state
 	var fString = "PlayerState change: %s"
 	var output
@@ -171,7 +178,7 @@ func SetPlayerState(state):
 			output = fString % "SWEEPING"
 		PlayerState.DEAD:
 			output = fString % "DEAD"
-	print(output)
+	#print(output)
 
 func _on_ladder_climbing_activate():
 	print("ladder active")
