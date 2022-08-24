@@ -124,7 +124,13 @@ func _process(delta):
 		else:
 			position.y += frameVel.y
 	else:
-		var col = move_and_collide(frameVel)
+		var col = move_and_collide(frameVel, true, true, true)
+		if col != null:
+			var ang = floor(rad2deg(col.get_angle()))
+			if ang != 0:
+				m_velocity.x = 0
+				frameVel = m_velocity * delta
+		col = move_and_collide(frameVel)
 		if col != null:
 			if col.collider.is_in_group("dust_kill"):
 				SetPlayerState(PlayerState.DEAD)
@@ -135,8 +141,6 @@ func _process(delta):
 			if ang == 0:
 				SetPlayerState(PlayerState.GROUND)
 				m_velocity.y = 0
-			else:
-				m_velocity.x = 0
 
 func SetPlayerState(state):
 	if m_state == state:
