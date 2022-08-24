@@ -60,7 +60,8 @@ func _on_dust_amount_changed(amount):
 			Events.emit_signal("level_complete")
 
 func _on_hit_time_limit():
-	cutscenePlayer.play("fired")
+	if cutscenePlayer:
+		cutscenePlayer.play("fired")
 
 func OnCutsceneStart():
 	door.OpenDoor()

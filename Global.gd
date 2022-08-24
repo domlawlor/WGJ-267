@@ -47,3 +47,9 @@ func MSecToTimeString(msec : int):
 #		resultString = formatString % [str(minComp).pad_zeros(2), str(secComp).pad_zeros(2), msComp]
 		
 	return resultString
+
+func SaveToFile(filePath, data):
+	var file = File.new()
+	file.open(filePath, File.WRITE)
+	file.store_line(to_json(data))
+	file.close()
