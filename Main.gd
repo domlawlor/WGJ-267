@@ -14,12 +14,15 @@ export var TotalTimeLimitSec : float = 30.0
 
 func _ready():
 	Events.connect("level_exited", self, "_on_level_exited")
+	Events.connect("start_game", self, "_on_start_game")
 	Events.connect("start_time_limit", self, "_on_start_time_limit")
 	Events.connect("show_death_screen", self, "_on_show_death_screen")
-	Events.emit_signal("start_time_limit")
 	
+	Global.TOTAL_TIME_LIMIT_SEC = TotalTimeLimitSec
+	levelList.visible = false
 	bgm.play()
 	animationPlayer.play("RESET")
+	load_level("LevelTitle")
 
 func _exit():
 	Events.disconnect("level_exited", self, "_on_level_exited")
@@ -49,9 +52,11 @@ func _process(delta):
 		animationPlayer.play("RESET")
 		animationPlayer.play("deathScreen")
 	
-	Global.TimeLimitTimeLeft = timeLimit.time_left
+	if Global.gameState == Global.GameState.PLAYING:
+		Global.TimeLimitTimeLeft = timeLimit.time_left
 
 func _on_LoadLevelTitle_pressed():
+	Global.gameState = Global.GameState.TITLE
 	load_level("LevelTitle")
 
 func _on_LoadLevel0_pressed():
@@ -75,8 +80,13 @@ func _on_level_exited(num):
 		2:
 			levelList.visible = true
 
+func _on_start_game():
+	load_level("Level0")
+	Events.emit_signal("start_time_limit")
+
 func _on_start_time_limit():
 	timeLimit.start(TotalTimeLimitSec)
+	Global.gameState = Global.GameState.PLAYING
 	
 func _on_TimeLimit_timeout():
 	Events.emit_signal("hit_time_limit")

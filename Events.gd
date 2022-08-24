@@ -8,6 +8,7 @@ signal dust_amount_changed(amount)
 signal level_complete()
 signal level_exited(num)
 
+signal start_game()
 signal start_time_limit()
 signal hit_time_limit()
 
