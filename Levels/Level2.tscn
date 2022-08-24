@@ -167,7 +167,7 @@ points = PoolVector2Array( 64, 64, 0, 64, 0, 0, 64, 0 )
 points = PoolVector2Array( 64, 64, 0, 64, 0, 0, 64, 0 )
 
 [sub_resource type="ConvexPolygonShape2D" id=24]
-points = PoolVector2Array( 32, 64, 0, 64, 0, 0, 32, 0 )
+points = PoolVector2Array( 16, 64, 0, 64, 0, 0, 16, 0 )
 
 [sub_resource type="ConvexPolygonShape2D" id=25]
 points = PoolVector2Array( 64, 64, 48, 64, 48, 0, 64, 0 )
@@ -520,14 +520,14 @@ visible = false
 position = Vector2( 128, 406 )
 scale = Vector2( 2, 2 )
 frames = SubResource( 36 )
-frame = 2
+frame = 1
 playing = true
 flip_h = true
 
-[node name="DustSim" parent="." instance=ExtResource( 2 )]
-
 [node name="Player" parent="." instance=ExtResource( 4 )]
 position = Vector2( 96, 64 )
+
+[node name="DustSim" parent="." instance=ExtResource( 2 )]
 
 [node name="TileMapForeground" type="TileMap" parent="."]
 tile_set = SubResource( 16 )
