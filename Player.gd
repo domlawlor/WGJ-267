@@ -170,7 +170,8 @@ func _on_ladder_climbing_deactivate():
 		m_velocity.y = 0
 
 func _on_SweepTimer_timeout():
-	SetPlayerState(PlayerState.AIR)
+	if m_state == PlayerState.SWEEPING:
+		SetPlayerState(PlayerState.AIR)
 
 func _on_hit_time_limit():
 	m_state = PlayerState.FROZEN
