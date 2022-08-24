@@ -4,7 +4,7 @@ const SILENT_DB = -80
 const MIN_DB = -40
 const MAX_DB = -12
 const INCREASE_DB = 3
-const DECAY = 4
+const DECAY = 6
 
 func _ready():
 	Events.connect("dust_amount_changed", self, "_on_dust_amount_changed")
