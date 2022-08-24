@@ -504,6 +504,7 @@ flip_h = true
 position = Vector2( 321, 214 )
 scale = Vector2( 2, 2 )
 frames = SubResource( 36 )
+frame = 3
 speed_scale = 0.99
 playing = true
 flip_h = true

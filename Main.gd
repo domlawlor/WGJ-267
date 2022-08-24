@@ -81,6 +81,7 @@ func _on_level_exited(num):
 			levelList.visible = true
 
 func _on_start_game():
+	Global.DustRemaining = 0
 	load_level("Level0")
 	Events.emit_signal("start_time_limit")
 
