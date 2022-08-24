@@ -35,7 +35,7 @@ func _exit():
 func unload_level():
 	if (is_instance_valid(level_instance)):
 		level_instance.queue_free()
-		main_2d.remove_child(level_instance)
+		main_2d.call_deferred("remove_child", level_instance)
 	level_instance = null
 
 func load_level(level_name : String):
@@ -44,7 +44,7 @@ func load_level(level_name : String):
 	var level_resource := load(level_path)
 	if (level_resource):
 		level_instance = level_resource.instance()
-		main_2d.add_child(level_instance)
+		main_2d.call_deferred("add_child", level_instance)
 		levelList.visible = false
 
 func _process(delta):
