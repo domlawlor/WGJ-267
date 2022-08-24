@@ -1,7 +1,7 @@
 extends Node2D
 
 onready var monitorProgress = $MonitorProgress
-
+onready var door = $Door
 onready var cutscenePlayer = $CutscenePlayer
 
 enum LevelState {
@@ -62,6 +62,9 @@ func _on_dust_amount_changed(amount):
 
 func _on_hit_time_limit():
 	cutscenePlayer.play("fired")
+
+func OnCutsceneStart():
+	door.OpenDoor()
 	
 func OnCutsceneEnd():
 	Events.emit_signal("show_death_screen")

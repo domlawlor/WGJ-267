@@ -8,6 +8,8 @@ onready var collision = $Collision
 onready var openSFX = $OpenSFX
 onready var animationDelay = $AnimationDelay
 
+var m_open = false
+
 func _ready():
 	Events.connect("level_complete", self, "_on_level_complete")
 	sprite.play("closed")
@@ -31,6 +33,9 @@ func _on_LevelCompleteTriggerR_body_entered(body):
 		Events.emit_signal("level_exited", LevelNum)
 
 func OpenDoor():
+	if m_open:
+		return
+	m_open = true
 	openSFX.play()
 	animationDelay.start()
 	collision.queue_free()
