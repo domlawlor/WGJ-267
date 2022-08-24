@@ -2,7 +2,7 @@ extends AudioStreamPlayer
 
 const SILENT_DB = -80
 const MIN_DB = -40
-const MAX_DB = -12
+const MAX_DB = -16
 const INCREASE_DB = 3
 const DECAY = 6
 
