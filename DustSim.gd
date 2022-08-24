@@ -282,11 +282,11 @@ func KillDust(pos, image):
 	Events.emit_signal("dust_amount_changed", -1)
 	
 	var smokePos = Vector2(pos.x, pos.y - 1)
-	SetPixel(smokePos, PixelType.SMOKE)
-	
-	var color = GetPixelTypeColor(PixelType.SMOKE)
-	image.set_pixelv(smokePos, color)
-	#print("kill! " + str(Global.DustRemaining))
+	if IsPositionEmpty(smokePos):
+		SetPixel(smokePos, PixelType.SMOKE)
+		
+		var color = GetPixelTypeColor(PixelType.SMOKE)
+		image.set_pixelv(smokePos, color)
 	
 func MovePixel(srcPos, destPos, image):
 	var destPosType = GetPixel(destPos)
@@ -385,7 +385,7 @@ func MoveLavaPixel(srcPos, destPos, image):
 func MoveSmokePixel(srcPos, destPos, image):
 	var destPosType = GetPixel(destPos)
 	if destPosType == PixelType.EMPTY:
-		SetPixel(destPos, GetPixel(srcPos)) # move dust
+		SetPixel(destPos, GetPixel(srcPos)) # move smoke
 		image.set_pixelv(destPos, image.get_pixelv(srcPos))
 	SetPixel(srcPos, PixelType.EMPTY)
 	image.set_pixelv(srcPos, Color.transparent)

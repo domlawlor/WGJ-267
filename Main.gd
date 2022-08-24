@@ -40,6 +40,7 @@ func unload_level():
 
 func load_level(level_name : String):
 	unload_level()
+	Global.DustRemaining = 0
 	var level_path := "res://Levels/%s.tscn" % level_name
 	var level_resource := load(level_path)
 	if (level_resource):
@@ -90,7 +91,6 @@ func _on_start_game():
 	
 func StartGame():
 	animationPlayer.play("RESET")
-	Global.DustRemaining = 0
 	load_level("Level0")
 	Events.emit_signal("start_time_limit")
 
