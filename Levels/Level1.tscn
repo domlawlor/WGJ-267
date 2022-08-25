@@ -13,7 +13,7 @@
 [ext_resource path="res://Levels/Ladders.gd" type="Script" id=11]
 [ext_resource path="res://Art/Overlay_illumination.png" type="Texture" id=12]
 [ext_resource path="res://Levels/OverlayHaze.gd" type="Script" id=13]
-[ext_resource path="res://Art/BackgroundObjects/Monitor1.png" type="Texture" id=14]
+[ext_resource path="res://Art/BackgroundObjects/Monitor7.png" type="Texture" id=14]
 [ext_resource path="res://Art/BackgroundObjects/Web1.png" type="Texture" id=15]
 [ext_resource path="res://Art/BackgroundObjects/Generator.png" type="Texture" id=16]
 [ext_resource path="res://Door.tscn" type="PackedScene" id=17]
@@ -102,6 +102,28 @@ animations = [ {
 "name": "default",
 "speed": 5.0
 } ]
+
+[sub_resource type="TileSet" id=26]
+0/name = "ladder.png 0"
+0/texture = ExtResource( 10 )
+0/tex_offset = Vector2( 0, 0 )
+0/modulate = Color( 1, 1, 1, 1 )
+0/region = Rect2( 0, 0, 64, 64 )
+0/tile_mode = 0
+0/occluder_offset = Vector2( 0, 0 )
+0/navigation_offset = Vector2( 0, 0 )
+0/shape_offset = Vector2( 0, 0 )
+0/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+0/shape_one_way = false
+0/shape_one_way_margin = 0.0
+0/shapes = [  ]
+0/z_index = 0
+
+[sub_resource type="RectangleShape2D" id=27]
+extents = Vector2( 0.5, 155 )
+
+[sub_resource type="RectangleShape2D" id=38]
+extents = Vector2( 32, 6.5 )
 
 [sub_resource type="ConvexPolygonShape2D" id=1]
 points = PoolVector2Array( 64, 64, 0, 64, 0, 0, 64, 0 )
@@ -371,28 +393,6 @@ points = PoolVector2Array( 64, 64, 48, 64, 48, 0, 64, 0 )
 } ]
 2/z_index = 0
 
-[sub_resource type="TileSet" id=26]
-0/name = "ladder.png 0"
-0/texture = ExtResource( 10 )
-0/tex_offset = Vector2( 0, 0 )
-0/modulate = Color( 1, 1, 1, 1 )
-0/region = Rect2( 0, 0, 64, 64 )
-0/tile_mode = 0
-0/occluder_offset = Vector2( 0, 0 )
-0/navigation_offset = Vector2( 0, 0 )
-0/shape_offset = Vector2( 0, 0 )
-0/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
-0/shape_one_way = false
-0/shape_one_way_margin = 0.0
-0/shapes = [  ]
-0/z_index = 0
-
-[sub_resource type="RectangleShape2D" id=27]
-extents = Vector2( 2.5, 89 )
-
-[sub_resource type="RectangleShape2D" id=28]
-extents = Vector2( 32, 32 )
-
 [sub_resource type="RectangleShape2D" id=37]
 extents = Vector2( 86.5, 23.5 )
 
@@ -472,10 +472,10 @@ texture = ExtResource( 8 )
 position = Vector2( -78, -240 )
 tile_set = SubResource( 23 )
 format = 1
-tile_data = PoolIntArray( 2, 0, 65536, 65538, 0, 65536, 65544, 0, 0, 131075, 0, 1, 131080, 0, 65537, 196616, 0, 65536, 262146, 0, 2, 262152, 0, 65536, 327682, 0, 65536, 327686, 0, 0, 327687, 0, 1, 327688, 0, 131073, 327690, 0, 1, 393218, 0, 65540, 393219, 0, 1, 393220, 0, 1, 393221, 0, 1, 393222, 0, 131073 )
+tile_data = PoolIntArray( 2, 0, 65536, 65538, 0, 65536, 65544, 0, 0, 131075, 0, 1, 131076, 0, 1, 131077, 0, 1, 131080, 0, 65537, 196616, 0, 65536, 262152, 0, 65536, 327686, 0, 0, 327687, 0, 1, 327688, 0, 131073, 327690, 0, 1, 458750, 0, 1, 458751, 0, 1, 393216, 0, 1, 393217, 0, 1, 393218, 0, 3, 393219, 0, 1, 393220, 0, 1, 393221, 0, 1, 393222, 0, 131073 )
 
 [node name="MonitorProgress" type="Sprite" parent="."]
-position = Vector2( 354, 88 )
+position = Vector2( 204, 408 )
 scale = Vector2( 2, 2 )
 texture = ExtResource( 19 )
 hframes = 10
@@ -483,12 +483,12 @@ hframes = 10
 [node name="BackgroundObjects" type="Node2D" parent="."]
 
 [node name="3Screens" type="Sprite" parent="BackgroundObjects"]
-position = Vector2( 314, 288 )
+position = Vector2( 158, 308 )
 scale = Vector2( 2, 2 )
 texture = ExtResource( 14 )
 
 [node name="Web" type="Sprite" parent="BackgroundObjects"]
-position = Vector2( 274, 208 )
+position = Vector2( 228, 208 )
 scale = Vector2( 2, 2 )
 texture = ExtResource( 15 )
 
@@ -518,8 +518,30 @@ frame = 2
 playing = true
 flip_h = true
 
+[node name="Ladders" type="Node2D" parent="."]
+script = ExtResource( 11 )
+
+[node name="Tilemap" type="TileMap" parent="Ladders"]
+tile_set = SubResource( 26 )
+format = 1
+tile_data = PoolIntArray( 131076, 0, 0, 196612, 0, 0, 262148, 0, 0, 327684, 0, 0, 393220, 0, 0 )
+
+[node name="Area2D" type="Area2D" parent="Ladders" groups=["ladder"]]
+position = Vector2( 100, 0 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ladders/Area2D"]
+position = Vector2( 187.5, 282 )
+shape = SubResource( 27 )
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Ladders" groups=["ladder_top"]]
+position = Vector2( 416, 159 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ladders/StaticBody2D"]
+position = Vector2( -128, -24.5 )
+shape = SubResource( 38 )
+
 [node name="Player" parent="." instance=ExtResource( 4 )]
-position = Vector2( 95, 128 )
+position = Vector2( 93, -6 )
 
 [node name="DustSim" parent="." instance=ExtResource( 2 )]
 
@@ -527,32 +549,10 @@ position = Vector2( 95, 128 )
 tile_set = SubResource( 16 )
 collision_layer = 2
 format = 1
-tile_data = PoolIntArray( -1, 1, 0, -65536, 1, 0, -65535, 1, 0, -65534, 1, 0, -65533, 1, 0, -65532, 1, 0, -65531, 1, 0, -65530, 1, 0, -65529, 1, 0, -65528, 1, 0, -65527, 1, 0, -65526, 1, 0, 65535, 1, 0, 0, 0, 65538, 8, 0, 131072, 9, 0, 65537, 10, 1, 0, 131071, 1, 0, 65536, 0, 65538, 65545, 0, 65536, 65546, 1, 0, 196607, 1, 0, 131072, 0, 65537, 131073, 0, 1, 131074, 0, 1, 131075, 2, 0, 131076, 0, 1, 131077, 0, 1, 131078, 0, 1, 131079, 0, 2, 131081, 0, 65536, 131082, 1, 0, 262143, 1, 0, 196608, 1, 65536, 196609, 1, 262144, 196610, 0, 131074, 196613, 1, 0, 196614, 1, 65536, 196615, 0, 131074, 196617, 0, 65536, 196618, 1, 0, 327679, 1, 0, 262144, 1, 131072, 262145, 0, 131074, 262153, 0, 65536, 262154, 1, 0, 327686, 0, 0, 327687, 0, 1, 327688, 2, 0, 327689, 0, 131072, 327690, 1, 0, 393226, 1, 0, 524287, 1, 0, 458752, 0, 1, 458753, 0, 1, 458754, 0, 1, 458755, 0, 1, 458756, 0, 1, 458757, 0, 1, 458758, 0, 2, 458762, 1, 0, 589823, 1, 0, 524288, 1, 0, 524289, 1, 0, 524290, 1, 0, 524291, 1, 0, 524292, 1, 0, 524293, 1, 0, 524294, 1, 0, 524295, 1, 0, 524296, 1, 0, 524297, 1, 0, 524298, 1, 0 )
+tile_data = PoolIntArray( -1, 1, 0, -65536, 1, 0, -65532, 1, 0, -65531, 1, 0, -65530, 1, 0, -65529, 1, 0, -65528, 1, 0, -65527, 1, 0, -65526, 1, 0, 65535, 1, 0, 0, 0, 65538, 8, 0, 131072, 9, 0, 65537, 10, 1, 0, 131071, 1, 0, 65536, 0, 65538, 65545, 0, 65536, 65546, 1, 0, 196607, 1, 0, 131072, 1, 131072, 131073, 0, 1, 131074, 0, 1, 131075, 0, 1, 131077, 0, 1, 131078, 0, 1, 131079, 0, 2, 131081, 0, 65536, 131082, 1, 0, 262143, 1, 0, 196608, 1, 65536, 196609, 1, 262144, 196610, 0, 131074, 196613, 1, 0, 196614, 1, 65536, 196615, 0, 131074, 196617, 0, 65536, 196618, 1, 0, 327679, 1, 0, 262144, 0, 131073, 262145, 0, 131074, 262153, 0, 65536, 262154, 1, 0, 327686, 0, 0, 327687, 0, 1, 327688, 2, 0, 327689, 0, 131072, 327690, 1, 0, 393226, 1, 0, 524287, 1, 0, 458752, 0, 1, 458753, 0, 1, 458754, 0, 1, 458755, 0, 1, 458756, 0, 1, 458757, 0, 1, 458758, 0, 2, 458762, 1, 0, 589823, 1, 0, 524288, 1, 0, 524289, 1, 0, 524290, 1, 0, 524291, 1, 0, 524292, 1, 0, 524293, 1, 0, 524294, 1, 0, 524295, 1, 0, 524296, 1, 0, 524297, 1, 0, 524298, 1, 0 )
 
 [node name="TimerScreen" parent="." instance=ExtResource( 20 )]
-position = Vector2( 190, 233 )
-
-[node name="LaddersOFFSCREEN" type="Node2D" parent="."]
-position = Vector2( 1000, 0 )
-script = ExtResource( 11 )
-
-[node name="Tilemap" type="TileMap" parent="LaddersOFFSCREEN"]
-tile_set = SubResource( 26 )
-format = 1
-
-[node name="Area2D" type="Area2D" parent="LaddersOFFSCREEN" groups=["ladder"]]
-position = Vector2( 100, 0 )
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="LaddersOFFSCREEN/Area2D"]
-position = Vector2( 316.5, 216 )
-shape = SubResource( 27 )
-
-[node name="StaticBody2D" type="StaticBody2D" parent="LaddersOFFSCREEN" groups=["ladder_top"]]
-position = Vector2( 416, 159 )
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="LaddersOFFSCREEN/StaticBody2D"]
-position = Vector2( 0, 1 )
-shape = SubResource( 28 )
+position = Vector2( 310, 74 )
 
 [node name="Door" parent="." instance=ExtResource( 17 )]
 position = Vector2( 0, 320 )
@@ -571,8 +571,8 @@ shape = SubResource( 37 )
 [node name="DustSpawns" type="Node2D" parent="."]
 
 [node name="DustSpawn" parent="DustSpawns" instance=ExtResource( 9 )]
-position = Vector2( 194, 118 )
-DustAmount = 12
+position = Vector2( 233, 121 )
+DustAmount = 15
 
 [node name="DustSpawn2" parent="DustSpawns" instance=ExtResource( 9 )]
 position = Vector2( 453, 119 )
@@ -595,5 +595,5 @@ playback_speed = 0.7
 anims/OverlayHazeMovement = SubResource( 29 )
 anims/RESET = SubResource( 30 )
 
-[connection signal="body_entered" from="LaddersOFFSCREEN/Area2D" to="LaddersOFFSCREEN" method="_on_Area2D_body_entered"]
-[connection signal="body_exited" from="LaddersOFFSCREEN/Area2D" to="LaddersOFFSCREEN" method="_on_Area2D_body_exited"]
+[connection signal="body_entered" from="Ladders/Area2D" to="Ladders" method="_on_Area2D_body_entered"]
+[connection signal="body_exited" from="Ladders/Area2D" to="Ladders" method="_on_Area2D_body_exited"]

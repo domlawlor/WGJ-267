@@ -66,6 +66,7 @@ var forceRight = true
 func _ready():
 	Events.connect("sweep", self, "_on_sweep")
 	Events.connect("spawn_dust", self, "_on_spawn_dust")
+	Events.connect("spawn_lava", self, "_on_spawn_lava")
 	
 	if Global.DUST_SCALE == 1:
 		sprite = sprite_2x
@@ -101,6 +102,7 @@ func _ready():
 func _exit_tree():
 	Events.disconnect("sweep", self, "_on_sweep")
 	Events.disconnect("spawn_dust", self, "_on_spawn_dust")
+	Events.disconnect("spawn_lava", self, "_on_spawn_lava")
 
 func GetPixelState(pos):
 	return pixelState[(pos.y * pixelWorldSizeX) + pos.x]
@@ -192,6 +194,15 @@ func _on_spawn_dust(pos, amount):
 		for y in range(0, amount):
 			positions.push_back(Vector2(xStart + x, yStart + y))
 	CreatePixels(positions, PixelType.DUST)
+
+func _on_spawn_lava(pos, directionLeft):
+	var positions = []
+	var startPos = GetSimPos(pos)
+	var xMod = 1
+	if directionLeft:
+		xMod = -1
+	positions.push_back(startPos)
+	CreatePixels(positions, PixelType.LAVA)
 
 func GetPixelTypeColor(type):
 	var colorArray

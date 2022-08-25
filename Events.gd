@@ -2,6 +2,7 @@ extends Node
 
 signal sweep(pos, facingRight)
 signal spawn_dust(pos, amount)
+signal spawn_lava(pos, directionLeft)
 signal ladder_climbing_activate()
 signal ladder_climbing_deactivate()
 signal player_using_ladder(usingLadder)
