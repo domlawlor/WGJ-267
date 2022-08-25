@@ -59,6 +59,9 @@ func load_level(level_name : String, transitionFade : bool):
 		main_2d.call_deferred("add_child", level_instance)
 		levelList.visible = false
 	
+	if level_name == "LevelTitle":
+		$Menu/StartButton.MakeActive()
+	
 	if transitionFade:
 		Events.emit_signal("fade_to_transparent")
 		yield(Events, "fade_to_transparent_complete")

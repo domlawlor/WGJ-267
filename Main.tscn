@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=2]
+[gd_scene load_steps=21 format=2]
 
 [ext_resource path="res://Main.gd" type="Script" id=1]
 [ext_resource path="res://Audio/music.ogg" type="AudioStream" id=2]
@@ -15,6 +15,7 @@
 [ext_resource path="res://Levels/OverlayHaze.gd" type="Script" id=13]
 [ext_resource path="res://Art/Overlay_illumination.png" type="Texture" id=14]
 [ext_resource path="res://TransitionFade.tscn" type="PackedScene" id=15]
+[ext_resource path="res://Levels/StartButton.gd" type="Script" id=16]
 
 [sub_resource type="Animation" id=7]
 length = 0.001
@@ -250,6 +251,15 @@ margin_right = 112.0
 margin_bottom = 195.0
 text = "Doms Testing"
 
+[node name="StartButton" type="Button" parent="Menu"]
+margin_left = 286.0
+margin_top = 330.3
+margin_right = 357.0
+margin_bottom = 373.3
+theme = ExtResource( 4 )
+text = "START"
+script = ExtResource( 16 )
+
 [node name="Camera2D" type="Camera2D" parent="."]
 anchor_mode = 0
 current = true
@@ -303,7 +313,6 @@ stream = ExtResource( 12 )
 volume_db = -4.0
 
 [node name="OverlayHaze" type="Sprite" parent="."]
-visible = false
 modulate = Color( 1, 1, 1, 0.246518 )
 scale = Vector2( 0.5, 0.5 )
 texture = ExtResource( 14 )
@@ -324,4 +333,5 @@ FadeLength = 0.6
 [connection signal="pressed" from="Menu/LevelList/LoadLevel2" to="." method="_on_LoadLevel2_pressed"]
 [connection signal="pressed" from="Menu/LevelList/LoadLevel3" to="." method="_on_LoadLevel3_pressed"]
 [connection signal="pressed" from="Menu/LevelList/DomsTestLevel" to="." method="_on_DomsTestLevel_pressed"]
+[connection signal="pressed" from="Menu/StartButton" to="Menu/StartButton" method="_on_StartButton_pressed"]
 [connection signal="timeout" from="TimeLimit" to="." method="_on_TimeLimit_timeout"]
