@@ -671,7 +671,9 @@ func ApplyForce(pos, image):
 	if forceRight:
 		mod = -1 # right
 	
-	var sweepHeight : int = int(16.0 / Global.DUST_SCALE)
+	var sweepHeight : int = 16
+	if Global.DUST_SCALE == 2:
+		sweepHeight = 6
 	var checkNum = 1
 	var xStart = pos.x - ((sweepHeight - 1) * mod)
 	var yStart = pos.y - (sweepHeight - 1)
