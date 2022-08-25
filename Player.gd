@@ -141,12 +141,22 @@ func _process(delta):
 	
 	var frameVel = m_velocity * delta
 	if m_state == PlayerState.LADDER:
-		#print("frameVel: " + str(frameVel))
 		var col : KinematicCollision2D = move_and_collide(frameVel, true, true, true)
 		if col != null:
-			move_and_collide(frameVel)   # the bug is because we end up in here even though we appear to be only colliding with a ladder_top block
-			SetPlayerState(PlayerState.GROUND)
+			if frameVel.y > 0:
+				var yCol : KinematicCollision2D = move_and_collide(Vector2(0, frameVel.y), true, true, true)
+				if yCol != null:
+					m_velocity.y = 0
+			var xCol : KinematicCollision2D = move_and_collide(Vector2(frameVel.x, 0), true, true, true)
+			if xCol != null:
+				m_velocity.x = 0
+			move_and_collide(m_velocity * delta)
+			var ang = floor(rad2deg(col.get_angle()))
+			if ang == 0:
+				SetPlayerState(PlayerState.GROUND)
+				m_velocity.y = 0
 		else:
+			position.x += frameVel.x
 			position.y += frameVel.y
 	else:
 		var col = move_and_collide(frameVel, true, true, true)
@@ -215,7 +225,10 @@ func _on_win_game():
 	animatedSprite.play("idle")
 
 func _on_unfreeze_player():
-	m_state = PlayerState.AIR
+	if m_ladderActive:
+		m_state = PlayerState.LADDER
+	else:
+		m_state = PlayerState.AIR
 
 #func _on_debug_set_player_pos(mousePos):
 #	position = mousePos

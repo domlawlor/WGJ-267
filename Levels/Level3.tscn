@@ -437,7 +437,7 @@ tile_data = PoolIntArray( 65540, 0, 0, 131076, 0, 0, 196612, 0, 0, 262148, 0, 0,
 position = Vector2( 100, 0 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Ladders/Area2D"]
-position = Vector2( 195, 213 )
+position = Vector2( 186, 213 )
 shape = SubResource( 27 )
 
 [node name="StaticBody2D" type="StaticBody2D" parent="Ladders" groups=["ladder_top"]]

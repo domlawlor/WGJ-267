@@ -13,7 +13,10 @@ func MakeActive():
 	self.visible = true
 	m_active = true
 
-func StartGame():
+func MakeInactive():
 	self.visible = false
 	m_active = false
+
+func StartGame():
+	MakeInactive()
 	Events.emit_signal("start_game")

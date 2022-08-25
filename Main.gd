@@ -62,6 +62,8 @@ func load_level(level_name : String, transitionFade : bool):
 	
 	if level_name == "LevelTitle":
 		$Menu/StartButton.MakeActive()
+	else:
+		$Menu/StartButton.MakeInactive()
 	
 	if transitionFade:
 		Events.emit_signal("fade_to_transparent")
