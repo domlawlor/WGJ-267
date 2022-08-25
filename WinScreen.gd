@@ -15,7 +15,7 @@ func _ready():
 
 func _exit_tree():
 	Events.disconnect("show_win_screen", self, "_on_show_win_screen")
-	Events.diconnect("sfx_death", self, "_on_sfx_death")
+	Events.disconnect("sfx_death", self, "_on_sfx_death")
 
 func _unhandled_input(event):
 	if resetInputEnabled and event.is_action_pressed("sweep"):
