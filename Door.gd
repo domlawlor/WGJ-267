@@ -76,3 +76,4 @@ func OnCutsceneEndWin():
 	sprite.play("closeAnimation")
 	openSFX.play()
 	Events.emit_signal("unfreeze_player")
+	Events.emit_signal("show_win_screen")

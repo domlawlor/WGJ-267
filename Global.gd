@@ -17,6 +17,11 @@ var DustRemaining : int = 0
 
 var TOTAL_TIME_LIMIT_SEC : float = 30.0
 var TimeLimitTimeLeft : float = 0.0
+var WinTime : float = 0.0
+
+var DustCleaned : int = 0
+var NumberOfSweeps : int = 0
+	
 
 func _ready():
 	randomize()
@@ -24,7 +29,7 @@ func _ready():
 func USecToMSec(usec : float):
 	return usec / 1000.0
 
-func MSecToTimeString(msec : int):
+func MSecToTimeString(msec : int, includeMsec):
 	var workingTimeLeft = msec
 	
 	var msComp = workingTimeLeft % 1000
@@ -37,8 +42,13 @@ func MSecToTimeString(msec : int):
 	#var hourComp = workingTimeLeft
 	#var hourComp = workingTimeLeft % 60
 	
-	var formatString = "%s:%s"
-	var resultString = formatString % [str(minComp).pad_zeros(2), str(secComp).pad_zeros(2)]
+	var resultString
+	if includeMsec:
+		var formatString = "%s:%s.%s"
+		resultString = formatString % [str(minComp).pad_zeros(2), str(secComp).pad_zeros(2), str(msComp).pad_zeros(3)]
+	else:
+		var formatString = "%s:%s"
+		resultString = formatString % [str(minComp).pad_zeros(2), str(secComp).pad_zeros(2)]
 	
 #	if hourComp > 0:
 #		var formatString = "%d:%s:%s.%d"

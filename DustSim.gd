@@ -302,6 +302,8 @@ func KillDust(pos, image):
 	Global.DustRemaining -= 1 # destroy dust
 	Events.emit_signal("dust_amount_changed", -1)
 	
+	Global.DustCleaned += 1
+	
 	var smokePos = Vector2(pos.x, pos.y - 1)
 	if IsPositionEmpty(smokePos):
 		SetPixel(smokePos, PixelType.SMOKE)

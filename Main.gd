@@ -15,6 +15,8 @@ export var TotalTimeLimitSec : float = 180.0
 func _ready():
 	Events.connect("level_exited", self, "_on_level_exited")
 	Events.connect("start_game", self, "_on_start_game")
+	Events.connect("win_game", self, "_on_win_game")
+	Events.connect("restart_game", self, "_on_restart_game")
 	Events.connect("start_time_limit", self, "_on_start_time_limit")
 	Events.connect("show_death_screen", self, "_on_show_death_screen")
 	Events.connect("sfx_sweep", self, "_on_sfx_sweep")
@@ -51,7 +53,6 @@ func load_level(level_name : String, transitionFade : bool):
 	
 	if transitionFade:
 		yield(Events, "fade_to_black_complete")
-		
 	Global.DustRemaining = 0
 	var level_path := "res://Levels/%s.tscn" % level_name
 	var level_resource := load(level_path)
@@ -110,10 +111,17 @@ func _on_level_exited(num):
 		2:
 			load_level("Level3", true)
 
+func _on_restart_game():
+	timeLimit.stop()
+	load_level("LevelTitle", true)
+
 func _on_start_game():
 	StartGame()
 	
 func StartGame():
+	Global.WinTime = 0.0
+	Global.DustCleaned = 0
+	Global.NumberOfSweeps = 0
 	animationPlayer.play("RESET")
 	load_level("Level0", true)
 	Events.emit_signal("start_time_limit")
@@ -132,8 +140,12 @@ func TriggerPlayerDeathAnimation():
 func AllowRestartInput():
 	Global.gameState = Global.GameState.BLOCKING_RESTART
 
+func _on_win_game():
+	Global.WinTime = timeLimit.wait_time - timeLimit.time_left
+
 func _on_show_death_screen():
 	animationPlayer.play("deathScreen")
+	timeLimit.stop()
 
 # sfx
 func _on_sfx_sweep():

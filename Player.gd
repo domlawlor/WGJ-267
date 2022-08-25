@@ -124,6 +124,7 @@ func _process(delta):
 		animatedSprite.play("sweep")
 		Events.emit_signal("sfx_sweep")
 		Events.emit_signal("sweep", Vector2(posX, position.y), m_facingRight)
+		Global.NumberOfSweeps += 1
 		if voiceCooldown.is_stopped():
 			Events.emit_signal("sfx_grunt")
 			voiceCooldown.start(rand_range(GRUNT_DELAY_MIN, GRUNT_DELAY_MAX))

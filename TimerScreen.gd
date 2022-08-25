@@ -12,7 +12,7 @@ func _exit_tree():
 func _process(delta):
 	var timeLeftMsec = Global.TimeLimitTimeLeft * 1000
 	if timeLeftMsec > 0:
-		var timeString = Global.MSecToTimeString(timeLeftMsec)
+		var timeString = Global.MSecToTimeString(timeLeftMsec, false)
 		#labelA.text = timeString
 		labelB.text = timeString
 

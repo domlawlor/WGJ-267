@@ -12,10 +12,14 @@ signal level_complete()
 signal level_exited(num)
 
 signal start_game()
+signal restart_game()
+
 signal start_time_limit()
 signal hit_time_limit()
 signal win_game()
 signal unfreeze_player()
+
+signal show_win_screen()
 
 signal player_death_animation()
 signal show_death_screen()
