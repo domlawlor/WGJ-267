@@ -5,7 +5,7 @@ export var FadeLength : float = 1.0
 onready var blackScreen = $BlackScreen
 onready var timer = $Timer
 
-var m_toBlack = false
+var m_toBlack = true
 
 func _ready():
 	Events.connect("fade_to_black", self, "_on_fade_to_black")

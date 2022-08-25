@@ -23,8 +23,12 @@ func _ready():
 	
 	Global.TOTAL_TIME_LIMIT_SEC = TotalTimeLimitSec
 	levelList.visible = false
+	
+	load_level("LevelTitle", false)
+	yield(get_tree().create_timer(1), "timeout")
 	bgm.play()
-	load_level("LevelTitle")
+	Events.emit_signal("fade_to_transparent")
+	yield(Events, "fade_to_transparent_complete")
 
 func _exit():
 	Events.disconnect("level_exited", self, "_on_level_exited")
@@ -38,10 +42,15 @@ func unload_level():
 		main_2d.call_deferred("remove_child", level_instance)
 	level_instance = null
 
-func load_level(level_name : String):
-	Events.emit_signal("fade_to_black")
+func load_level(level_name : String, transitionFade : bool):
+	if transitionFade:
+		Events.emit_signal("fade_to_black")
+	
 	unload_level()
-	yield(Events, "fade_to_black_complete")
+	
+	if transitionFade:
+		yield(Events, "fade_to_black_complete")
+		
 	Global.DustRemaining = 0
 	var level_path := "res://Levels/%s.tscn" % level_name
 	var level_resource := load(level_path)
@@ -49,8 +58,10 @@ func load_level(level_name : String):
 		level_instance = level_resource.instance()
 		main_2d.call_deferred("add_child", level_instance)
 		levelList.visible = false
-	Events.emit_signal("fade_to_transparent")
-	yield(Events, "fade_to_transparent_complete")
+	
+	if transitionFade:
+		Events.emit_signal("fade_to_transparent")
+		yield(Events, "fade_to_transparent_complete")
 
 func _process(delta):
 	if Input.is_action_just_pressed("toggle_menu"):
@@ -67,26 +78,26 @@ func _process(delta):
 
 func _on_LoadLevelTitle_pressed():
 	Global.gameState = Global.GameState.TITLE
-	load_level("LevelTitle")
+	load_level("LevelTitle", true)
 
 func _on_LoadLevel0_pressed():
-	load_level("Level0")
+	load_level("Level0", true)
 	
 func _on_LoadLevel1_pressed():
-	load_level("Level1")
+	load_level("Level1", true)
 
 func _on_LoadLevel2_pressed():
-	load_level("Level2")
+	load_level("Level2", true)
 	
 func _on_DomsTestLevel_pressed():
-	load_level("DomsTestLevel")
+	load_level("DomsTestLevel", true)
 
 func _on_level_exited(num):
 	match num:
 		0:
-			load_level("Level1")
+			load_level("Level1", true)
 		1:
-			load_level("Level2")
+			load_level("Level2", true)
 		2:
 			levelList.visible = true
 
@@ -95,7 +106,7 @@ func _on_start_game():
 	
 func StartGame():
 	animationPlayer.play("RESET")
-	load_level("Level0")
+	load_level("Level0", true)
 	Events.emit_signal("start_time_limit")
 
 func _on_start_time_limit():
