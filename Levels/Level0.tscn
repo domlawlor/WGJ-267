@@ -437,6 +437,7 @@ visible = false
 position = Vector2( 128, 406 )
 scale = Vector2( 2, 2 )
 frames = SubResource( 36 )
+frame = 1
 playing = true
 flip_h = true
 
@@ -469,8 +470,12 @@ shape = SubResource( 39 )
 [node name="DustSpawns" type="Node2D" parent="."]
 
 [node name="DustSpawn" parent="DustSpawns" instance=ExtResource( 9 )]
-position = Vector2( 320, 186 )
-DustAmount = 25
+position = Vector2( 349, 185 )
+DustAmount = 20
 
 [node name="DustSpawn2" parent="DustSpawns" instance=ExtResource( 9 )]
-position = Vector2( 481, 185 )
+position = Vector2( 505, 185 )
+
+[node name="DustSpawn3" parent="DustSpawns" instance=ExtResource( 9 )]
+position = Vector2( 123, 123 )
+DustAmount = 4
