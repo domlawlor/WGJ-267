@@ -253,8 +253,9 @@ func FirePixelInDir(pos, vel, type, canMakeDust):
 		var color = GetPixelTypeColor(type)
 		image.set_pixelv(pos, color)
 		ActivateRegion(pos)
-		Global.DustRemaining += 1
-		Events.emit_signal("dust_amount_changed", 1)
+		if pixelType == PixelType.DUST:
+			Global.DustRemaining += 1
+			Events.emit_signal("dust_amount_changed", 1)
 	
 	image.unlock()
 	sprite.get_texture().set_data(image)
@@ -320,7 +321,7 @@ func MovePixel(srcPos, destPos, srcType, image):
 		SetPixel(srcPos, PixelType.EMPTY)
 		image.set_pixelv(srcPos, Color.transparent)
 		
-		if destPosType != PixelType.EMPTY:
+		if destPosType == PixelType.LAVA or destPosType == PixelType.FLYING_LAVA:
 			KillDust(srcPos, image)
 	
 	elif srcType == PixelType.LAVA or srcType == PixelType.FLYING_LAVA:
