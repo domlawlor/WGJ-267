@@ -39,7 +39,9 @@ func unload_level():
 	level_instance = null
 
 func load_level(level_name : String):
+	Events.emit_signal("fade_to_black")
 	unload_level()
+	yield(Events, "fade_to_black_complete")
 	Global.DustRemaining = 0
 	var level_path := "res://Levels/%s.tscn" % level_name
 	var level_resource := load(level_path)
@@ -47,6 +49,8 @@ func load_level(level_name : String):
 		level_instance = level_resource.instance()
 		main_2d.call_deferred("add_child", level_instance)
 		levelList.visible = false
+	Events.emit_signal("fade_to_transparent")
+	yield(Events, "fade_to_transparent_complete")
 
 func _process(delta):
 	if Input.is_action_just_pressed("toggle_menu"):
