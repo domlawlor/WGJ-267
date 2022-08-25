@@ -80,6 +80,7 @@ func _process(delta):
 	if dustSim.IsPlayerInLava(self):
 		SetPlayerState(PlayerState.DEAD)
 		animatedSprite.play("dead")
+		Events.emit_signal("sfx_death")
 		if Global.gameState != Global.GameState.WIN:
 			respawnTimer.start()
 		return

@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=2]
+[gd_scene load_steps=23 format=2]
 
 [ext_resource path="res://Main.gd" type="Script" id=1]
 [ext_resource path="res://Audio/music.ogg" type="AudioStream" id=2]
@@ -16,6 +16,8 @@
 [ext_resource path="res://Art/Overlay_illumination.png" type="Texture" id=14]
 [ext_resource path="res://TransitionFade.tscn" type="PackedScene" id=15]
 [ext_resource path="res://Levels/StartButton.gd" type="Script" id=16]
+[ext_resource path="res://Audio/janitor_death01.wav" type="AudioStream" id=17]
+[ext_resource path="res://Audio/janitor_death02.wav" type="AudioStream" id=18]
 
 [sub_resource type="Animation" id=7]
 length = 0.001
@@ -310,6 +312,14 @@ volume_db = -4.0
 
 [node name="JanitorGrunt04" type="AudioStreamPlayer" parent="SFX"]
 stream = ExtResource( 12 )
+volume_db = -4.0
+
+[node name="JanitorDeath01" type="AudioStreamPlayer" parent="SFX"]
+stream = ExtResource( 17 )
+volume_db = -4.0
+
+[node name="JanitorDeath02" type="AudioStreamPlayer" parent="SFX"]
+stream = ExtResource( 18 )
 volume_db = -4.0
 
 [node name="OverlayHaze" type="Sprite" parent="."]

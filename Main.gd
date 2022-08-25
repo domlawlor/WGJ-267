@@ -20,6 +20,7 @@ func _ready():
 	Events.connect("sfx_sweep", self, "_on_sfx_sweep")
 	Events.connect("sfx_janitorStart", self, "_on_sfx_janitorStart")
 	Events.connect("sfx_grunt", self, "_on_sfx_grunt")
+	Events.connect("sfx_death", self, "_on_sfx_death")
 	
 	Global.TOTAL_TIME_LIMIT_SEC = TotalTimeLimitSec
 	levelList.visible = false
@@ -155,3 +156,10 @@ func _on_sfx_grunt():
 		$SFX/JanitorGrunt03.play()
 	else:
 		$SFX/JanitorGrunt04.play()
+
+func _on_sfx_death():
+	var r = randi() % 2
+	if r == 0:
+		$SFX/JanitorDeath01.play()
+	elif r == 1:
+		$SFX/JanitorDeath02.play()
