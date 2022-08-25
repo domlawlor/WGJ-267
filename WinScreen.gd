@@ -10,13 +10,16 @@ var resetInputEnabled = false
 
 func _ready():
 	Events.connect("show_win_screen", self, "_on_show_win_screen")
+	Events.connect("sfx_death", self, "_on_sfx_death")
 	animationPlayer.play("RESET")
 
 func _exit_tree():
 	Events.disconnect("show_win_screen", self, "_on_show_win_screen")
+	Events.diconnect("sfx_death", self, "_on_sfx_death")
 
 func _unhandled_input(event):
 	if resetInputEnabled and event.is_action_pressed("sweep"):
+		resetInputEnabled = false
 		animationPlayer.play("RESET")
 		Events.emit_signal("restart_game")
 	
@@ -34,3 +37,6 @@ func _on_show_win_screen():
 	numSweepsText.text = "Number of Sweeps - " + str(Global.NumberOfSweeps)
 	
 	animationPlayer.play("win")
+
+func _on_sfx_death():
+	animationPlayer.queue("returnToMenu")
