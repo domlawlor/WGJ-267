@@ -201,7 +201,7 @@ points = PoolVector2Array( 64, 64, 0, 64, 0, 0, 64, 0 )
 points = PoolVector2Array( 64, 64, 0, 64, 0, 0, 64, 0 )
 
 [sub_resource type="ConvexPolygonShape2D" id=24]
-points = PoolVector2Array( 32, 64, 0, 64, 0, 0, 32, 0 )
+points = PoolVector2Array( 17.2369, 64, 0, 64, 0, 0, 17.2369, 0.117279 )
 
 [sub_resource type="ConvexPolygonShape2D" id=25]
 points = PoolVector2Array( 64, 64, 48, 64, 48, 0, 64, 0 )
@@ -527,7 +527,6 @@ texture = ExtResource( 15 )
 position = Vector2( 321, 214 )
 scale = Vector2( 2, 2 )
 frames = SubResource( 36 )
-frame = 1
 speed_scale = 0.99
 playing = true
 flip_h = true
