@@ -141,6 +141,7 @@ func AllowRestartInput():
 	Global.gameState = Global.GameState.BLOCKING_RESTART
 
 func _on_win_game():
+	timeLimit.stop()
 	Global.WinTime = timeLimit.wait_time - timeLimit.time_left
 
 func _on_show_death_screen():

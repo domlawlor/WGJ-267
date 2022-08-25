@@ -8,6 +8,8 @@ onready var numSweepsText = $VBoxContainer/NumSweeps
 
 var resetInputEnabled = false
 
+var inWinScreen = false
+
 func _ready():
 	Events.connect("show_win_screen", self, "_on_show_win_screen")
 	Events.connect("sfx_death", self, "_on_sfx_death")
@@ -20,6 +22,7 @@ func _exit_tree():
 func _unhandled_input(event):
 	if resetInputEnabled and event.is_action_pressed("sweep"):
 		resetInputEnabled = false
+		inWinScreen = false
 		animationPlayer.play("RESET")
 		Events.emit_signal("restart_game")
 	
@@ -30,6 +33,7 @@ func SetRetryInputDisabled():
 	resetInputEnabled = false
 
 func _on_show_win_screen():
+	inWinScreen = true
 	var winTimeMSec = Global.WinTime * 1000.0
 	timeTakenText.text = "Time - " + Global.MSecToTimeString(winTimeMSec, true)
 	
@@ -39,4 +43,5 @@ func _on_show_win_screen():
 	animationPlayer.play("win")
 
 func _on_sfx_death():
-	animationPlayer.queue("returnToMenu")
+	if inWinScreen:
+		animationPlayer.queue("returnToMenu")
