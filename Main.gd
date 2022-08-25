@@ -10,7 +10,7 @@ onready var animationPlayer : AnimationPlayer = $AnimationPlayer
 
 var level_instance : Node2D
 
-export var TotalTimeLimitSec : float = 180.0
+export var TotalTimeLimitSec : float = 120.0
 
 func _ready():
 	Events.connect("level_exited", self, "_on_level_exited")
