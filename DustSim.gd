@@ -173,7 +173,7 @@ func SetLevelCollisions():
 		var collisions = space_state.intersect_point(testPos)
 		for col in collisions:
 			var collider = col.collider
-			if collider.is_in_group("player"):
+			if collider.is_in_group("player") or collider.is_in_group("ladder_top"):
 				continue
 			
 			if collider.is_in_group("dust_kill"):
