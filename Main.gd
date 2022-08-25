@@ -88,6 +88,9 @@ func _on_LoadLevel1_pressed():
 
 func _on_LoadLevel2_pressed():
 	load_level("Level2", true)
+
+func _on_LoadLevel3_pressed():
+	load_level("Level3", true)
 	
 func _on_DomsTestLevel_pressed():
 	load_level("DomsTestLevel", true)
@@ -99,7 +102,7 @@ func _on_level_exited(num):
 		1:
 			load_level("Level2", true)
 		2:
-			levelList.visible = true
+			load_level("Level3", true)
 
 func _on_start_game():
 	StartGame()

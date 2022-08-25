@@ -4,6 +4,7 @@ enum GameState {
 	TITLE
 	PLAYING
 	DEAD
+	WIN
 	BLOCKING_RESTART
 }
 var gameState = GameState.TITLE

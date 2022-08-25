@@ -167,13 +167,13 @@ script = ExtResource( 8 )
 visible = false
 frames = SubResource( 37 )
 animation = "idle"
+frame = 1
 playing = true
 
 [node name="ScientistB" type="AnimatedSprite" parent="."]
 visible = false
 frames = SubResource( 66 )
 animation = "idle"
-frame = 3
 playing = true
 
 [node name="FiredText" type="Label" parent="."]
@@ -184,3 +184,12 @@ margin_right = 36.0
 margin_bottom = -24.0
 theme = SubResource( 67 )
 text = "You're FIRED!"
+
+[node name="WinText" type="Label" parent="."]
+visible = false
+margin_left = -36.0
+margin_top = -38.0
+margin_right = 36.0
+margin_bottom = -24.0
+theme = SubResource( 67 )
+text = "Good job, Herbert!"

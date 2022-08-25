@@ -4,17 +4,19 @@
 [ext_resource path="res://DustSim.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Art/1.png" type="Texture" id=3]
 [ext_resource path="res://Player.tscn" type="PackedScene" id=4]
-[ext_resource path="res://Art/BackgroundObjects/Web5.png" type="Texture" id=5]
 [ext_resource path="res://Art/4.png" type="Texture" id=6]
-[ext_resource path="res://Art/BackgroundObjects/Web3.png" type="Texture" id=7]
 [ext_resource path="res://Art/6.png" type="Texture" id=8]
 [ext_resource path="res://DustSpawn.tscn" type="PackedScene" id=9]
-[ext_resource path="res://Art/BackgroundObjects/Monitor1.png" type="Texture" id=14]
-[ext_resource path="res://TimerScreen.tscn" type="PackedScene" id=15]
-[ext_resource path="res://Art/BackgroundObjects/Generator.png" type="Texture" id=16]
+[ext_resource path="res://Art/ladder.png" type="Texture" id=10]
+[ext_resource path="res://Levels/Ladders.gd" type="Script" id=11]
+[ext_resource path="res://Art/BackgroundObjects/Capsule6.png" type="Texture" id=12]
+[ext_resource path="res://Art/BackgroundObjects/Tube_19.png" type="Texture" id=13]
+[ext_resource path="res://Art/BackgroundObjects/Web1.png" type="Texture" id=15]
 [ext_resource path="res://Door.tscn" type="PackedScene" id=17]
 [ext_resource path="res://Levels/LevelProgression.gd" type="Script" id=18]
 [ext_resource path="res://Art/BackgroundObjects/MonitorLevelProgress.png" type="Texture" id=19]
+[ext_resource path="res://TimerScreen.tscn" type="PackedScene" id=20]
+[ext_resource path="res://LavaSpawn.tscn" type="PackedScene" id=23]
 
 [sub_resource type="TileSet" id=23]
 0/name = "TileSet64.png 0"
@@ -74,29 +76,27 @@
 2/shapes = [  ]
 2/z_index = 0
 
-[sub_resource type="AtlasTexture" id=32]
-atlas = ExtResource( 16 )
-region = Rect2( 0, 0, 42, 42 )
+[sub_resource type="TileSet" id=26]
+0/name = "ladder.png 0"
+0/texture = ExtResource( 10 )
+0/tex_offset = Vector2( 0, 0 )
+0/modulate = Color( 1, 1, 1, 1 )
+0/region = Rect2( 0, 0, 64, 64 )
+0/tile_mode = 0
+0/occluder_offset = Vector2( 0, 0 )
+0/navigation_offset = Vector2( 0, 0 )
+0/shape_offset = Vector2( 0, 0 )
+0/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+0/shape_one_way = false
+0/shape_one_way_margin = 0.0
+0/shapes = [  ]
+0/z_index = 0
 
-[sub_resource type="AtlasTexture" id=33]
-atlas = ExtResource( 16 )
-region = Rect2( 42, 0, 42, 42 )
+[sub_resource type="RectangleShape2D" id=27]
+extents = Vector2( 2.5, 150 )
 
-[sub_resource type="AtlasTexture" id=34]
-atlas = ExtResource( 16 )
-region = Rect2( 84, 0, 42, 42 )
-
-[sub_resource type="AtlasTexture" id=35]
-atlas = ExtResource( 16 )
-region = Rect2( 126, 0, 42, 42 )
-
-[sub_resource type="SpriteFrames" id=36]
-animations = [ {
-"frames": [ SubResource( 32 ), SubResource( 33 ), SubResource( 34 ), SubResource( 35 ) ],
-"loop": true,
-"name": "default",
-"speed": 5.0
-} ]
+[sub_resource type="RectangleShape2D" id=39]
+extents = Vector2( 32, 5 )
 
 [sub_resource type="ConvexPolygonShape2D" id=1]
 points = PoolVector2Array( 64, 64, 0, 64, 0, 0, 64, 0 )
@@ -366,10 +366,10 @@ points = PoolVector2Array( 64, 64, 48, 64, 48, 0, 64, 0 )
 } ]
 2/z_index = 0
 
-[sub_resource type="RectangleShape2D" id=39]
-extents = Vector2( 117.5, 87 )
+[sub_resource type="RectangleShape2D" id=40]
+extents = Vector2( 56, 212 )
 
-[node name="Level0" type="Node2D"]
+[node name="Level3" type="Node2D"]
 script = ExtResource( 18 )
 
 [node name="Background" type="Node2D" parent="."]
@@ -389,7 +389,7 @@ texture = ExtResource( 6 )
 position = Vector2( -78, -240 )
 tile_set = SubResource( 23 )
 format = 1
-tile_data = PoolIntArray( 2, 2, 65536, 6, 2, 65536, 65538, 2, 131072, 65539, 2, 1, 65540, 2, 1, 65541, 2, 1, 65542, 2, 65537, 65543, 2, 1, 65544, 2, 1, 65545, 2, 1, 65546, 2, 1, 131077, 2, 0, 131078, 2, 131073, 196613, 2, 65536, 262149, 2, 65536, 393215, 2, 1, 327681, 2, 1, 327685, 2, 65536, 393219, 2, 65536, 393221, 2, 65536, 458755, 2, 65536, 458757, 2, 65536, 524293, 2, 65536 )
+tile_data = PoolIntArray( 393215, 2, 1, 458753, 2, 65536, 524289, 2, 65536 )
 
 [node name="ForeDark" type="Sprite" parent="Background"]
 position = Vector2( 217, 21 )
@@ -400,49 +400,55 @@ texture = ExtResource( 8 )
 position = Vector2( -78, -240 )
 tile_set = SubResource( 23 )
 format = 1
-tile_data = PoolIntArray( -65532, 0, 65536, 4, 0, 65536, 65540, 0, 65536, 131076, 0, 65536, 196612, 0, 65536, 262146, 0, 1, 262147, 0, 1, 262148, 0, 4, 262149, 0, 1, 262150, 0, 1, 262151, 0, 2, 262152, 0, 65536, 327687, 0, 131072, 327688, 0, 1, 327689, 0, 1, 327690, 0, 1 )
+tile_data = PoolIntArray( 2, 0, 65536, 6, 2, 65536, 65537, 2, 1, 65538, 2, 1, 65539, 2, 1, 65540, 2, 1, 65541, 2, 1, 65542, 2, 65537, 65543, 2, 1, 65544, 2, 2, 131074, 0, 65536, 131078, 2, 65536, 131080, 2, 131072, 131081, 2, 1, 131082, 2, 1, 131083, 2, 1, 196609, 0, 0, 196610, 0, 131073, 196614, 2, 65536, 262145, 0, 65536, 262150, 2, 65540, 262151, 2, 1, 262152, 2, 1, 327680, 0, 1, 327681, 0, 65539, 327686, 2, 65536, 393217, 0, 65540, 393218, 0, 1, 393219, 0, 1, 393220, 0, 2, 393222, 2, 65536, 458753, 0, 65536 )
 
 [node name="MonitorProgress" type="Sprite" parent="."]
-position = Vector2( 194, 152 )
+position = Vector2( 354, 344 )
 scale = Vector2( 2, 2 )
 texture = ExtResource( 19 )
 hframes = 10
 
 [node name="BackgroundObjects" type="Node2D" parent="."]
 
-[node name="3Screens" type="Sprite" parent="BackgroundObjects"]
-position = Vector2( 172, 40 )
+[node name="Capsule" type="Sprite" parent="BackgroundObjects"]
+position = Vector2( 458, 336 )
 scale = Vector2( 2, 2 )
-texture = ExtResource( 14 )
+texture = ExtResource( 12 )
 
-[node name="Web2" type="Sprite" parent="BackgroundObjects"]
-position = Vector2( 212, 272 )
+[node name="Web" type="Sprite" parent="BackgroundObjects"]
+position = Vector2( 544, 272 )
 scale = Vector2( 2, 2 )
-texture = ExtResource( 5 )
-flip_h = true
+texture = ExtResource( 15 )
 
-[node name="Web3" type="Sprite" parent="BackgroundObjects"]
-position = Vector2( 556, 336 )
+[node name="Pipe" type="Sprite" parent="BackgroundObjects"]
+position = Vector2( 108, 23 )
 scale = Vector2( 2, 2 )
-texture = ExtResource( 5 )
+texture = ExtResource( 13 )
 
-[node name="Web4" type="Sprite" parent="BackgroundObjects"]
-position = Vector2( 558, 80 )
-scale = Vector2( 2, 2 )
-texture = ExtResource( 7 )
-flip_h = true
+[node name="Ladders" type="Node2D" parent="."]
+script = ExtResource( 11 )
 
-[node name="Generator" type="AnimatedSprite" parent="BackgroundObjects"]
-visible = false
-position = Vector2( 128, 406 )
-scale = Vector2( 2, 2 )
-frames = SubResource( 36 )
-frame = 2
-playing = true
-flip_h = true
+[node name="Tilemap" type="TileMap" parent="Ladders"]
+tile_set = SubResource( 26 )
+format = 1
+tile_data = PoolIntArray( 65540, 0, 0, 131076, 0, 0, 196612, 0, 0, 262148, 0, 0, 327684, 0, 0 )
+
+[node name="Area2D" type="Area2D" parent="Ladders" groups=["ladder"]]
+position = Vector2( 100, 0 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ladders/Area2D"]
+position = Vector2( 195, 213 )
+shape = SubResource( 27 )
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Ladders" groups=["ladder_top"]]
+position = Vector2( 544, 202 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ladders/StaticBody2D"]
+position = Vector2( -256, -133 )
+shape = SubResource( 39 )
 
 [node name="Player" parent="." instance=ExtResource( 4 )]
-position = Vector2( 92, -6 )
+position = Vector2( 376, -5 )
 
 [node name="DustSim" parent="." instance=ExtResource( 2 )]
 
@@ -450,32 +456,42 @@ position = Vector2( 92, -6 )
 tile_set = SubResource( 16 )
 collision_layer = 2
 format = 1
-tile_data = PoolIntArray( -1, 1, 0, -65536, 1, 0, -65531, 1, 0, -65530, 1, 0, -65529, 1, 0, -65528, 1, 0, -65527, 1, 0, -65526, 1, 0, 65535, 1, 0, 0, 0, 65538, 7, 0, 131072, 8, 0, 131073, 9, 0, 131073, 10, 1, 0, 131071, 1, 0, 65536, 0, 65538, 196607, 1, 0, 131072, 0, 65537, 131073, 0, 2, 262143, 1, 0, 196608, 0, 65537, 196609, 0, 65537, 196610, 0, 1, 196611, 0, 1, 196612, 0, 1, 196613, 0, 1, 196614, 2, 0, 196615, 0, 1, 196616, 0, 1, 196617, 0, 1, 196618, 1, 0, 327679, 1, 0, 262144, 0, 65537, 262145, 1, 65536, 262146, 0, 65538, 262152, 1, 65536, 262153, 0, 65536, 262154, 1, 0, 393215, 1, 0, 327680, 1, 0, 327681, 1, 131072, 327682, 0, 65537, 327683, 0, 1, 327684, 0, 2, 327689, 0, 65536, 327690, 1, 0, 458751, 1, 0, 393216, 1, 327680, 393217, 1, 196608, 393218, 1, 0, 393219, 1, 327680, 393220, 0, 65538, 393225, 0, 65536, 393226, 1, 0, 524287, 1, 0, 458752, 1, 262144, 458753, 0, 65537, 458754, 0, 65537, 458755, 0, 65537, 458756, 0, 65538, 458761, 0, 65536, 458762, 1, 0, 589823, 1, 0, 524288, 1, 0, 524289, 1, 0, 524290, 1, 0, 524291, 1, 0, 524292, 1, 0, 524293, 1, 0, 524294, 1, 0, 524295, 1, 0, 524296, 1, 0, 524297, 1, 0, 524298, 1, 0 )
+tile_data = PoolIntArray( -1, 1, 0, -65536, 1, 0, -65535, 1, 0, -65534, 1, 0, -65533, 1, 0, -65532, 1, 0, -65529, 1, 0, -65528, 1, 0, -65527, 1, 0, -65526, 1, 0, 65535, 1, 0, 0, 0, 65538, 7, 0, 131072, 8, 0, 65537, 9, 0, 65537, 10, 1, 0, 131071, 1, 0, 65536, 0, 65538, 65539, 0, 2, 65544, 0, 65536, 65545, 1, 262144, 65546, 1, 262144, 196607, 1, 0, 131072, 0, 65538, 131075, 0, 65538, 131080, 0, 65536, 131081, 1, 327680, 131082, 1, 262144, 262143, 1, 0, 196608, 0, 65538, 196611, 0, 65538, 196616, 0, 131072, 196617, 0, 131073, 196618, 1, 0, 327679, 1, 0, 262144, 0, 65538, 262147, 0, 65538, 393215, 1, 0, 327680, 0, 65538, 327683, 0, 65538, 458751, 1, 0, 393216, 0, 65538, 393219, 0, 65538, 393220, 0, 1, 393221, 0, 1, 393222, 0, 1, 393223, 0, 1, 393224, 0, 1, 393225, 0, 1, 393226, 1, 0, 524287, 1, 0, 458752, 0, 65537, 458753, 0, 65537, 458754, 0, 65537, 458755, 0, 65537, 458756, 1, 262144, 458757, 0, 65537, 458758, 1, 0, 458759, 1, 0, 458760, 1, 65536, 458761, 0, 65537, 458762, 1, 0, 589823, 1, 0, 524288, 1, 0, 524289, 1, 0, 524290, 1, 0, 524291, 1, 0, 524292, 1, 0, 524293, 1, 0, 524294, 1, 0, 524295, 1, 0, 524296, 1, 0, 524297, 1, 0, 524298, 1, 0 )
 
-[node name="TimerScreen" parent="." instance=ExtResource( 15 )]
-position = Vector2( 360, 82 )
+[node name="TimerScreen" parent="." instance=ExtResource( 20 )]
+position = Vector2( 351, 165 )
 
 [node name="Door" parent="." instance=ExtResource( 17 )]
-position = Vector2( 576, 64 )
+position = Vector2( 576, 256 )
 scale = Vector2( 2, 2 )
+LevelNum = 3
 
 [node name="LavaPit" type="KinematicBody2D" parent="." groups=["dust_kill"]]
 position = Vector2( 556, 483 )
 collision_mask = 2
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="LavaPit"]
-position = Vector2( -107.5, -71 )
-shape = SubResource( 39 )
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="LavaPit"]
+position = Vector2( -429, -260 )
+shape = SubResource( 40 )
 
-[node name="DustSpawns" type="Node2D" parent="."]
+[node name="PixelSpawners" type="Node2D" parent="."]
 
-[node name="DustSpawn" parent="DustSpawns" instance=ExtResource( 9 )]
-position = Vector2( 349, 185 )
-DustAmount = 20
+[node name="DustSpawn" parent="PixelSpawners" instance=ExtResource( 9 )]
+position = Vector2( 224, 57 )
 
-[node name="DustSpawn2" parent="DustSpawns" instance=ExtResource( 9 )]
-position = Vector2( 505, 185 )
+[node name="LavaSpawn" parent="PixelSpawners" instance=ExtResource( 23 )]
+position = Vector2( 105, 24 )
+isFlying = true
+flyingDirection = Vector2( 0, 1 )
+flyingSpeed = 1.2
+spawnArea = Rect2( 0, 0, 16, 0 )
 
-[node name="DustSpawn3" parent="DustSpawns" instance=ExtResource( 9 )]
-position = Vector2( 123, 123 )
-DustAmount = 4
+[node name="LavaSpawn2" parent="PixelSpawners" instance=ExtResource( 23 )]
+position = Vector2( 109, 24 )
+isFlying = true
+flyingDirection = Vector2( 0, 1 )
+flyingSpeed = 2.0
+spawnArea = Rect2( 0, 0, 16, 0 )
+
+[connection signal="body_entered" from="Ladders/Area2D" to="Ladders" method="_on_Area2D_body_entered"]
+[connection signal="body_exited" from="Ladders/Area2D" to="Ladders" method="_on_Area2D_body_exited"]

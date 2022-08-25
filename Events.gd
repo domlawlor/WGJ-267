@@ -14,6 +14,8 @@ signal level_exited(num)
 signal start_game()
 signal start_time_limit()
 signal hit_time_limit()
+signal win_game()
+signal unfreeze_player()
 
 signal player_death_animation()
 signal show_death_screen()

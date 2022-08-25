@@ -238,10 +238,16 @@ margin_right = 112.0
 margin_bottom = 125.0
 text = "Load Level 2"
 
-[node name="DomsTestLevel" type="Button" parent="Menu/LevelList"]
+[node name="LoadLevel3" type="Button" parent="Menu/LevelList"]
 margin_top = 140.0
 margin_right = 112.0
 margin_bottom = 160.0
+text = "Load Level 3"
+
+[node name="DomsTestLevel" type="Button" parent="Menu/LevelList"]
+margin_top = 175.0
+margin_right = 112.0
+margin_bottom = 195.0
 text = "Doms Testing"
 
 [node name="Camera2D" type="Camera2D" parent="."]
@@ -316,5 +322,6 @@ FadeLength = 0.6
 [connection signal="pressed" from="Menu/LevelList/LoadLevel0" to="." method="_on_LoadLevel0_pressed"]
 [connection signal="pressed" from="Menu/LevelList/LoadLevel1" to="." method="_on_LoadLevel1_pressed"]
 [connection signal="pressed" from="Menu/LevelList/LoadLevel2" to="." method="_on_LoadLevel2_pressed"]
+[connection signal="pressed" from="Menu/LevelList/LoadLevel3" to="." method="_on_LoadLevel3_pressed"]
 [connection signal="pressed" from="Menu/LevelList/DomsTestLevel" to="." method="_on_DomsTestLevel_pressed"]
 [connection signal="timeout" from="TimeLimit" to="." method="_on_TimeLimit_timeout"]

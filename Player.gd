@@ -38,6 +38,8 @@ func _ready():
 	Events.connect("ladder_climbing_deactivate", self, "_on_ladder_climbing_deactivate")
 	#Events.connect("debug_set_player_pos", self, "_on_debug_set_player_pos")
 	Events.connect("hit_time_limit", self, "_on_hit_time_limit")
+	Events.connect("win_game", self, "_on_win_game")
+	Events.connect("unfreeze_player", self, "_on_unfreeze_player")
 	Events.connect("player_death_animation", self, "_on_player_death_animation")
 	
 	m_spawnPos = position
@@ -48,6 +50,8 @@ func _exit_tree():
 	Events.disconnect("ladder_climbing_deactivate", self, "_on_ladder_climbing_deactivate")
 	#Events.disconnect("debug_set_player_pos", self, "_on_debug_set_player_pos")
 	Events.disconnect("hit_time_limit", self, "_on_hit_time_limit")
+	Events.disconnect("win_game", self, "_on_win_game")
+	Events.disconnect("unfreeze_player", self, "_on_unfreeze_player")
 	Events.disconnect("player_death_animation", self, "_on_player_death_animation")
 
 func ResetPlayer():
@@ -76,7 +80,8 @@ func _process(delta):
 	if dustSim.IsPlayerInLava(self):
 		SetPlayerState(PlayerState.DEAD)
 		animatedSprite.play("dead")
-		respawnTimer.start()
+		if Global.gameState != Global.GameState.WIN:
+			respawnTimer.start()
 		return
 	
 	if Input.is_action_pressed("moveLeft"):
@@ -201,6 +206,15 @@ func _on_SweepTimer_timeout():
 func _on_hit_time_limit():
 	m_state = PlayerState.FROZEN
 	animatedSprite.play("idle")
+
+func _on_win_game():
+	m_facingRight = true
+	animatedSprite.flip_h = !m_facingRight
+	m_state = PlayerState.FROZEN
+	animatedSprite.play("idle")
+
+func _on_unfreeze_player():
+	m_state = PlayerState.AIR
 
 #func _on_debug_set_player_pos(mousePos):
 #	position = mousePos

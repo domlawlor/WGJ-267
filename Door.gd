@@ -6,7 +6,7 @@ export var IsLeftOfLevel : bool = false
 onready var sprite = $Sprite
 onready var scientist = $Scientist
 onready var cutscenePlayer = $CutscenePlayer
-onready var collision = $Collision
+onready var collision = $Collision/CollisionShape2D
 onready var openSFX = $OpenSFX
 onready var animationDelay = $AnimationDelay
 
@@ -33,7 +33,12 @@ func _exit_tree():
 #		OpenDoor()
 
 func _on_level_complete():
-	OpenDoor()
+	if LevelNum < 3:
+		OpenDoor()
+	else: #player won the game
+		Global.gameState = Global.GameState.WIN
+		cutscenePlayer.play("win")
+		Events.emit_signal("win_game")
 
 func _on_LevelCompleteTriggerL_body_entered(body):
 	if IsLeftOfLevel and body.is_in_group("player"):
@@ -49,7 +54,8 @@ func OpenDoor():
 	m_open = true
 	openSFX.play()
 	animationDelay.start()
-	collision.queue_free()
+	if Global.gameState != Global.GameState.WIN:
+		collision.disabled = true
 
 func _on_AnimationDelay_timeout():
 	sprite.play("open")
@@ -65,3 +71,8 @@ func OnCutsceneStart():
 	
 func OnCutsceneEnd():
 	Events.emit_signal("show_death_screen")
+	
+func OnCutsceneEndWin():
+	sprite.play("closeAnimation")
+	openSFX.play()
+	Events.emit_signal("unfreeze_player")

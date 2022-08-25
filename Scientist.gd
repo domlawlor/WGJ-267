@@ -3,6 +3,7 @@ extends Node2D
 onready var scientistA : AnimatedSprite = $ScientistA
 onready var scientistB : AnimatedSprite = $ScientistB
 onready var firedText : Label = $FiredText
+onready var winText : Label = $WinText
 
 var scientistUsed : AnimatedSprite
 
@@ -24,3 +25,6 @@ func SetAnimation(animation):
 	
 func ToggleText():
 	firedText.visible = !firedText.visible
+	
+func ToggleTextWin():
+	winText.visible = !winText.visible
