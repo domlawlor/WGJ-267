@@ -28,9 +28,9 @@ func _exit_tree():
 	Events.disconnect("level_complete", self, "_on_level_complete")
 	Events.disconnect("hit_time_limit", self, "_on_hit_time_limit")
 
-func _unhandled_input(event):
-	if event.is_action_pressed("debug_button_5"):
-		OpenDoor()
+#func _unhandled_input(event):
+#	if event.is_action_pressed("debug_button_5"):
+#		OpenDoor()
 
 func _on_level_complete():
 	OpenDoor()

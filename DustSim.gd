@@ -27,9 +27,9 @@ const FIRE_DUST_TEST = false
 var FLYING_DUST_GRAVITY = 2
 var FLYING_LAVA_GRAVITY = 3
 
-var enabledDebugDrawCollision = false
-var enabledDebugDrawRegions = false
-var enabledDebugDrawDirtyRects = false
+#var enabledDebugDrawCollision = false
+#var enabledDebugDrawRegions = false
+#var enabledDebugDrawDirtyRects = false
 
 const DIRTY_RECT_BOUNDARY = 1
 
@@ -798,61 +798,61 @@ func _input(event):
 			var simPos = ScreenPosToSimPos(event.position)
 			CreateBulkPixels(simPos, PixelType.DUST)
 
-func _process(event):
-	var mousePos = get_viewport().get_mouse_position()
-	var simPos = ScreenPosToSimPos(mousePos)
-	
-	if Input.is_action_just_pressed("debug_button_2"):
-		enabledDebugDrawCollision = !enabledDebugDrawCollision
-			
-	if Input.is_action_just_pressed("debug_button_4"):
-		enabledDebugDrawDirtyRects = !enabledDebugDrawDirtyRects
-		
-	if Input.is_action_pressed("fire_dust"):
-		FirePixel(simPos, PixelType.LAVA, true)
-	elif Input.is_action_pressed("spawn_bulk_pixels"):
-		CreateBulkPixels(simPos, PixelType.DUST)
-	elif Input.is_action_pressed("spawn_pixel"):
-		CreatePixels([simPos], PixelType.LAVA)
+#func _process(event):
+#	var mousePos = get_viewport().get_mouse_position()
+#	var simPos = ScreenPosToSimPos(mousePos)
+#
+#	if Input.is_action_just_pressed("debug_button_2"):
+#		enabledDebugDrawCollision = !enabledDebugDrawCollision
+#
+#	if Input.is_action_just_pressed("debug_button_4"):
+#		enabledDebugDrawDirtyRects = !enabledDebugDrawDirtyRects
+#		
+#	if Input.is_action_pressed("fire_dust"):
+#		FirePixel(simPos, PixelType.LAVA, true)
+#	elif Input.is_action_pressed("spawn_bulk_pixels"):
+#		CreateBulkPixels(simPos, PixelType.DUST)
+#	elif Input.is_action_pressed("spawn_pixel"):
+#		CreatePixels([simPos], PixelType.LAVA)
 
 func _physics_process(delta):
 	UpdateSim(delta)
-	update()
+	#update()
 
-func _draw():
-	if enabledDebugDrawCollision:
-		var rectSize = Vector2(pixelSizeScale, pixelSizeScale)
-		var pixelFinalIndex = (pixelWorldSizeX * pixelWorldSizeY) - 1
-		for i in range(pixelFinalIndex, -1, -1):
-			if pixelTypes[i] == PixelType.COLLISION or pixelTypes[i] == PixelType.LAVA:
-				var x = (i % pixelWorldSizeX) * pixelSizeScale
-				var y = floor(i / float(pixelWorldSizeX)) * pixelSizeScale
-				var pos = Vector2(x, y)
-				var rect = Rect2(pos, rectSize)
-				var c = Color(0, 1, 1, 0.9)
-				if pixelTypes[i] == PixelType.LAVA:
-					c = Color(1, 1, 0, 0.9)
-				draw_rect(rect, c, true)
-	
-	if enabledDebugDrawDirtyRects:
-		var regionSize = Vector2(REGION_SIZE * pixelSizeScale, REGION_SIZE * pixelSizeScale)
-		var regionFinalIndex = (regionWorldSizeX * regionWorldSizeY) - 1
-		for i in range(regionFinalIndex, -1, -1):
-			var posStart = ConvertRegionIndexToPosStart(i)
-
-			var scaledPos = Vector2(posStart.x * pixelSizeScale, posStart.y * pixelSizeScale)
-			var rect = Rect2(scaledPos, regionSize)
-			var regionBuffer = checkRegionsBuffers[activeRegionsBufferNum]
-			var regionDirtyRect = regionBuffer[i]
-			if regionDirtyRect:
-				draw_rect(rect, Color.gray, false)
-
-				var dirtyRect = regionDirtyRect
-				var drawDirtyRect = Rect2()
-				drawDirtyRect.position.x = dirtyRect.minX * pixelSizeScale
-				drawDirtyRect.position.y = dirtyRect.minY * pixelSizeScale
-				drawDirtyRect.end.x = (dirtyRect.maxX + 1) * pixelSizeScale
-				drawDirtyRect.end.y = (dirtyRect.maxY + 1) * pixelSizeScale
-				draw_rect(drawDirtyRect, Color.yellow, false)
-			else:
-				draw_rect(rect, Color.black, false)
+#func _draw():
+#	if enabledDebugDrawCollision:
+#		var rectSize = Vector2(pixelSizeScale, pixelSizeScale)
+#		var pixelFinalIndex = (pixelWorldSizeX * pixelWorldSizeY) - 1
+#		for i in range(pixelFinalIndex, -1, -1):
+#			if pixelTypes[i] == PixelType.COLLISION or pixelTypes[i] == PixelType.LAVA:
+#				var x = (i % pixelWorldSizeX) * pixelSizeScale
+#				var y = floor(i / float(pixelWorldSizeX)) * pixelSizeScale
+#				var pos = Vector2(x, y)
+#				var rect = Rect2(pos, rectSize)
+#				var c = Color(0, 1, 1, 0.9)
+#				if pixelTypes[i] == PixelType.LAVA:
+#					c = Color(1, 1, 0, 0.9)
+#				draw_rect(rect, c, true)
+#
+#	if enabledDebugDrawDirtyRects:
+#		var regionSize = Vector2(REGION_SIZE * pixelSizeScale, REGION_SIZE * pixelSizeScale)
+#		var regionFinalIndex = (regionWorldSizeX * regionWorldSizeY) - 1
+#		for i in range(regionFinalIndex, -1, -1):
+#			var posStart = ConvertRegionIndexToPosStart(i)
+#
+#			var scaledPos = Vector2(posStart.x * pixelSizeScale, posStart.y * pixelSizeScale)
+#			var rect = Rect2(scaledPos, regionSize)
+#			var regionBuffer = checkRegionsBuffers[activeRegionsBufferNum]
+#			var regionDirtyRect = regionBuffer[i]
+#			if regionDirtyRect:
+#				draw_rect(rect, Color.gray, false)
+#
+#				var dirtyRect = regionDirtyRect
+#				var drawDirtyRect = Rect2()
+#				drawDirtyRect.position.x = dirtyRect.minX * pixelSizeScale
+#				drawDirtyRect.position.y = dirtyRect.minY * pixelSizeScale
+#				drawDirtyRect.end.x = (dirtyRect.maxX + 1) * pixelSizeScale
+#				drawDirtyRect.end.y = (dirtyRect.maxY + 1) * pixelSizeScale
+#				draw_rect(drawDirtyRect, Color.yellow, false)
+#			else:
+#				draw_rect(rect, Color.black, false)

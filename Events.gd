@@ -23,7 +23,7 @@ signal fade_to_black_complete()
 signal fade_to_transparent()
 signal fade_to_transparent_complete()
 
-signal debug_set_player_pos(pos)
+#signal debug_set_player_pos(pos)
 
 # sfx
 signal sfx_sweep()

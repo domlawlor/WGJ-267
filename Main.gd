@@ -67,8 +67,8 @@ func _process(delta):
 	if Input.is_action_just_pressed("toggle_menu"):
 		levelList.visible = !levelList.visible
 	
-	if Input.is_action_just_pressed("debug_button_3"):
-		animationPlayer.play("deathScreen")
+#	if Input.is_action_just_pressed("debug_button_3"):
+#		animationPlayer.play("deathScreen")
 	
 	if Global.gameState == Global.GameState.BLOCKING_RESTART:
 		if Input.is_action_just_pressed("button_ui_confirm"):

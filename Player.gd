@@ -36,7 +36,7 @@ var m_voiceActive : bool
 func _ready():
 	Events.connect("ladder_climbing_activate", self, "_on_ladder_climbing_activate")
 	Events.connect("ladder_climbing_deactivate", self, "_on_ladder_climbing_deactivate")
-	Events.connect("debug_set_player_pos", self, "_on_debug_set_player_pos")
+	#Events.connect("debug_set_player_pos", self, "_on_debug_set_player_pos")
 	Events.connect("hit_time_limit", self, "_on_hit_time_limit")
 	Events.connect("player_death_animation", self, "_on_player_death_animation")
 	
@@ -46,7 +46,7 @@ func _ready():
 func _exit_tree():
 	Events.disconnect("ladder_climbing_activate", self, "_on_ladder_climbing_activate")
 	Events.disconnect("ladder_climbing_deactivate", self, "_on_ladder_climbing_deactivate")
-	Events.disconnect("debug_set_player_pos", self, "_on_debug_set_player_pos")
+	#Events.disconnect("debug_set_player_pos", self, "_on_debug_set_player_pos")
 	Events.disconnect("hit_time_limit", self, "_on_hit_time_limit")
 	Events.disconnect("player_death_animation", self, "_on_player_death_animation")
 
@@ -62,9 +62,9 @@ func ResetPlayer():
 	startSoundTimer.start()
 
 func _process(delta):
-	if Input.is_action_just_pressed("debug_button_1"):
-		var mousePos = get_viewport().get_mouse_position()
-		Events.emit_signal("debug_set_player_pos", mousePos / 2)
+#	if Input.is_action_just_pressed("debug_button_1"):
+#		var mousePos = get_viewport().get_mouse_position()
+#		Events.emit_signal("debug_set_player_pos", mousePos / 2)
 	
 	if m_state == PlayerState.FROZEN:
 		return
@@ -202,10 +202,10 @@ func _on_hit_time_limit():
 	m_state = PlayerState.FROZEN
 	animatedSprite.play("idle")
 
-func _on_debug_set_player_pos(mousePos):
-	position = mousePos
-	m_state = PlayerState.GROUND
-	m_ladderActive = false
+#func _on_debug_set_player_pos(mousePos):
+#	position = mousePos
+#	m_state = PlayerState.GROUND
+#	m_ladderActive = false
 
 func _on_RespawnTimer_timeout():
 	ResetPlayer()
