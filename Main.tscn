@@ -189,18 +189,17 @@ align = 1
 
 [node name="DeathReason" type="Label" parent="DeathScreen"]
 visible = false
-margin_top = 67.0
 margin_right = 640.0
-margin_bottom = 104.0
+margin_bottom = 37.0
 theme = ExtResource( 4 )
 text = "The lab was not clean in time"
 align = 1
 
 [node name="RetryText" type="Label" parent="DeathScreen"]
 visible = false
-margin_top = 134.0
 margin_right = 640.0
-margin_bottom = 148.0
+margin_bottom = 37.0
+theme = ExtResource( 4 )
 text = "Press action to try again"
 align = 1
 
