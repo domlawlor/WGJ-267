@@ -737,6 +737,61 @@ func GetSimPos(pos):
 	var simPosY = floor(pos.y / pixelSizeScale)
 	return Vector2(simPosX, simPosY)
 
+func IsPlayerInLava(player):
+	var deathBox = player.get_node("DeathBox")
+	var polygon = deathBox.polygon
+	
+	var boundsInit = false
+	var minX
+	var maxX
+	var minY
+	var maxY
+	
+	for vertex in polygon:
+		var xPos = vertex.x
+		var yPos = vertex.y
+		if !boundsInit:
+			boundsInit = true
+			minX = xPos
+			maxX = xPos
+			minY = yPos
+			maxY = yPos
+			continue
+		minX = min(xPos, minX)
+		maxX = max(xPos, maxX)
+		minY = min(yPos, minY)
+		maxY = max(yPos, maxY)
+	
+	#print("pos:", player.position, ", polygon:", polygon)
+	#print("minX:", minX, ", maxX:", maxX, ", minY:", minY, ", maxY:", maxY)
+	
+	var lavaCountInBounds = 0
+	
+	var simMin = GetSimPos(Vector2(minX, minY))
+	var simMax = GetSimPos(Vector2(maxX, maxY))
+	
+	var playerSimPos = GetSimPos(player.position)
+	
+	#print("playerSimPos:", playerSimPos, ", simMin:", simMin, ", simMax:", simMax)
+	
+	var xPos = simMin.x
+	var yPos = simMin.y
+	while yPos < simMax.y:
+		while xPos < simMax.x:
+			var testPos = playerSimPos + Vector2(xPos, yPos)
+			#print(xPos, ",", yPos, " - testPos:", testPos)
+			if IsInBounds(testPos):
+				var pixelType = GetPixel(testPos)
+				if pixelType == PixelType.LAVA:# or pixelType == PixelType.FLYING_LAVA:
+					lavaCountInBounds += 1
+			xPos += 1
+		yPos += 1
+	
+#	if lavaCountInBounds > 0:
+#		print("In lavaCount:", lavaCountInBounds)
+		
+	return lavaCountInBounds > 5
+
 func _input(event):
 	if event is InputEventScreenTouch:
 		if event.is_pressed():

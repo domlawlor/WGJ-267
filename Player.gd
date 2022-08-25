@@ -6,6 +6,8 @@ onready var respawnTimer = $RespawnTimer
 onready var startSoundTimer = $StartSoundTimer
 onready var voiceCooldown = $VoiceCooldown
 
+onready var dustSim = get_node("../DustSim")
+
 enum PlayerState {
 	GROUND
 	AIR
@@ -69,6 +71,12 @@ func _process(delta):
 	
 	if m_state == PlayerState.DEAD:
 		position.y += SINK_SPEED * delta
+		return
+	
+	if dustSim.IsPlayerInLava(self):
+		SetPlayerState(PlayerState.DEAD)
+		animatedSprite.play("dead")
+		respawnTimer.start()
 		return
 	
 	if Input.is_action_pressed("moveLeft"):
@@ -143,11 +151,6 @@ func _process(delta):
 				frameVel = m_velocity * delta
 		col = move_and_collide(frameVel)
 		if col != null:
-			if col.collider.is_in_group("dust_kill"):
-				SetPlayerState(PlayerState.DEAD)
-				animatedSprite.play("dead")
-				respawnTimer.start()
-				return
 			var ang = floor(rad2deg(col.get_angle()))
 			if ang == 0:
 				SetPlayerState(PlayerState.GROUND)
