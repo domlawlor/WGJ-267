@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=2]
+[gd_scene load_steps=19 format=2]
 
 [ext_resource path="res://Main.gd" type="Script" id=1]
 [ext_resource path="res://Audio/music.mp3" type="AudioStream" id=2]
@@ -12,6 +12,8 @@
 [ext_resource path="res://Audio/janitor_grunt02.wav" type="AudioStream" id=10]
 [ext_resource path="res://Audio/janitor_grunt03.wav" type="AudioStream" id=11]
 [ext_resource path="res://Audio/janitor_grunt04.wav" type="AudioStream" id=12]
+[ext_resource path="res://Levels/OverlayHaze.gd" type="Script" id=13]
+[ext_resource path="res://Art/Overlay_illumination.png" type="Texture" id=14]
 
 [sub_resource type="Animation" id=7]
 length = 0.001
@@ -107,6 +109,51 @@ tracks/3/keys = {
 "args": [  ],
 "method": "AllowRestartInput"
 } ]
+}
+
+[sub_resource type="Animation" id=8]
+resource_name = "OverlayHazeMovement"
+length = 20.0
+loop = true
+step = 1.0
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:offset")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 10, 20 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 0, 0 ), Vector2( -500, -200 ), Vector2( 0, 0 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath(".:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 10, 20 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0.156863 ), Color( 1, 1, 1, 0.27451 ), Color( 1, 1, 1, 0.156863 ) ]
+}
+
+[sub_resource type="Animation" id=9]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:offset")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( 0, 0 ) ]
 }
 
 [node name="Main" type="Control"]
@@ -248,6 +295,19 @@ volume_db = -4.0
 [node name="JanitorGrunt04" type="AudioStreamPlayer" parent="SFX"]
 stream = ExtResource( 12 )
 volume_db = -4.0
+
+[node name="OverlayHaze" type="Sprite" parent="."]
+visible = false
+modulate = Color( 1, 1, 1, 0.246518 )
+scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 14 )
+centered = false
+script = ExtResource( 13 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="OverlayHaze"]
+playback_speed = 0.7
+anims/OverlayHazeMovement = SubResource( 8 )
+anims/RESET = SubResource( 9 )
 
 [connection signal="pressed" from="Menu/LevelList/LoadLevelTitle" to="." method="_on_LoadLevelTitle_pressed"]
 [connection signal="pressed" from="Menu/LevelList/LoadLevel0" to="." method="_on_LoadLevel0_pressed"]

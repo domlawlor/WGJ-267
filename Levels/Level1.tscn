@@ -1,4 +1,4 @@
-[gd_scene load_steps=57 format=2]
+[gd_scene load_steps=53 format=2]
 
 [ext_resource path="res://Art/TileSet64.png" type="Texture" id=1]
 [ext_resource path="res://DustSim.tscn" type="PackedScene" id=2]
@@ -11,8 +11,6 @@
 [ext_resource path="res://DustSpawn.tscn" type="PackedScene" id=9]
 [ext_resource path="res://Art/ladder.png" type="Texture" id=10]
 [ext_resource path="res://Levels/Ladders.gd" type="Script" id=11]
-[ext_resource path="res://Art/Overlay_illumination.png" type="Texture" id=12]
-[ext_resource path="res://Levels/OverlayHaze.gd" type="Script" id=13]
 [ext_resource path="res://Art/BackgroundObjects/Monitor7.png" type="Texture" id=14]
 [ext_resource path="res://Art/BackgroundObjects/Web1.png" type="Texture" id=15]
 [ext_resource path="res://Art/BackgroundObjects/Generator.png" type="Texture" id=16]
@@ -396,51 +394,6 @@ points = PoolVector2Array( 64, 64, 48, 64, 48, 0, 64, 0 )
 [sub_resource type="RectangleShape2D" id=37]
 extents = Vector2( 86.5, 23.5 )
 
-[sub_resource type="Animation" id=29]
-resource_name = "OverlayHazeMovement"
-length = 20.0
-loop = true
-step = 1.0
-tracks/0/type = "value"
-tracks/0/path = NodePath(".:offset")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0, 10, 20 ),
-"transitions": PoolRealArray( 1, 1, 1 ),
-"update": 0,
-"values": [ Vector2( 0, 0 ), Vector2( -1000, -200 ), Vector2( 0, 0 ) ]
-}
-tracks/1/type = "value"
-tracks/1/path = NodePath(".:modulate")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/keys = {
-"times": PoolRealArray( 0, 10, 20 ),
-"transitions": PoolRealArray( 1, 1, 1 ),
-"update": 0,
-"values": [ Color( 1, 1, 1, 0.156863 ), Color( 1, 1, 1, 0.27451 ), Color( 1, 1, 1, 0.156863 ) ]
-}
-
-[sub_resource type="Animation" id=30]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/path = NodePath(".:offset")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 0,
-"values": [ Vector2( 0, 0 ) ]
-}
-
 [node name="Level1" type="Node2D"]
 script = ExtResource( 18 )
 
@@ -514,6 +467,7 @@ visible = false
 position = Vector2( 128, 406 )
 scale = Vector2( 2, 2 )
 frames = SubResource( 36 )
+frame = 2
 playing = true
 flip_h = true
 
@@ -580,19 +534,6 @@ DustAmount = 18
 [node name="DustSpawn3" parent="DustSpawns" instance=ExtResource( 9 )]
 position = Vector2( 418, 310 )
 DustAmount = 14
-
-[node name="OverlayHaze" type="Sprite" parent="."]
-visible = false
-modulate = Color( 1, 1, 1, 0.156863 )
-position = Vector2( 0, -100 )
-texture = ExtResource( 12 )
-centered = false
-script = ExtResource( 13 )
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="OverlayHaze"]
-playback_speed = 0.7
-anims/OverlayHazeMovement = SubResource( 29 )
-anims/RESET = SubResource( 30 )
 
 [connection signal="body_entered" from="Ladders/Area2D" to="Ladders" method="_on_Area2D_body_entered"]
 [connection signal="body_exited" from="Ladders/Area2D" to="Ladders" method="_on_Area2D_body_exited"]
