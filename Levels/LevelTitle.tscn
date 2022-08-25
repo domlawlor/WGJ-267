@@ -527,7 +527,7 @@ texture = ExtResource( 15 )
 position = Vector2( 321, 214 )
 scale = Vector2( 2, 2 )
 frames = SubResource( 36 )
-frame = 3
+frame = 1
 speed_scale = 0.99
 playing = true
 flip_h = true
@@ -568,9 +568,13 @@ DustAmount = 15
 
 [node name="LavaSpawn" parent="PixelSpawners" instance=ExtResource( 11 )]
 position = Vector2( 193, 33 )
+isFlying = true
+spawnArea = Rect2( 0, 0, 16, 0 )
 
 [node name="LavaSpawn2" parent="PixelSpawners" instance=ExtResource( 11 )]
 position = Vector2( 449, 66 )
+isFlying = true
+spawnArea = Rect2( 0, 0, 16, 0 )
 
 [node name="Sprite" type="Sprite" parent="."]
 position = Vector2( 320, 123 )

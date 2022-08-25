@@ -489,7 +489,6 @@ visible = false
 position = Vector2( 128, 406 )
 scale = Vector2( 2, 2 )
 frames = SubResource( 36 )
-frame = 3
 playing = true
 flip_h = true
 
@@ -561,11 +560,18 @@ position = Vector2( 349, 313 )
 DustAmount = 14
 
 [node name="LavaSpawn" parent="PixelSpawners" instance=ExtResource( 23 )]
-position = Vector2( 69, 292 )
+position = Vector2( 70, 282 )
+isFlying = true
+flyingDirection = Vector2( 1, 0 )
+flyingSpeed = 1.2
+spawnArea = Rect2( 0, 0, 0, 16 )
 
 [node name="LavaSpawn2" parent="PixelSpawners" instance=ExtResource( 23 )]
-position = Vector2( 571, 419 )
-DirectionLeft = true
+position = Vector2( 571, 410 )
+isFlying = true
+flyingDirection = Vector2( -1, 0 )
+flyingSpeed = 1.2
+spawnArea = Rect2( 0, 0, 0, 16 )
 
 [connection signal="body_entered" from="Ladders/Area2D" to="Ladders" method="_on_Area2D_body_entered"]
 [connection signal="body_exited" from="Ladders/Area2D" to="Ladders" method="_on_Area2D_body_exited"]
