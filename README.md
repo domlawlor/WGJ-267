@@ -1,7 +1,6 @@
 ## Nuclear Haste!  
 
 ![GameTitleScreenImage](title.png)
-![InGameImage](ingame.png)
 
 As the nuclear power plants janitor, you must clean up all the radioactive dust before the scientists return!
 Play it at https://bronxtaco.itch.io/nuclear-haste
