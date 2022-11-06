@@ -1,9 +1,9 @@
 [gd_scene load_steps=5 format=2]
 
-[ext_resource path="res://TimerScreen.gd" type="Script" id=1]
+[ext_resource path="res://Scenes/TimerScreen.gd" type="Script" id=1]
 [ext_resource path="res://Art/BackgroundObjects/Monitor4.png" type="Texture" id=2]
-[ext_resource path="res://timerScreenB.tres" type="Theme" id=3]
-[ext_resource path="res://timerScreenA.tres" type="Theme" id=4]
+[ext_resource path="res://Art/timerScreenB.tres" type="Theme" id=3]
+[ext_resource path="res://Art/timerScreenA.tres" type="Theme" id=4]
 
 [node name="TimerScreen" type="Node2D"]
 script = ExtResource( 1 )

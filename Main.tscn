@@ -2,7 +2,7 @@
 
 [ext_resource path="res://Main.gd" type="Script" id=1]
 [ext_resource path="res://Audio/music.ogg" type="AudioStream" id=2]
-[ext_resource path="res://AcidHissSound.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Scenes/AcidHissSound.tscn" type="PackedScene" id=3]
 [ext_resource path="res://deathScreen.tres" type="Theme" id=4]
 [ext_resource path="res://Audio/sweep01.mp3" type="AudioStream" id=5]
 [ext_resource path="res://Audio/janitor_startlevel01.wav" type="AudioStream" id=6]
@@ -14,11 +14,11 @@
 [ext_resource path="res://Audio/janitor_grunt04.wav" type="AudioStream" id=12]
 [ext_resource path="res://Levels/OverlayHaze.gd" type="Script" id=13]
 [ext_resource path="res://Art/Overlay_illumination.png" type="Texture" id=14]
-[ext_resource path="res://TransitionFade.tscn" type="PackedScene" id=15]
+[ext_resource path="res://Scenes/TransitionFade.tscn" type="PackedScene" id=15]
 [ext_resource path="res://Levels/StartButton.gd" type="Script" id=16]
 [ext_resource path="res://Audio/janitor_death01.wav" type="AudioStream" id=17]
 [ext_resource path="res://Audio/janitor_death02.wav" type="AudioStream" id=18]
-[ext_resource path="res://WinScreen.tscn" type="PackedScene" id=19]
+[ext_resource path="res://Scenes/WinScreen.tscn" type="PackedScene" id=19]
 
 [sub_resource type="Animation" id=7]
 length = 0.001
